@@ -2,20 +2,36 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { parseJobPosting } from "@/lib/ai/parser";
 
-// Helper to set CORS headers so your Chrome Extension can post directly to your API
 function corsHeaders() {
   return {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
   };
 }
 
-// Handle browser pre-flight OPTIONS check
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders() });
 }
 
+// GET /api/jobs - Fetch all jobs for the dashboard
+export async function GET() {
+  try {
+    const jobs = await prisma.job.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json({ success: true, jobs }, { headers: corsHeaders() });
+  } catch (error: unknown) {
+    console.error("Error fetching jobs:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch jobs" },
+      { status: 500, headers: corsHeaders() }
+    );
+  }
+}
+
+// POST /api/jobs - Save and parse new job posting
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -28,7 +44,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Get or create a default user if no userId provided
     let targetUserId = userId;
     if (!targetUserId) {
       const defaultUser = await prisma.user.upsert({
@@ -42,18 +57,15 @@ export async function POST(req: NextRequest) {
       targetUserId = defaultUser.id;
     }
 
-    // 2. Fetch user to check for resume text to pass to Claude
     const user = await prisma.user.findUnique({
       where: { id: targetUserId },
     });
 
-    // 3. Parse job posting with Claude 3.5 Haiku
     const parsedData = await parseJobPosting(
       rawText,
       user?.baseResumeText || undefined
     );
 
-    // 4. Save job record to Neon DB
     const newJob = await prisma.job.create({
       data: {
         userId: targetUserId,
