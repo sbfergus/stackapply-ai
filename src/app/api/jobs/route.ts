@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { parseJobPosting } from "@/lib/ai/parser";
+import { JobStatus } from "@prisma/client";
 
 function corsHeaders() {
   return {
@@ -14,76 +14,87 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders() });
 }
 
-// GET /api/jobs - Fetch all jobs for the dashboard
+// GET /api/jobs - List all jobs
 export async function GET() {
   try {
     const jobs = await prisma.job.findMany({
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ success: true, jobs }, { headers: corsHeaders() });
-  } catch (error: unknown) {
-    console.error("Error fetching jobs:", error);
     return NextResponse.json(
-      { error: "Failed to fetch jobs" },
+      { success: true, count: jobs.length, jobs },
+      { headers: corsHeaders() }
+    );
+  } catch (error: unknown) {
+    console.error("GET /api/jobs failed:", error);
+    return NextResponse.json(
+      {
+        error: "Failed to fetch jobs",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500, headers: corsHeaders() }
     );
   }
 }
 
-// POST /api/jobs - Save and parse new job posting
+// POST /api/jobs - Create new job (from Chrome Extension or UI)
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { rawText, sourceUrl, userId } = body;
+    const {
+      title,
+      company,
+      location,
+      workSetting,
+      salaryMin,
+      salaryMax,
+      techStack,
+      companyOverview,
+      roleSummary,
+      benefits,
+      matchScore,
+      matchReasoning,
+      sources,
+      originalUrls,
+      status,
+    } = body;
 
-    if (!rawText) {
+    if (!title || !company) {
       return NextResponse.json(
-        { error: "Missing required rawText field" },
+        { error: "Title and Company are required fields" },
         { status: 400, headers: corsHeaders() }
       );
     }
 
-    let targetUserId = userId;
-    if (!targetUserId) {
-      const defaultUser = await prisma.user.upsert({
-        where: { email: "demo@stackapply.ai" },
-        update: {},
-        create: {
+    // Get primary user (or demo user)
+    let user = await prisma.user.findFirst();
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
           email: "demo@stackapply.ai",
-          fullName: "Demo User",
+          fullName: "Scott Ferguson",
         },
       });
-      targetUserId = defaultUser.id;
     }
-
-    const user = await prisma.user.findUnique({
-      where: { id: targetUserId },
-    });
-
-    const parsedData = await parseJobPosting(
-      rawText,
-      user?.baseResumeText || undefined
-    );
 
     const newJob = await prisma.job.create({
       data: {
-        userId: targetUserId,
-        title: parsedData.title,
-        company: parsedData.company,
-        location: parsedData.location,
-        workSetting: parsedData.workSetting,
-        salaryMin: parsedData.salaryMin,
-        salaryMax: parsedData.salaryMax,
-        companyOverview: parsedData.companyOverview,
-        roleSummary: parsedData.roleSummary,
-        techStack: parsedData.techStack,
-        benefits: parsedData.benefits,
-        matchScore: parsedData.matchScore,
-        matchReasoning: parsedData.matchReasoning,
-        sources: sourceUrl ? ["Extension"] : ["Manual"],
-        originalUrls: sourceUrl ? [sourceUrl] : [],
-        status: "TO_REVIEW",
+        userId: user.id,
+        title,
+        company,
+        location: location || "Remote",
+        workSetting: workSetting || "REMOTE",
+        salaryMin: salaryMin ? Number(salaryMin) : null,
+        salaryMax: salaryMax ? Number(salaryMax) : null,
+        techStack: Array.isArray(techStack) ? techStack : [],
+        companyOverview: companyOverview || null,
+        roleSummary: roleSummary || null,
+        benefits: Array.isArray(benefits) ? benefits : [],
+        matchScore: matchScore ? Number(matchScore) : 85,
+        matchReasoning: matchReasoning || "Saved directly via StackApply Chrome Extension.",
+        sources: Array.isArray(sources) ? sources : ["Chrome Extension"],
+        originalUrls: Array.isArray(originalUrls) ? originalUrls : [],
+        status: (status as JobStatus) || JobStatus.TO_REVIEW,
       },
     });
 
@@ -92,9 +103,12 @@ export async function POST(req: NextRequest) {
       { status: 201, headers: corsHeaders() }
     );
   } catch (error: unknown) {
-    console.error("Error ingesting job:", error);
+    console.error("POST /api/jobs failed:", error);
     return NextResponse.json(
-      { error: "Failed to parse and save job posting" },
+      {
+        error: "Failed to create job",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500, headers: corsHeaders() }
     );
   }
