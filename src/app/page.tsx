@@ -17,6 +17,7 @@ import {
   RefreshCw,
   GripVertical,
 } from "lucide-react";
+import { JobDetailsDrawer } from "@/components/JobDetailsDrawer";
 
 export interface Job {
   id: string;
@@ -28,6 +29,13 @@ export interface Job {
   salaryMax?: number | null;
   techStack: string[];
   matchScore?: number | null;
+  matchReasoning?: string | null;
+  companyOverview?: string | null;
+  roleSummary?: string | null;
+  benefits?: string[];
+  sources?: string[];
+  originalUrls?: string[];
+  notes?: string | null;
   status: "TO_REVIEW" | "READY_TO_APPLY" | "APPLIED" | "INTERVIEWING";
 }
 
@@ -42,6 +50,10 @@ export default function Dashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+
+  // Selected job for the right-side details drawer
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -61,6 +73,23 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCardClick = (job: Job) => {
+    setSelectedJob(job);
+    setIsDrawerOpen(true);
+  };
+
+  const handleJobUpdated = (updatedJob: Job) => {
+    setJobs((prev) =>
+      prev.map((j) => (j.id === updatedJob.id ? updatedJob : j))
+    );
+    setSelectedJob(updatedJob);
+  };
+
+  const handleJobDeleted = (jobId: string) => {
+    setJobs((prev) => prev.filter((j) => j.id !== jobId));
+    setSelectedJob(null);
   };
 
   const handleDragEnd = async (result: DropResult) => {
@@ -92,7 +121,7 @@ export default function Dashboard() {
       });
 
       if (!res.ok) {
-        fetchJobs(); // Revert on failure
+        fetchJobs();
       }
     } catch (err) {
       console.error("Failed to update job status:", err);
@@ -191,20 +220,16 @@ export default function Dashboard() {
                                 job.workSetting &&
                                 job.location.toLowerCase().includes(job.workSetting.toLowerCase());
 
-                              // Show up to 6 tech stack items across 2 rows
-                              const MAX_TAGS = 6;
-                              const visibleTech = job.techStack.slice(0, MAX_TAGS);
-                              const remainingCount = job.techStack.length - MAX_TAGS;
-
                               const cardContent = (
                                 <div
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
+                                  onClick={() => handleCardClick(job)}
                                   style={{
                                     ...provided.draggableProps.style,
                                     zIndex: snapshot.isDragging ? 9999 : "auto",
                                   }}
-                                  className={`bg-slate-900 border border-slate-800 rounded-xl p-3.5 group select-none transition-all ${
+                                  className={`bg-slate-900 border border-slate-800 rounded-xl p-3.5 group select-none transition-all cursor-pointer ${
                                     snapshot.isDragging
                                       ? "shadow-2xl ring-2 ring-indigo-500 border-indigo-500 bg-slate-850"
                                       : "hover:border-slate-700/80 hover:shadow-md"
@@ -215,6 +240,7 @@ export default function Dashboard() {
                                     <div className="flex items-center gap-1.5 font-medium text-slate-300 min-w-0 pr-2">
                                       <div
                                         {...provided.dragHandleProps}
+                                        onClick={(e) => e.stopPropagation()}
                                         className="cursor-grab active:cursor-grabbing p-0.5 text-slate-600 hover:text-slate-300 rounded shrink-0 transition-colors"
                                       >
                                         <GripVertical className="w-3.5 h-3.5" />
@@ -230,7 +256,7 @@ export default function Dashboard() {
                                     )}
                                   </div>
 
-                                  {/* Job Title - Full Width, 2 Lines Max */}
+                                  {/* Job Title - Full Width */}
                                   <h3 className="font-semibold text-sm text-slate-100 group-hover:text-indigo-300 transition-colors line-clamp-2 leading-snug mb-2.5">
                                     {job.title}
                                   </h3>
@@ -259,7 +285,6 @@ export default function Dashboard() {
 
                                   {/* Tech Stack Pills (Strict 2-Row Layout with +X Indicator) */}
                                   {job.techStack.length > 0 && (() => {
-                                    // If 5 or fewer, display all of them across 2 rows cleanly
                                     const hasOverflow = job.techStack.length > 5;
                                     const visibleTech = hasOverflow ? job.techStack.slice(0, 4) : job.techStack;
                                     const hiddenCount = job.techStack.length - 4;
@@ -303,6 +328,15 @@ export default function Dashboard() {
           })}
         </div>
       </DragDropContext>
+
+      {/* Right-Side Slide-Over Job Details Drawer */}
+      <JobDetailsDrawer
+        job={selectedJob}
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        onJobUpdated={handleJobUpdated}
+        onJobDeleted={handleJobDeleted}
+      />
     </div>
   );
 }

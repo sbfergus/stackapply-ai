@@ -14,6 +14,7 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders() });
 }
 
+// PATCH /api/jobs/[id] - Update job status or notes
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -21,7 +22,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await req.json();
-    const { status, note } = body;
+    const { status, notes, note } = body;
 
     const existingJob = await prisma.job.findUnique({
       where: { id },
@@ -37,7 +38,6 @@ export async function PATCH(
     const updateData: { status?: JobStatus; notes?: string } = {};
 
     if (status) {
-      // Map directly through the Prisma JobStatus enum object
       const enumValue = JobStatus[status as keyof typeof JobStatus];
       if (enumValue) {
         updateData.status = enumValue;
@@ -49,8 +49,9 @@ export async function PATCH(
       }
     }
 
-    if (note !== undefined) {
-      updateData.notes = note;
+    const noteContent = notes ?? note;
+    if (noteContent !== undefined) {
+      updateData.notes = noteContent;
     }
 
     const updatedJob = await prisma.job.update({
@@ -67,6 +68,34 @@ export async function PATCH(
     return NextResponse.json(
       {
         error: "Failed to update job",
+        details: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500, headers: corsHeaders() }
+    );
+  }
+}
+
+// DELETE /api/jobs/[id] - Remove a job
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    await prisma.job.delete({
+      where: { id },
+    });
+
+    return NextResponse.json(
+      { success: true, message: "Job deleted" },
+      { headers: corsHeaders() }
+    );
+  } catch (error: unknown) {
+    console.error("DELETE /api/jobs/[id] failed:", error);
+    return NextResponse.json(
+      {
+        error: "Failed to delete job",
         details: error instanceof Error ? error.message : String(error),
       },
       { status: 500, headers: corsHeaders() }
