@@ -6,8 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
-  },
+    "lint": "next lint",
+    "postinstall": "prisma generate"
+},
   "dependencies": {
     "@anthropic-ai/sdk": "^0.116.0",
     "@hello-pangea/dnd": "^18.0.1",
