@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                  String     @id @default(uuid())
+  email               String     @unique
+  fullName            String?
+  avatarUrl           String?
+  linkedinUrl         String?
+  linkedinData        Json?
+  baseResumeText      String?
+  baseCoverLetter     String?
+  writingStyle        Json?
+
+  // 🎯 User Onboarding & Job Preferences
+  preferredWorkTypes  WorkType[] @default([REMOTE, HYBRID])
+  preferredTechStack  String[]   // e.g. ["Next.js", "TypeScript", "Tailwind"]
+  targetSalaryMin     Int?       // e.g. 140000
+  preferredLocations  String[]   // e.g. ["Denver, CO", "Remote"]
+
+  jobs                Job[]
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+}
+
+model Job {
+  id                 String    @id @default(uuid())
+  userId             String
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title              String
+  company            String
+  location           String
+  workSetting        WorkType  @default(HYBRID)
+  salaryMin          Int?
+  salaryMax          Int?
+  sources            String[]
+  originalUrls       String[]
+  companyOverview    String
+  roleSummary        String
+  techStack          String[]
+  benefits           Json
+  status             JobStatus @default(TO_REVIEW)
+
+  // 📊 Scoring & Metrics
+  matchScore         Int?      // Candidate Fit (0-100%): Skills/Experience match
+  preferenceScore    Int?      // Job Fit (0-100%): Work type, Tech, Salary match
+  matchReasoning     String?   // Concise 1-sentence breakdown for UI hover tooltips
+
+  tailoredResumeText String?
+  coverLetterText    String?
+  appliedAt          DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([userId, status])
+}
+
+enum WorkType {
+  REMOTE
+  HYBRID
+  IN_OFFICE
+}
+
+enum JobStatus {
+  TO_REVIEW
+  READY
+  APPLIED
+  INTERVIEWING
+  ARCHIVED
+}
