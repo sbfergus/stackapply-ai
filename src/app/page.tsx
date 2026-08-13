@@ -186,6 +186,16 @@ export default function Dashboard() {
                             {(provided, snapshot) => {
                               const usePortal = snapshot.isDragging;
 
+                              const isRedundantSetting =
+                                job.location &&
+                                job.workSetting &&
+                                job.location.toLowerCase().includes(job.workSetting.toLowerCase());
+
+                              // Show up to 6 tech stack items across 2 rows
+                              const MAX_TAGS = 6;
+                              const visibleTech = job.techStack.slice(0, MAX_TAGS);
+                              const remainingCount = job.techStack.length - MAX_TAGS;
+
                               const cardContent = (
                                 <div
                                   ref={provided.innerRef}
@@ -194,25 +204,23 @@ export default function Dashboard() {
                                     ...provided.draggableProps.style,
                                     zIndex: snapshot.isDragging ? 9999 : "auto",
                                   }}
-                                  className={`bg-slate-900 border border-slate-800 rounded-xl p-4 group select-none ${
+                                  className={`bg-slate-900 border border-slate-800 rounded-xl p-3.5 group select-none transition-all ${
                                     snapshot.isDragging
                                       ? "shadow-2xl ring-2 ring-indigo-500 border-indigo-500 bg-slate-850"
-                                      : "hover:border-slate-700"
+                                      : "hover:border-slate-700/80 hover:shadow-md"
                                   }`}
                                 >
-                                  {/* Top row with explicit drag handle */}
-                                  <div className="flex items-center justify-between gap-2 mb-2">
-                                    <div className="flex items-center gap-2">
-                                      {/* Drag Handle Icon */}
+                                  {/* Top Meta Row: Drag Handle + Company & Match Score */}
+                                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                                    <div className="flex items-center gap-1.5 font-medium text-slate-300 min-w-0 pr-2">
                                       <div
                                         {...provided.dragHandleProps}
-                                        className="cursor-grab active:cursor-grabbing p-1 text-slate-600 hover:text-slate-300 rounded"
+                                        className="cursor-grab active:cursor-grabbing p-0.5 text-slate-600 hover:text-slate-300 rounded shrink-0 transition-colors"
                                       >
-                                        <GripVertical className="w-4 h-4" />
+                                        <GripVertical className="w-3.5 h-3.5" />
                                       </div>
-                                      <h3 className="font-semibold text-sm text-slate-100 line-clamp-1">
-                                        {job.title}
-                                      </h3>
+                                      <Building2 className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                      <span className="truncate">{job.company}</span>
                                     </div>
 
                                     {job.matchScore && (
@@ -222,50 +230,58 @@ export default function Dashboard() {
                                     )}
                                   </div>
 
-                                  <div className="space-y-1 text-xs text-slate-400 mb-3 ml-6">
-                                    <div className="flex items-center gap-1.5">
-                                      <Building2 className="w-3.5 h-3.5 text-slate-500" />
-                                      <span>{job.company}</span>
-                                    </div>
+                                  {/* Job Title - Full Width, 2 Lines Max */}
+                                  <h3 className="font-semibold text-sm text-slate-100 group-hover:text-indigo-300 transition-colors line-clamp-2 leading-snug mb-2.5">
+                                    {job.title}
+                                  </h3>
+
+                                  {/* Dedicated Metadata Rows */}
+                                  <div className="space-y-1 text-xs text-slate-400 mb-3">
                                     {job.location && (
-                                      <div className="flex items-center gap-1.5">
-                                        <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                                      <div className="flex items-center gap-1.5 text-slate-400">
+                                        <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                        <span className="truncate">
+                                          {job.location}
+                                          {!isRedundantSetting && job.workSetting && ` (${job.workSetting})`}
+                                        </span>
+                                      </div>
+                                    )}
+
+                                    {(job.salaryMin || job.salaryMax) && (
+                                      <div className="flex items-center gap-1 font-medium text-emerald-400/90">
+                                        <DollarSign className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                                         <span>
-                                          {job.location}{" "}
-                                          {job.workSetting &&
-                                            `(${job.workSetting})`}
+                                          ${(job.salaryMin! / 1000).toFixed(0)}k - ${(job.salaryMax! / 1000).toFixed(0)}k
                                         </span>
                                       </div>
                                     )}
                                   </div>
 
-                                  {(job.salaryMin || job.salaryMax) && (
-                                    <div className="flex items-center gap-1 text-xs font-medium text-emerald-400/90 mb-3 bg-emerald-950/30 border border-emerald-900/30 rounded-lg px-2.5 py-1 ml-6">
-                                      <DollarSign className="w-3.5 h-3.5" />
-                                      <span>
-                                        ${(job.salaryMin! / 1000).toFixed(0)}k -
-                                        ${(job.salaryMax! / 1000).toFixed(0)}k
-                                      </span>
-                                    </div>
-                                  )}
+                                  {/* Tech Stack Pills (Strict 2-Row Layout with +X Indicator) */}
+                                  {job.techStack.length > 0 && (() => {
+                                    // If 5 or fewer, display all of them across 2 rows cleanly
+                                    const hasOverflow = job.techStack.length > 5;
+                                    const visibleTech = hasOverflow ? job.techStack.slice(0, 4) : job.techStack;
+                                    const hiddenCount = job.techStack.length - 4;
 
-                                  {job.techStack.length > 0 && (
-                                    <div className="flex flex-wrap gap-1 ml-6">
-                                      {job.techStack.slice(0, 3).map((tech) => (
-                                        <span
-                                          key={tech}
-                                          className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700/50"
-                                        >
-                                          {tech}
-                                        </span>
-                                      ))}
-                                      {job.techStack.length > 3 && (
-                                        <span className="text-[10px] text-slate-500 self-center">
-                                          +{job.techStack.length - 3}
-                                        </span>
-                                      )}
-                                    </div>
-                                  )}
+                                    return (
+                                      <div className="flex flex-wrap gap-1.5 max-h-[52px] overflow-hidden">
+                                        {visibleTech.map((tech) => (
+                                          <span
+                                            key={tech}
+                                            className="text-[10px] bg-slate-800/80 text-slate-300 px-2 py-0.5 rounded border border-slate-700/50 font-mono h-fit"
+                                          >
+                                            {tech}
+                                          </span>
+                                        ))}
+                                        {hasOverflow && (
+                                          <span className="text-[10px] bg-slate-800/40 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800 font-mono h-fit">
+                                            +{hiddenCount}
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
                               );
 

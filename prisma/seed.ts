@@ -22,6 +22,7 @@ async function main() {
     },
   });
 
+  // Job 1: Existing Demo Job
   await prisma.job.create({
     data: {
       userId: user.id,
@@ -43,7 +44,29 @@ async function main() {
     },
   });
 
-  console.log("Database seeded successfully with demo job!");
+  // Job 2: Second Demo Job to test multi-card column layout
+  await prisma.job.create({
+    data: {
+      userId: user.id,
+      title: "Senior React / Next.js Engineer",
+      company: "Vercel Labs",
+      location: "Remote",
+      workSetting: "REMOTE",
+      salaryMin: 165000,
+      salaryMax: 195000,
+      companyOverview: "Vercel is the platform for frontend developers, providing developer speed and reliability.",
+      roleSummary: "Building Next.js App Router features and developer experience tooling.",
+      techStack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "GraphQL", "SCSS", "JAVA", "COBALT"],
+      benefits: ["Remote stipend", "Flexible hours", "Full health benefits"],
+      matchScore: 96,
+      matchReasoning: "Exceptional match for modern frontend architecture and Next.js performance optimization.",
+      status: "TO_REVIEW",
+      sources: ["Manual"],
+      originalUrls: ["https://example.com/job/456"],
+    },
+  });
+
+  console.log("Database seeded successfully with multiple demo jobs!");
 }
 
 main()
