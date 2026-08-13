@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { JobStatus } from "@prisma/client";
+import { JobStatus, WorkType } from "@prisma/client";
 
 function corsHeaders() {
   return {
@@ -12,6 +12,30 @@ function corsHeaders() {
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders() });
+}
+
+// Safely normalize any incoming work setting string to a valid WorkType enum
+function parseWorkType(input?: string | null): WorkType {
+  if (!input) return WorkType.REMOTE;
+
+  const normalized = input.toUpperCase().replace(/[^A-Z]/g, "");
+
+  if (normalized.includes("HYBRID")) return WorkType.HYBRID;
+  if (
+    normalized.includes("SITE") ||
+    normalized.includes("OFFICE") ||
+    normalized.includes("PERSON")
+  ) {
+    return (
+      (WorkType as Record<string, WorkType>).ONSITE ||
+      (WorkType as Record<string, WorkType>).ON_SITE ||
+      WorkType.REMOTE
+    );
+  }
+
+  if (normalized.includes("REMOTE")) return WorkType.REMOTE;
+
+  return (WorkType as Record<string, WorkType>)[normalized] || WorkType.REMOTE;
 }
 
 // GET /api/jobs - List all jobs
@@ -77,22 +101,27 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const validatedWorkSetting = parseWorkType(workSetting);
+
     const newJob = await prisma.job.create({
       data: {
-        userId: user.id,
+        user: {
+          connect: { id: user.id },
+        },
         title,
         company,
         location: location || "Remote",
-        workSetting: workSetting || "REMOTE",
+        workSetting: validatedWorkSetting,
         salaryMin: salaryMin ? Number(salaryMin) : null,
         salaryMax: salaryMax ? Number(salaryMax) : null,
         techStack: Array.isArray(techStack) ? techStack : [],
-        companyOverview: companyOverview || null,
-        roleSummary: roleSummary || null,
+        companyOverview: companyOverview || "",
+        roleSummary: roleSummary || "",
         benefits: Array.isArray(benefits) ? benefits : [],
         matchScore: matchScore ? Number(matchScore) : 85,
-        matchReasoning: matchReasoning || "Saved directly via StackApply Chrome Extension.",
-        sources: Array.isArray(sources) ? sources : ["Chrome Extension"],
+        matchReasoning:
+          matchReasoning || "Saved directly via StackApply Dashboard.",
+        sources: Array.isArray(sources) ? sources : ["Manual Entry"],
         originalUrls: Array.isArray(originalUrls) ? originalUrls : [],
         status: (status as JobStatus) || JobStatus.TO_REVIEW,
       },

@@ -16,8 +16,10 @@ import {
   Sparkles,
   RefreshCw,
   GripVertical,
+  Plus,
 } from "lucide-react";
 import { JobDetailsDrawer } from "@/components/JobDetailsDrawer";
+import { AddJobModal } from "@/components/AddJobModal";
 
 export interface Job {
   id: string;
@@ -51,9 +53,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Selected job for the right-side details drawer
+  // Drawer and Modal States
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -90,6 +93,10 @@ export default function Dashboard() {
   const handleJobDeleted = (jobId: string) => {
     setJobs((prev) => prev.filter((j) => j.id !== jobId));
     setSelectedJob(null);
+  };
+
+  const handleJobAdded = (newJob: Job) => {
+    setJobs((prev) => [newJob, ...prev]);
   };
 
   const handleDragEnd = async (result: DropResult) => {
@@ -151,12 +158,21 @@ export default function Dashboard() {
 
         <div className="flex items-center gap-3">
           <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-md shadow-indigo-600/20 transition"
+          >
+            <Plus className="w-4 h-4" />
+            Add Job
+          </button>
+
+          <button
             onClick={fetchJobs}
             className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-900 border border-slate-800 rounded-lg hover:bg-slate-800 hover:text-white transition"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
             Refresh
           </button>
+
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-950/60 border border-indigo-800/40 text-indigo-300 text-xs font-medium">
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
             Claude 3.5 Active
@@ -235,7 +251,7 @@ export default function Dashboard() {
                                       : "hover:border-slate-700/80 hover:shadow-md"
                                   }`}
                                 >
-                                  {/* Top Meta Row: Drag Handle + Company & Match Score */}
+                                  {/* Top Meta Row */}
                                   <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
                                     <div className="flex items-center gap-1.5 font-medium text-slate-300 min-w-0 pr-2">
                                       <div
@@ -256,7 +272,7 @@ export default function Dashboard() {
                                     )}
                                   </div>
 
-                                  {/* Job Title - Full Width */}
+                                  {/* Job Title */}
                                   <h3 className="font-semibold text-sm text-slate-100 group-hover:text-indigo-300 transition-colors line-clamp-2 leading-snug mb-2.5">
                                     {job.title}
                                   </h3>
@@ -283,7 +299,7 @@ export default function Dashboard() {
                                     )}
                                   </div>
 
-                                  {/* Tech Stack Pills (Strict 2-Row Layout with +X Indicator) */}
+                                  {/* Tech Stack Pills */}
                                   {job.techStack.length > 0 && (() => {
                                     const hasOverflow = job.techStack.length > 5;
                                     const visibleTech = hasOverflow ? job.techStack.slice(0, 4) : job.techStack;
@@ -329,13 +345,20 @@ export default function Dashboard() {
         </div>
       </DragDropContext>
 
-      {/* Right-Side Slide-Over Job Details Drawer */}
+      {/* Slide-Over Job Details Drawer */}
       <JobDetailsDrawer
         job={selectedJob}
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         onJobUpdated={handleJobUpdated}
         onJobDeleted={handleJobDeleted}
+      />
+
+      {/* Manual Add Job Modal */}
+      <AddJobModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onJobAdded={handleJobAdded}
       />
     </div>
   );
