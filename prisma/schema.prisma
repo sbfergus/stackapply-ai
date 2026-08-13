@@ -71,8 +71,9 @@ enum WorkType {
 
 enum JobStatus {
   TO_REVIEW
-  READY
+  READY_TO_APPLY
   APPLIED
   INTERVIEWING
-  ARCHIVED
+  REJECTED
+  OFFER
 }
