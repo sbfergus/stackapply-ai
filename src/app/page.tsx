@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { JobDetailsDrawer } from "@/components/JobDetailsDrawer";
 import { AddJobModal } from "@/components/AddJobModal";
+import { ExtensionDownloadButton } from "@/components/ExtensionDownloadButton";
 
 export interface Job {
   id: string;
@@ -52,11 +53,9 @@ const STAGES = [
 // Helper function to format salary
 const formatSalary = (amount: number): string => {
   if (amount >= 1000000) {
-    // For millions, show up to 2 decimal places, remove trailing zeros
     const millions = amount / 1000000;
     return `$${millions % 1 === 0 ? millions.toFixed(0) : millions.toFixed(2).replace(/\.?0+$/, '')}M`;
   } else {
-    // For thousands
     return `$${(amount / 1000).toFixed(0)}k`;
   }
 };
@@ -64,7 +63,6 @@ const formatSalary = (amount: number): string => {
 // Skeleton card component
 const SkeletonJobCard = () => (
   <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 animate-pulse">
-    {/* Top meta row */}
     <div className="flex items-center justify-between mb-2">
       <div className="flex items-center gap-1.5">
         <div className="w-3.5 h-3.5 bg-slate-800 rounded" />
@@ -74,16 +72,13 @@ const SkeletonJobCard = () => (
       <div className="h-4 w-16 bg-slate-800 rounded-full" />
     </div>
     
-    {/* Title */}
     <div className="h-4 w-full bg-slate-800 rounded mb-2.5" />
     
-    {/* Metadata */}
     <div className="space-y-1 mb-3">
       <div className="h-3 w-3/4 bg-slate-800 rounded" />
       <div className="h-3 w-1/2 bg-slate-800 rounded" />
     </div>
     
-    {/* Tech stack pills */}
     <div className="flex flex-wrap gap-1.5">
       <div className="h-5 w-16 bg-slate-800 rounded" />
       <div className="h-5 w-20 bg-slate-800 rounded" />
@@ -112,7 +107,6 @@ export default function Dashboard() {
   useEffect(() => {
     setIsMounted(true);
     
-    // Load cached skeleton counts from localStorage
     const cached = localStorage.getItem('jobColumnCounts');
     if (cached) {
       try {
@@ -125,7 +119,6 @@ export default function Dashboard() {
     fetchJobs();
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = () => {
       if (openDropdownId) {
@@ -145,7 +138,6 @@ export default function Dashboard() {
       if (data.success) {
         setJobs(data.jobs);
         
-        // Calculate and cache column counts for next time
         const counts = STAGES.reduce((acc, stage) => {
           acc[stage.id] = data.jobs.filter((j: Job) => j.status === stage.id).length;
           return acc;
@@ -183,15 +175,12 @@ export default function Dashboard() {
   };
 
   const handleStatusChangeFromDropdown = async (jobId: string, newStatus: Job["status"]) => {
-    // Close dropdown
     setOpenDropdownId(null);
 
-    // Optimistic update
     setJobs((prevJobs) =>
       prevJobs.map((job) => {
         if (job.id === jobId) {
           const updatedJob = { ...job, status: newStatus };
-          // Also update selectedJob if this is the currently viewed job
           if (selectedJob?.id === jobId) {
             setSelectedJob(updatedJob);
           }
@@ -201,7 +190,6 @@ export default function Dashboard() {
       })
     );
 
-    // Persist to API
     try {
       const res = await fetch(`/api/jobs/${jobId}`, {
         method: "PATCH",
@@ -231,12 +219,10 @@ export default function Dashboard() {
 
     const newStatus = destination.droppableId as Job["status"];
 
-    // 1. Optimistic state update
     setJobs((prevJobs) =>
       prevJobs.map((job) => {
         if (job.id === draggableId) {
           const updatedJob = { ...job, status: newStatus };
-          // Also update selectedJob if this is the currently viewed job
           if (selectedJob?.id === draggableId) {
             setSelectedJob(updatedJob);
           }
@@ -246,7 +232,6 @@ export default function Dashboard() {
       })
     );
 
-    // 2. Persist to API
     try {
       const res = await fetch(`/api/jobs/${draggableId}`, {
         method: "PATCH",
@@ -284,6 +269,8 @@ export default function Dashboard() {
         </div>
 
         <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
+          <ExtensionDownloadButton />
+
           <button
             onClick={() => setIsAddModalOpen(true)}
             className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-md shadow-indigo-600/20 transition whitespace-nowrap"
@@ -338,7 +325,6 @@ export default function Dashboard() {
                       }`}
                     >
                       {loading ? (
-                        // Show skeleton cards while loading
                         Array.from({ length: skeletonCounts[stage.id] || 0 }).map((_, i) => (
                           <SkeletonJobCard key={`skeleton-${stage.id}-${i}`} />
                         ))
@@ -358,7 +344,6 @@ export default function Dashboard() {
                             {(provided, snapshot) => {
                               const usePortal = snapshot.isDragging;
 
-                              // Simple logic: show max 5 pills, then "+#" if more exist
                               const maxVisible = 5;
                               const hasOverflow = job.techStack.length > maxVisible;
                               const visibleTech = hasOverflow ? job.techStack.slice(0, maxVisible) : job.techStack;
@@ -387,9 +372,7 @@ export default function Dashboard() {
                                   {/* Top Meta Row */}
                                   <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
                                     <div className="flex items-center gap-1.5 font-medium text-slate-300 min-w-0 pr-2">
-                                      {/* Desktop: Drag handle, Mobile: Status dropdown */}
                                       <div className="relative">
-                                        {/* Drag Handle (hidden on mobile) */}
                                         <div
                                           {...provided.dragHandleProps}
                                           onClick={(e) => e.stopPropagation()}
@@ -398,7 +381,6 @@ export default function Dashboard() {
                                           <GripVertical className="w-3.5 h-3.5" />
                                         </div>
 
-                                        {/* Dropdown Toggle (visible on mobile only) */}
                                         <button
                                           onClick={(e) => {
                                             e.stopPropagation();
@@ -409,7 +391,6 @@ export default function Dashboard() {
                                           <ChevronDown className="w-3.5 h-3.5" />
                                         </button>
 
-                                        {/* Dropdown Menu */}
                                         {openDropdownId === job.id && (
                                           <div className="absolute top-full left-0 mt-1 z-50 bg-slate-800 border border-slate-700 rounded-lg shadow-xl py-1 min-w-[160px]">
                                             {STAGES.map((stage) => (
@@ -453,7 +434,7 @@ export default function Dashboard() {
                                         <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                                         <span className="truncate">
                                           {job.location}
-                                          {!isRedundantSetting && job.workSetting && ` (${job.workSetting})`}
+                                          {!isRedundantSetting && job.workSetting && ` (${job.workSetting === "IN_OFFICE" ? "In-Office" : job.workSetting})`}
                                         </span>
                                       </div>
                                     )}
