@@ -17,6 +17,7 @@ import {
   RefreshCw,
   GripVertical,
   Plus,
+  ChevronDown,
 } from "lucide-react";
 import { JobDetailsDrawer } from "@/components/JobDetailsDrawer";
 import { AddJobModal } from "@/components/AddJobModal";
@@ -52,6 +53,7 @@ export default function Dashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   // Drawer and Modal States
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -62,6 +64,18 @@ export default function Dashboard() {
     setIsMounted(true);
     fetchJobs();
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (openDropdownId) {
+        setOpenDropdownId(null);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [openDropdownId]);
 
   const fetchJobs = async () => {
     try {
@@ -97,6 +111,34 @@ export default function Dashboard() {
 
   const handleJobAdded = (newJob: Job) => {
     setJobs((prev) => [newJob, ...prev]);
+  };
+
+  const handleStatusChangeFromDropdown = async (jobId: string, newStatus: Job["status"]) => {
+    // Close dropdown
+    setOpenDropdownId(null);
+
+    // Optimistic update
+    setJobs((prevJobs) =>
+      prevJobs.map((job) =>
+        job.id === jobId ? { ...job, status: newStatus } : job
+      )
+    );
+
+    // Persist to API
+    try {
+      const res = await fetch(`/api/jobs/${jobId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!res.ok) {
+        fetchJobs();
+      }
+    } catch (err) {
+      console.error("Failed to update job status:", err);
+      fetchJobs();
+    }
   };
 
   const handleDragEnd = async (result: DropResult) => {
@@ -260,13 +302,49 @@ export default function Dashboard() {
                                   {/* Top Meta Row */}
                                   <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
                                     <div className="flex items-center gap-1.5 font-medium text-slate-300 min-w-0 pr-2">
-                                      <div
-                                        {...provided.dragHandleProps}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="cursor-grab active:cursor-grabbing p-0.5 text-slate-600 hover:text-slate-300 rounded shrink-0 transition-colors"
-                                      >
-                                        <GripVertical className="w-3.5 h-3.5" />
+                                      {/* Desktop: Drag handle, Mobile: Status dropdown */}
+                                      <div className="relative">
+                                        {/* Drag Handle (hidden on mobile) */}
+                                        <div
+                                          {...provided.dragHandleProps}
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="hidden md:block cursor-grab active:cursor-grabbing p-0.5 text-slate-600 hover:text-slate-300 rounded shrink-0 transition-colors"
+                                        >
+                                          <GripVertical className="w-3.5 h-3.5" />
+                                        </div>
+
+                                        {/* Dropdown Toggle (visible on mobile only) */}
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setOpenDropdownId(openDropdownId === job.id ? null : job.id);
+                                          }}
+                                          className="md:hidden p-0.5 text-slate-600 hover:text-slate-300 rounded shrink-0 transition-colors"
+                                        >
+                                          <ChevronDown className="w-3.5 h-3.5" />
+                                        </button>
+
+                                        {/* Dropdown Menu */}
+                                        {openDropdownId === job.id && (
+                                          <div className="absolute top-full left-0 mt-1 z-50 bg-slate-800 border border-slate-700 rounded-lg shadow-xl py-1 min-w-[160px]">
+                                            {STAGES.map((stage) => (
+                                              <button
+                                                key={stage.id}
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleStatusChangeFromDropdown(job.id, stage.id as Job["status"]);
+                                                }}
+                                                className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-700 transition ${
+                                                  job.status === stage.id ? "text-indigo-400 font-semibold" : "text-slate-300"
+                                                }`}
+                                              >
+                                                {stage.label}
+                                              </button>
+                                            ))}
+                                          </div>
+                                        )}
                                       </div>
+
                                       <Building2 className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                                       <span className="truncate">{job.company}</span>
                                     </div>
