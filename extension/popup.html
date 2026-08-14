@@ -2,145 +2,147 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Save to StackApply AI</title>
   <style>
     body {
       width: 340px;
-      margin: 0;
       padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: #0f172a;
       color: #f8fafc;
-      box-sizing: border-box;
+      margin: 0;
     }
     .header {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
-    .logo {
-      width: 24px;
-      height: 24px;
-      background: #4f46e5;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 12px;
-    }
-    h2 {
-      font-size: 15px;
+    .header h2 {
+      font-size: 16px;
       font-weight: 700;
       margin: 0;
-      background: linear-gradient(to right, #ffffff, #cbd5e1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #f8fafc;
     }
-    .form-group {
-      margin-bottom: 10px;
+    .field-group {
+      margin-bottom: 12px;
+    }
+    .field-row {
+      display: flex;
+      gap: 8px;
+    }
+    .field-row .field-group {
+      flex: 1;
     }
     label {
       display: block;
       font-size: 11px;
       font-weight: 600;
-      color: #94a3b8;
       text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
       margin-bottom: 4px;
     }
     input, select, textarea {
       width: 100%;
-      padding: 8px 10px;
-      font-size: 12px;
+      box-sizing: border-box;
       background-color: #1e293b;
       border: 1px solid #334155;
-      border-radius: 8px;
-      color: #f1f5f9;
-      box-sizing: border-box;
+      border-radius: 6px;
+      padding: 8px;
+      color: #f8fafc;
+      font-size: 13px;
       outline: none;
+      font-family: inherit;
     }
     input:focus, select:focus, textarea:focus {
       border-color: #6366f1;
     }
-    .tech-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-top: 4px;
+    textarea {
+      resize: vertical;
+      min-height: 50px;
     }
-    .tag {
-      font-size: 10px;
-      background-color: #334155;
-      color: #e2e8f0;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: monospace;
-    }
-    .btn {
+    button {
       width: 100%;
       padding: 10px;
-      margin-top: 12px;
       background-color: #4f46e5;
-      color: white;
+      color: #ffffff;
       border: none;
-      border-radius: 8px;
-      font-size: 13px;
+      border-radius: 6px;
       font-weight: 600;
+      font-size: 14px;
       cursor: pointer;
+      margin-top: 8px;
       transition: background-color 0.2s;
     }
-    .btn:hover {
+    button:hover {
       background-color: #4338ca;
     }
-    .btn:disabled {
-      opacity: 0.6;
+    button:disabled {
+      background-color: #334155;
       cursor: not-allowed;
     }
-    .status-msg {
+    .status {
       margin-top: 10px;
-      font-size: 11px;
+      font-size: 12px;
       text-align: center;
-      display: none;
     }
-    .status-msg.success {
-      color: #34d399;
-      display: block;
-    }
-    .status-msg.error {
-      color: #f87171;
-      display: block;
-    }
+    .status.success { color: #4ade80; }
+    .status.error { color: #f87171; }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="logo">⚡</div>
-    <h2>StackApply AI</h2>
+    <h2>⚡ StackApply AI</h2>
   </div>
 
-  <div class="form-group">
-    <label>Job Title</label>
+  <div class="field-group">
+    <label for="title">Job Title</label>
     <input type="text" id="title" placeholder="e.g. Senior Frontend Engineer" />
   </div>
 
-  <div class="form-group">
-    <label>Company</label>
+  <div class="field-group">
+    <label for="company">Company</label>
     <input type="text" id="company" placeholder="e.g. Vercel" />
   </div>
 
-  <div class="form-group">
-    <label>Location / Work Setting</label>
-    <input type="text" id="location" placeholder="e.g. Remote (US)" />
+  <div class="field-row">
+    <div class="field-group">
+      <label for="location">Location</label>
+      <input type="text" id="location" placeholder="e.g. Denver, CO" />
+    </div>
+    <div class="field-group">
+      <label for="workSetting">Setting</label>
+      <select id="workSetting">
+        <option value="REMOTE">Remote</option>
+        <option value="HYBRID">Hybrid</option>
+        <option value="IN_OFFICE">In-Office</option>
+      </select>
+    </div>
   </div>
 
-  <div class="form-group">
-    <label>Detected Tech Stack</label>
+  <div class="field-row">
+    <div class="field-group">
+      <label for="salaryMin">Min Salary ($)</label>
+      <input type="number" id="salaryMin" placeholder="130000" />
+    </div>
+    <div class="field-group">
+      <label for="salaryMax">Max Salary ($)</label>
+      <input type="number" id="salaryMax" placeholder="170000" />
+    </div>
+  </div>
+
+  <div class="field-group">
+    <label for="techStack">Tech Stack</label>
     <input type="text" id="techStack" placeholder="React, TypeScript, Next.js" />
   </div>
 
-  <button class="btn" id="saveBtn">Save to Dashboard</button>
-  <div id="statusMsg" class="status-msg"></div>
+  <div class="field-group">
+    <label for="roleSummary">Role Summary</label>
+    <textarea id="roleSummary" placeholder="Brief job overview..."></textarea>
+  </div>
+
+  <button id="save-btn">Save to Dashboard</button>
+  <div id="status" class="status"></div>
 
   <script src="popup.js"></script>
 </body>

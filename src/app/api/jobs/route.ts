@@ -14,28 +14,32 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders() });
 }
 
-// Safely normalize any incoming work setting string to a valid WorkType enum
+// Safely normalize any incoming work setting string to exact WorkType enum: REMOTE | HYBRID | IN_OFFICE
 function parseWorkType(input?: string | null): WorkType {
   if (!input) return WorkType.REMOTE;
 
   const normalized = input.toUpperCase().replace(/[^A-Z]/g, "");
 
-  if (normalized.includes("HYBRID")) return WorkType.HYBRID;
+  // 1. Hybrid
+  if (normalized.includes("HYBRID")) {
+    return WorkType.HYBRID;
+  }
+
+  // 2. In-Office / On-Site (Maps directly to WorkType.IN_OFFICE)
   if (
     normalized.includes("SITE") ||
     normalized.includes("OFFICE") ||
     normalized.includes("PERSON")
   ) {
-    return (
-      (WorkType as Record<string, WorkType>).ONSITE ||
-      (WorkType as Record<string, WorkType>).ON_SITE ||
-      WorkType.REMOTE
-    );
+    return WorkType.IN_OFFICE;
   }
 
-  if (normalized.includes("REMOTE")) return WorkType.REMOTE;
+  // 3. Remote
+  if (normalized.includes("REMOTE")) {
+    return WorkType.REMOTE;
+  }
 
-  return (WorkType as Record<string, WorkType>)[normalized] || WorkType.REMOTE;
+  return WorkType.REMOTE;
 }
 
 // GET /api/jobs - List all jobs
@@ -61,7 +65,7 @@ export async function GET() {
   }
 }
 
-// POST /api/jobs - Create new job (from Chrome Extension or UI)
+// POST /api/jobs - Create new job (from Chrome/Safari Extension or UI)
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -70,6 +74,8 @@ export async function POST(req: NextRequest) {
       company,
       location,
       workSetting,
+      setting,
+      workType,
       salaryMin,
       salaryMax,
       techStack,
@@ -101,7 +107,9 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const validatedWorkSetting = parseWorkType(workSetting);
+    // Normalizes work setting to enum WorkType (REMOTE | HYBRID | IN_OFFICE)
+    const rawWorkType = workSetting || setting || workType;
+    const validatedWorkSetting = parseWorkType(rawWorkType);
 
     const newJob = await prisma.job.create({
       data: {
@@ -120,8 +128,8 @@ export async function POST(req: NextRequest) {
         benefits: Array.isArray(benefits) ? benefits : [],
         matchScore: matchScore ? Number(matchScore) : 85,
         matchReasoning:
-          matchReasoning || "Saved directly via StackApply Dashboard.",
-        sources: Array.isArray(sources) ? sources : ["Manual Entry"],
+          matchReasoning || "Saved directly via StackApply Extension.",
+        sources: Array.isArray(sources) ? sources : ["Extension"],
         originalUrls: Array.isArray(originalUrls) ? originalUrls : [],
         status: (status as JobStatus) || JobStatus.TO_REVIEW,
       },
