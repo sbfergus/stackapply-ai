@@ -7,7 +7,7 @@ import {
   Sparkles,
   Building2,
   MapPin,
-  DollarSign,
+  Banknote,
   Calendar,
   Globe,
   Trash2,
@@ -220,7 +220,7 @@ export function JobDetailsDrawer({
 
           {(job.salaryMin || job.salaryMax) && (
             <div className="flex items-center gap-2 text-emerald-400 font-medium">
-              <DollarSign className="w-4 h-4 text-emerald-500 shrink-0" />
+              <Banknote className="w-4 h-4 text-emerald-500 shrink-0" />
               <span>
                 ${(job.salaryMin! / 1000).toFixed(0)}k - ${(job.salaryMax! / 1000).toFixed(0)}k / year
               </span>
@@ -252,7 +252,7 @@ export function JobDetailsDrawer({
                   key={tech}
                   className="text-xs bg-slate-800 text-slate-200 px-2.5 py-1 rounded-lg border border-slate-700/60 font-mono"
                 >
-                  {tech}
+                  {tech.toUpperCase()}
                 </span>
               ))}
             </div>

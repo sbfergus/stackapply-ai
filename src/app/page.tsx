@@ -12,7 +12,7 @@ import {
   Briefcase,
   Building2,
   MapPin,
-  DollarSign,
+  Banknote,
   Sparkles,
   RefreshCw,
   GripVertical,
@@ -231,6 +231,12 @@ export default function Dashboard() {
                             {(provided, snapshot) => {
                               const usePortal = snapshot.isDragging;
 
+                              // Simple logic: show max 5 pills, then "+#" if more exist
+                              const maxVisible = 5;
+                              const hasOverflow = job.techStack.length > maxVisible;
+                              const visibleTech = hasOverflow ? job.techStack.slice(0, maxVisible) : job.techStack;
+                              const hiddenCount = job.techStack.length - maxVisible;
+
                               const isRedundantSetting =
                                 job.location &&
                                 job.workSetting &&
@@ -291,7 +297,7 @@ export default function Dashboard() {
 
                                     {(job.salaryMin || job.salaryMax) && (
                                       <div className="flex items-center gap-1 font-medium text-emerald-400/90">
-                                        <DollarSign className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                        <Banknote className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                                         <span>
                                           ${(job.salaryMin! / 1000).toFixed(0)}k - ${(job.salaryMax! / 1000).toFixed(0)}k
                                         </span>
@@ -300,29 +306,23 @@ export default function Dashboard() {
                                   </div>
 
                                   {/* Tech Stack Pills */}
-                                  {job.techStack.length > 0 && (() => {
-                                    const hasOverflow = job.techStack.length > 5;
-                                    const visibleTech = hasOverflow ? job.techStack.slice(0, 4) : job.techStack;
-                                    const hiddenCount = job.techStack.length - 4;
-
-                                    return (
-                                      <div className="flex flex-wrap gap-1.5 max-h-[52px] overflow-hidden">
-                                        {visibleTech.map((tech) => (
-                                          <span
-                                            key={tech}
-                                            className="text-[10px] bg-slate-800/80 text-slate-300 px-2 py-0.5 rounded border border-slate-700/50 font-mono h-fit"
-                                          >
-                                            {tech}
-                                          </span>
-                                        ))}
-                                        {hasOverflow && (
-                                          <span className="text-[10px] bg-slate-800/40 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800 font-mono h-fit">
-                                            +{hiddenCount}
-                                          </span>
-                                        )}
-                                      </div>
-                                    );
-                                  })()}
+                                  {job.techStack.length > 0 && (
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {visibleTech.map((tech) => (
+                                        <span
+                                          key={tech}
+                                          className="text-[10px] bg-slate-800/80 text-slate-300 px-2 py-0.5 rounded border border-slate-700/50 font-mono h-fit"
+                                        >
+                                          {tech.toUpperCase()}
+                                        </span>
+                                      ))}
+                                      {hasOverflow && (
+                                        <span className="text-[10px] bg-slate-800/40 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800 font-mono h-fit">
+                                          +{hiddenCount} more
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               );
 
