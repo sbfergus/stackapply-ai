@@ -61,11 +61,48 @@ const formatSalary = (amount: number): string => {
   }
 };
 
+// Skeleton card component
+const SkeletonJobCard = () => (
+  <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 animate-pulse">
+    {/* Top meta row */}
+    <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center gap-1.5">
+        <div className="w-3.5 h-3.5 bg-slate-800 rounded" />
+        <div className="w-3.5 h-3.5 bg-slate-800 rounded" />
+        <div className="h-3 w-20 bg-slate-800 rounded" />
+      </div>
+      <div className="h-4 w-16 bg-slate-800 rounded-full" />
+    </div>
+    
+    {/* Title */}
+    <div className="h-4 w-full bg-slate-800 rounded mb-2.5" />
+    
+    {/* Metadata */}
+    <div className="space-y-1 mb-3">
+      <div className="h-3 w-3/4 bg-slate-800 rounded" />
+      <div className="h-3 w-1/2 bg-slate-800 rounded" />
+    </div>
+    
+    {/* Tech stack pills */}
+    <div className="flex flex-wrap gap-1.5">
+      <div className="h-5 w-16 bg-slate-800 rounded" />
+      <div className="h-5 w-20 bg-slate-800 rounded" />
+      <div className="h-5 w-14 bg-slate-800 rounded" />
+    </div>
+  </div>
+);
+
 export default function Dashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [skeletonCounts, setSkeletonCounts] = useState<Record<string, number>>({
+    TO_REVIEW: 0,
+    READY_TO_APPLY: 0,
+    APPLIED: 0,
+    INTERVIEWING: 0,
+  });
 
   // Drawer and Modal States
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -74,6 +111,17 @@ export default function Dashboard() {
 
   useEffect(() => {
     setIsMounted(true);
+    
+    // Load cached skeleton counts from localStorage
+    const cached = localStorage.getItem('jobColumnCounts');
+    if (cached) {
+      try {
+        setSkeletonCounts(JSON.parse(cached));
+      } catch (e) {
+        console.error('Failed to parse cached counts:', e);
+      }
+    }
+    
     fetchJobs();
   }, []);
 
@@ -96,6 +144,15 @@ export default function Dashboard() {
       const data = await res.json();
       if (data.success) {
         setJobs(data.jobs);
+        
+        // Calculate and cache column counts for next time
+        const counts = STAGES.reduce((acc, stage) => {
+          acc[stage.id] = data.jobs.filter((j: Job) => j.status === stage.id).length;
+          return acc;
+        }, {} as Record<string, number>);
+        
+        setSkeletonCounts(counts);
+        localStorage.setItem('jobColumnCounts', JSON.stringify(counts));
       }
     } catch (err) {
       console.error("Error loading jobs:", err);
@@ -280,7 +337,12 @@ export default function Dashboard() {
                           : ""
                       }`}
                     >
-                      {stageJobs.length === 0 ? (
+                      {loading ? (
+                        // Show skeleton cards while loading
+                        Array.from({ length: skeletonCounts[stage.id] || 0 }).map((_, i) => (
+                          <SkeletonJobCard key={`skeleton-${stage.id}-${i}`} />
+                        ))
+                      ) : stageJobs.length === 0 ? (
                         <div className="h-32 flex items-center justify-center border border-dashed border-slate-800/80 rounded-xl">
                           <p className="text-xs text-slate-600">
                             No jobs in this stage

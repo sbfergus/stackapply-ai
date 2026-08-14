@@ -19,6 +19,7 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
   const [salaryMax, setSalaryMax] = useState("");
   const [techStackInput, setTechStackInput] = useState("");
   const [roleSummary, setRoleSummary] = useState("");
+  const [companyOverview, setCompanyOverview] = useState("");
   const [originalUrl, setOriginalUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -61,6 +62,7 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
       salaryMax: salaryMax ? Number(salaryMax) : null,
       techStack,
       roleSummary: roleSummary.trim() || null,
+      companyOverview: companyOverview.trim() || null,
       originalUrls: originalUrl.trim() ? [originalUrl.trim()] : [],
       sources: ["Manual Entry"],
       status: "TO_REVIEW",
@@ -86,6 +88,7 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
         setSalaryMax("");
         setTechStackInput("");
         setRoleSummary("");
+        setCompanyOverview("");
         setOriginalUrl("");
         onClose();
       } else {
@@ -267,12 +270,25 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
           {/* Role Summary */}
           <div>
             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-              Role Summary / Key Details
+              Role Summary
             </label>
             <textarea
               value={roleSummary}
               onChange={(e) => setRoleSummary(e.target.value)}
               placeholder="Brief description of responsibilities or key team goals..."
+              className="w-full h-20 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none font-sans"
+            />
+          </div>
+
+          {/* Company Overview */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              Company Overview
+            </label>
+            <textarea
+              value={companyOverview}
+              onChange={(e) => setCompanyOverview(e.target.value)}
+              placeholder="Brief description of the company, its mission, or culture..."
               className="w-full h-20 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none font-sans"
             />
           </div>
