@@ -183,17 +183,17 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
       {/* Header */}
-      <header className="max-w-7xl mx-auto mb-8 flex items-center justify-between">
+      <header className="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-1">
             <div className="p-2 bg-indigo-600/20 rounded-xl border border-indigo-500/30 text-indigo-400">
               <Briefcase className="w-6 h-6" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-              StackApply AI
+            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent whitespace-nowrap">
+              StackApply.ai
             </h1>
           </div>
-          <p className="text-xs text-slate-400 ml-11">
+          <p className="hidden md:block text-xs text-slate-400 ml-11">
             Automated job tracking, candidate matching, and AI resume tailoring
           </p>
         </div>
