@@ -32,6 +32,18 @@ const STAGE_OPTIONS = [
   { id: "INTERVIEWING", label: "Interviewing" },
 ];
 
+// Helper function to format salary
+const formatSalary = (amount: number): string => {
+  if (amount >= 1000000) {
+    // For millions, show up to 2 decimal places, remove trailing zeros
+    const millions = amount / 1000000;
+    return `$${millions % 1 === 0 ? millions.toFixed(0) : millions.toFixed(2).replace(/\.?0+$/, '')}M`;
+  } else {
+    // For thousands
+    return `$${(amount / 1000).toFixed(0)}k`;
+  }
+};
+
 export function JobDetailsDrawer({
   job,
   isOpen,
@@ -222,7 +234,7 @@ export function JobDetailsDrawer({
             <div className="flex items-center gap-2 text-emerald-400 font-medium">
               <Banknote className="w-4 h-4 text-emerald-500 shrink-0" />
               <span>
-                ${(job.salaryMin! / 1000).toFixed(0)}k - ${(job.salaryMax! / 1000).toFixed(0)}k / year
+                {formatSalary(job.salaryMin!)} - {formatSalary(job.salaryMax!)} / year
               </span>
             </div>
           )}

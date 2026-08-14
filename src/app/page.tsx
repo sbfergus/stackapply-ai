@@ -49,6 +49,18 @@ const STAGES = [
   { id: "INTERVIEWING", label: "Interviewing", color: "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" },
 ];
 
+// Helper function to format salary
+const formatSalary = (amount: number): string => {
+  if (amount >= 1000000) {
+    // For millions, show up to 2 decimal places, remove trailing zeros
+    const millions = amount / 1000000;
+    return `$${millions % 1 === 0 ? millions.toFixed(0) : millions.toFixed(2).replace(/\.?0+$/, '')}M`;
+  } else {
+    // For thousands
+    return `$${(amount / 1000).toFixed(0)}k`;
+  }
+};
+
 export default function Dashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,9 +131,17 @@ export default function Dashboard() {
 
     // Optimistic update
     setJobs((prevJobs) =>
-      prevJobs.map((job) =>
-        job.id === jobId ? { ...job, status: newStatus } : job
-      )
+      prevJobs.map((job) => {
+        if (job.id === jobId) {
+          const updatedJob = { ...job, status: newStatus };
+          // Also update selectedJob if this is the currently viewed job
+          if (selectedJob?.id === jobId) {
+            setSelectedJob(updatedJob);
+          }
+          return updatedJob;
+        }
+        return job;
+      })
     );
 
     // Persist to API
@@ -156,9 +176,17 @@ export default function Dashboard() {
 
     // 1. Optimistic state update
     setJobs((prevJobs) =>
-      prevJobs.map((job) =>
-        job.id === draggableId ? { ...job, status: newStatus } : job
-      )
+      prevJobs.map((job) => {
+        if (job.id === draggableId) {
+          const updatedJob = { ...job, status: newStatus };
+          // Also update selectedJob if this is the currently viewed job
+          if (selectedJob?.id === draggableId) {
+            setSelectedJob(updatedJob);
+          }
+          return updatedJob;
+        }
+        return job;
+      })
     );
 
     // 2. Persist to API
@@ -372,7 +400,7 @@ export default function Dashboard() {
                                       <div className="flex items-center gap-1 font-medium text-emerald-400/90">
                                         <Banknote className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                                         <span>
-                                          ${(job.salaryMin! / 1000).toFixed(0)}k - ${(job.salaryMax! / 1000).toFixed(0)}k
+                                          {formatSalary(job.salaryMin!)} - {formatSalary(job.salaryMax!)}
                                         </span>
                                       </div>
                                     )}
