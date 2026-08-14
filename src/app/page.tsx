@@ -198,10 +198,10 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-md shadow-indigo-600/20 transition"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-md shadow-indigo-600/20 transition whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             Add Job
@@ -209,16 +209,11 @@ export default function Dashboard() {
 
           <button
             onClick={fetchJobs}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-900 border border-slate-800 rounded-lg hover:bg-slate-800 hover:text-white transition"
+            className="flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-900 border border-slate-800 rounded-lg hover:bg-slate-800 hover:text-white transition whitespace-nowrap"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
             Refresh
           </button>
-
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-950/60 border border-indigo-800/40 text-indigo-300 text-xs font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            Claude 3.5 Active
-          </div>
         </div>
       </header>
 
