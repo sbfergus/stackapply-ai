@@ -18,6 +18,8 @@ import {
   GripVertical,
   Plus,
   ChevronDown,
+  FileText,
+  FileUser,
 } from "lucide-react";
 import { JobDetailsDrawer } from "@/components/JobDetailsDrawer";
 import { AddJobModal } from "@/components/AddJobModal";
@@ -95,6 +97,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [useAI, setUseAI] = useState(false);
   const [skeletonCounts, setSkeletonCounts] = useState<Record<string, number>>({
     TO_REVIEW: 0,
     READY_TO_APPLY: 0,
@@ -282,11 +285,13 @@ export default function Dashboard() {
               <div className="relative inline-block w-8 h-4 shrink-0">
                 <input
                   type="checkbox"
+                  checked={useAI}
                   disabled
                   className="opacity-0 w-0 h-0"
+                  readOnly
                 />
-                <span className="absolute cursor-not-allowed top-0 left-0 right-0 bottom-0 bg-slate-700 rounded-full transition-all"></span>
-                <span className="absolute left-0.5 bottom-0.5 bg-slate-500 w-3 h-3 rounded-full transition-all"></span>
+                <span className={`absolute cursor-not-allowed top-0 left-0 right-0 bottom-0 rounded-full transition-all ${useAI ? 'bg-indigo-600' : 'bg-slate-700'}`}></span>
+                <span className={`absolute bottom-0.5 w-3 h-3 rounded-full transition-all ${useAI ? 'left-4 bg-white' : 'left-0.5 bg-slate-500'}`}></span>
               </div>
             </button>
             <div className="invisible group-hover:visible absolute top-full left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 mt-2 bg-slate-800 text-slate-300 text-[10px] px-3 py-1.5 rounded-md border border-slate-700 whitespace-nowrap shadow-lg z-10">
@@ -491,6 +496,44 @@ export default function Dashboard() {
                                           +{hiddenCount} more
                                         </span>
                                       )}
+                                    </div>
+                                  )}
+
+                                  {/* PDF Generation Buttons - Only show in READY_TO_APPLY */}
+                                  {job.status === "READY_TO_APPLY" && (
+                                    <div className="mt-3 pt-3 border-t border-slate-800/60 flex md:flex-col gap-2">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          // TODO: Implement cover letter generation
+                                          console.log("Generate cover letter for:", job.id);
+                                        }}
+                                        disabled={!useAI}
+                                        className={`flex-1 md:flex-auto flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
+                                          useAI
+                                            ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 hover:bg-indigo-600/30"
+                                            : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
+                                        }`}
+                                      >
+                                        <FileText className="w-3 h-3 shrink-0" />
+                                        <span className="whitespace-nowrap">Generate Cover Letter</span>
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          // TODO: Implement resume generation
+                                          console.log("Generate resume for:", job.id);
+                                        }}
+                                        disabled={!useAI}
+                                        className={`flex-1 md:flex-auto flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
+                                          useAI
+                                            ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-600/30"
+                                            : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
+                                        }`}
+                                      >
+                                        <FileUser className="w-3 h-3 shrink-0" />
+                                        <span className="whitespace-nowrap">Generate Resume</span>
+                                      </button>
                                     </div>
                                   )}
                                 </div>
