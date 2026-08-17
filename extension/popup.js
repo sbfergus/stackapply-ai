@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const saveBtn = document.getElementById("save-btn");
   const statusEl = document.getElementById("status");
+  const useAiToggle = document.getElementById("use-ai-toggle");
 
   let scrapedData = {};
+  const useAI = false; // Disabled until AI keys are added
 
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

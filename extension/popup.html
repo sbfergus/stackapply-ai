@@ -14,7 +14,7 @@
     .header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
       margin-bottom: 16px;
     }
     .header h2 {
@@ -23,6 +23,94 @@
       margin: 0;
       color: #f8fafc;
     }
+    
+    /* Toggle Switch Styles */
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+    .toggle-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-switch input:disabled + .toggle-slider {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: not-allowed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #334155;
+      transition: 0.3s;
+      border-radius: 22px;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #64748b;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+    input:checked + .toggle-slider {
+      background-color: #6366f1;
+    }
+    input:checked + .toggle-slider:before {
+      background-color: #ffffff;
+      transform: translateX(18px);
+    }
+    
+    /* Tooltip */
+    .toggle-container .tooltip {
+      visibility: hidden;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      background-color: #1e293b;
+      color: #94a3b8;
+      text-align: right;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      white-space: nowrap;
+      border: 1px solid #334155;
+      z-index: 1;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    .toggle-container .tooltip::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      right: 12px;
+      border: 5px solid transparent;
+      border-bottom-color: #334155;
+    }
+    .toggle-container:hover .tooltip {
+      visibility: visible;
+    }
+    
     .field-group {
       margin-bottom: 12px;
     }
@@ -99,6 +187,14 @@
 <body>
   <div class="header">
     <h2>⚡ StackApply AI</h2>
+    <div class="toggle-container">
+      <span class="toggle-label">Use AI</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="use-ai-toggle" disabled>
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="tooltip">Add AI Keys to Activate</span>
+    </div>
   </div>
 
   <div class="field-group">
