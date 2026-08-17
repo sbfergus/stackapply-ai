@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setTimeout(() => window.close(), 1200);
       } else if (res.status === 409) {
         // Duplicate detected
-        statusEl.innerText = "⚠️ Unable to Save, Duplicate Listing";
+        statusEl.innerText = "Already in your dashboard";
         statusEl.className = "status error";
         saveBtn.disabled = false;
         saveBtn.innerText = "Save to Dashboard";
@@ -214,6 +214,34 @@ function scrapeJobDataInTab() {
   // Clean raw description
   description = description.replace(/<[^>]*>?/gm, " ").replace(/\s+/g, " ").trim();
 
+  // Extract role summary and company overview from description
+  let roleSummary = "";
+  let companyOverview = "";
+
+  // LinkedIn often structures content as "About Us" followed by job details
+  // Try to split on common section headers
+  const aboutUsMatch = description.match(/About Us(.+?)(?:Job Details|Description|Essential Duties|Responsibilities|Qualifications|$)/is);
+  const jobDetailsMatch = description.match(/(?:Job Details|Description|Essential Duties|Responsibilities|Position Summary)(.+?)(?:About Us|Qualifications|Benefits|$)/is);
+  
+  if (aboutUsMatch && aboutUsMatch[1]) {
+    companyOverview = aboutUsMatch[1].trim().slice(0, 300);
+  }
+  
+  if (jobDetailsMatch && jobDetailsMatch[1]) {
+    roleSummary = jobDetailsMatch[1].trim().slice(0, 500);
+  } else {
+    // Fallback: if no clear structure, use first part as role summary
+    roleSummary = description.slice(0, 500);
+  }
+
+  // If we didn't find company overview but description mentions company, extract it
+  if (!companyOverview && description.length > 500) {
+    const companyMatch = description.match(/(?:About|Company|Organization)[\s\S]{0,50}?([A-Z][^.!?]{50,300})/i);
+    if (companyMatch) {
+      companyOverview = companyMatch[1].trim().slice(0, 300);
+    }
+  }
+
   // Strict Work Setting Parsing (Strictly IN_OFFICE, HYBRID, REMOTE)
   const fullContent = (title + " " + location + " " + description).toUpperCase();
   if (fullContent.includes("HYBRID")) {
@@ -274,8 +302,8 @@ function scrapeJobDataInTab() {
     salaryMin,
     salaryMax,
     techStack: detectedStack,
-    roleSummary: description ? description.slice(0, 400) + "..." : "",
-    companyOverview: description ? description.slice(0, 250) + "..." : "",
+    roleSummary: roleSummary || (description ? description.slice(0, 500) : ""),
+    companyOverview: companyOverview || (description ? description.slice(500, 800) : ""),
     originalUrls: [window.location.href],
     sources: [source],
   };

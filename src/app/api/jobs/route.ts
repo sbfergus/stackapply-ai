@@ -107,7 +107,22 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Check for duplicate job (by URL or by title + company)
+    // Normalize text for fuzzy duplicate detection
+    function normalizeText(text: string): string {
+      return text
+        .toLowerCase()
+        .trim()
+        // Remove common company suffixes
+        .replace(/\b(inc|llc|ltd|corp|corporation|company|co)\b\.?/gi, "")
+        // Remove "the" prefix
+        .replace(/^the\s+/i, "")
+        // Normalize punctuation and spacing
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    // Check for duplicate job (by URL or by normalized title + company)
     // First, try to find by URL if available
     let existingJob = null;
 
@@ -124,22 +139,25 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // If not found by URL, check by title + company (case-insensitive)
+    // If not found by URL, check by normalized title + company
     if (!existingJob) {
-      // Fetch all jobs for this user and do case-insensitive comparison in JavaScript
+      // Fetch all jobs for this user and do fuzzy comparison
       const allUserJobs = await prisma.job.findMany({
         where: { userId: user.id },
         select: { id: true, title: true, company: true },
       });
 
-      // Case-insensitive comparison in JavaScript
-      const titleLower = title.toLowerCase().trim();
-      const companyLower = company.toLowerCase().trim();
+      // Normalize incoming data
+      const normalizedTitle = normalizeText(title);
+      const normalizedCompany = normalizeText(company);
 
-      existingJob = allUserJobs.find(job => 
-        job.title.toLowerCase().trim() === titleLower &&
-        job.company.toLowerCase().trim() === companyLower
-      );
+      // Find matching job with normalized comparison
+      existingJob = allUserJobs.find(job => {
+        const existingTitle = normalizeText(job.title);
+        const existingCompany = normalizeText(job.company);
+        
+        return existingTitle === normalizedTitle && existingCompany === normalizedCompany;
+      });
     }
 
     if (existingJob) {
