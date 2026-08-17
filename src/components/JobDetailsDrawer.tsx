@@ -293,7 +293,7 @@ export function JobDetailsDrawer({
             <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
               Role Summary
             </h3>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/30 p-3.5 rounded-xl border border-slate-800/40">
+            <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/30 p-3.5 rounded-xl border border-slate-800/40 whitespace-pre-wrap">
               {job.roleSummary}
             </p>
           </div>
@@ -305,7 +305,7 @@ export function JobDetailsDrawer({
             <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
               Company Overview
             </h3>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/30 p-3.5 rounded-xl border border-slate-800/40">
+            <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/30 p-3.5 rounded-xl border border-slate-800/40 whitespace-pre-wrap">
               {job.companyOverview}
             </p>
           </div>

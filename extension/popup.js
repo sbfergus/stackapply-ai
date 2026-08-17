@@ -30,8 +30,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (data.workSetting) document.getElementById("workSetting").value = data.workSetting;
     if (data.salaryMin) document.getElementById("salaryMin").value = data.salaryMin;
     if (data.salaryMax) document.getElementById("salaryMax").value = data.salaryMax;
-    if (data.roleSummary) document.getElementById("roleSummary").value = data.roleSummary;
-    if (data.companyOverview) document.getElementById("companyOverview").value = data.companyOverview;
+    
+    // Debug: log the role summary to see if newlines are present
+    if (data.roleSummary) {
+      console.log("Role Summary character codes:", data.roleSummary.split('').slice(0, 200).map((c, i) => `${i}:${c.charCodeAt(0)}`));
+      console.log("Role Summary length:", data.roleSummary.length);
+      console.log("Newline count:", (data.roleSummary.match(/\n/g) || []).length);
+      document.getElementById("roleSummary").value = data.roleSummary;
+    }
+    
+    if (data.companyOverview) {
+      console.log("Company Overview newline count:", (data.companyOverview.match(/\n/g) || []).length);
+      document.getElementById("companyOverview").value = data.companyOverview;
+    }
+    
     if (data.techStack && Array.isArray(data.techStack)) {
       document.getElementById("techStack").value = data.techStack.join(", ");
     }
@@ -378,65 +390,103 @@ function scrapeJobDataInTab() {
     
     // Description extraction
     if (!description) {
-      description =
-        document.querySelector("[data-testid='expandable-text-box']")?.innerText ||
-        document.querySelector("#job-details")?.innerText ||
-        document.querySelector("main")?.innerText ||
-        "";
-    }
-    
-    // Clean description
-    description = description.replace(/<[^>]*>?/gm, " ").replace(/\s+/g, " ").trim();
-    description = description.replace(/^Job Details\s+Description\s+/i, "").trim();
-    
-    // Parse role summary and company overview
-    const aboutUsIndex = description.search(/\bAbout Us\b/i);
-    const positionSummaryIndex = description.search(/\b(Position Summary|Role Summary|Job Summary)\b/i);
-    
-    if (aboutUsIndex !== -1 && positionSummaryIndex !== -1) {
-      if (aboutUsIndex < positionSummaryIndex) {
-        companyOverview = description
-          .slice(aboutUsIndex, positionSummaryIndex)
-          .replace(/^About Us\s*/i, "")
-          .trim();
-        roleSummary = description
-          .slice(positionSummaryIndex)
-          .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
+      const descElement = document.querySelector("[data-testid='expandable-text-box']") ||
+                         document.querySelector("#job-details") ||
+                         document.querySelector("main");
+      
+      if (descElement) {
+        // Get innerHTML and convert <br> tags to double newlines (paragraph breaks)
+        let html = descElement.innerHTML;
+        html = html.replace(/<br\s*\/?>/gi, "\n\n");
+        // Remove all other HTML tags
+        html = html.replace(/<[^>]+>/g, " ");
+        // Decode HTML entities
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = html;
+        description = tempDiv.textContent || tempDiv.innerText || "";
+        
+        // Clean up whitespace while preserving paragraph breaks
+        description = description
+          .replace(/[ \t]+/g, " ")          // Multiple spaces/tabs become single space
+          .replace(/ ?\n\n ?/g, "\n\n")     // Clean spaces around paragraph breaks
+          .replace(/\n{3,}/g, "\n\n")       // 3+ newlines become 2
           .trim();
       } else {
-        roleSummary = description
-          .slice(positionSummaryIndex, aboutUsIndex)
-          .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
-          .trim();
-        companyOverview = description
-          .slice(aboutUsIndex)
-          .replace(/^About Us\s*/i, "")
-          .trim();
+        description = "";
       }
-    } else if (aboutUsIndex !== -1) {
+    }
+    
+    // Remove LinkedIn-specific header text
+    description = description.replace(/^Job Details\s+Description\s+/i, "");
+    
+    // Parse role summary and company overview
+    // Strategy: Look for "About Us" and "Position Summary" section headers
+    // Extract each section separately, preserving paragraph breaks
+    
+    const aboutUsIndex = description.search(/\bAbout Us\b/i);
+    const positionSummaryIndex = description.search(/\bPosition Summary\b/i);
+    const dutiesIndex = description.search(/\bEssential Duties\b/i);
+    
+    // Track where About Us section ends (needed for fallback logic)
+    let aboutUsEnd = description.length;
+    
+    // Extract Company Overview (About Us section)
+    if (aboutUsIndex !== -1) {
+      // Find end of About Us section (usually Position Summary comes next)
+      if (positionSummaryIndex !== -1 && positionSummaryIndex > aboutUsIndex) {
+        aboutUsEnd = positionSummaryIndex;
+      } else if (dutiesIndex !== -1 && dutiesIndex > aboutUsIndex) {
+        aboutUsEnd = dutiesIndex;
+      }
+      
+      // Extract and clean - preserve newlines
       companyOverview = description
-        .slice(aboutUsIndex)
+        .slice(aboutUsIndex, aboutUsEnd)
         .replace(/^About Us\s*/i, "")
-        .trim()
-        .slice(0, 800);
+        .trim();
+      
+      // Limit length while keeping complete paragraphs
+      if (companyOverview.length > 1000) {
+        companyOverview = companyOverview.slice(0, 1000).trim();
+      }
+    }
+    
+    // Extract Role Summary (Position Summary section)
+    if (positionSummaryIndex !== -1) {
+      // Find end of Position Summary section (usually Essential Duties comes next)
+      let positionSummaryEnd = description.length;
+      if (dutiesIndex !== -1 && dutiesIndex > positionSummaryIndex) {
+        positionSummaryEnd = dutiesIndex;
+      }
+      
+      // Extract and clean - preserve newlines
       roleSummary = description
-        .slice(0, aboutUsIndex)
-        .trim()
-        .slice(0, 1000);
-    } else if (positionSummaryIndex !== -1) {
-      roleSummary = description
-        .slice(positionSummaryIndex)
-        .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
-        .trim()
-        .slice(0, 1000);
-      companyOverview = description
-        .slice(0, positionSummaryIndex)
-        .trim()
-        .slice(0, 800);
+        .slice(positionSummaryIndex, positionSummaryEnd)
+        .replace(/^Position Summary\s*/i, "")
+        .trim();
+    } else if (dutiesIndex !== -1) {
+      // No explicit Position Summary, take everything before Essential Duties
+      let beforeDuties = description.slice(0, dutiesIndex).trim();
+      
+      // If we already extracted company overview, remove it from role summary
+      if (aboutUsIndex !== -1) {
+        // Remove the About Us section from the role summary
+        beforeDuties = beforeDuties.slice(0, aboutUsIndex).trim();
+      }
+      
+      roleSummary = beforeDuties;
     } else {
-      const midpoint = Math.min(Math.floor(description.length / 2), 800);
-      roleSummary = description.slice(0, midpoint).trim();
-      companyOverview = description.slice(midpoint).trim().slice(0, 800);
+      // Fallback: take first portion of description
+      let fallbackSummary = description.slice(0, 1500).trim();
+      
+      // Remove About Us section if present
+      if (aboutUsIndex !== -1 && aboutUsIndex < 1500) {
+        const beforeAboutUs = description.slice(0, aboutUsIndex).trim();
+        const afterAboutUs = description.slice(aboutUsEnd).slice(0, 1500 - aboutUsIndex).trim();
+        roleSummary = (beforeAboutUs + "\n\n" + afterAboutUs).trim();
+      } else {
+        roleSummary = fallbackSummary;
+      }
     }
     
     // LinkedIn-specific structured benefits
