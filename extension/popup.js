@@ -31,8 +31,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (data.salaryMin) document.getElementById("salaryMin").value = data.salaryMin;
     if (data.salaryMax) document.getElementById("salaryMax").value = data.salaryMax;
     if (data.roleSummary) document.getElementById("roleSummary").value = data.roleSummary;
+    if (data.companyOverview) document.getElementById("companyOverview").value = data.companyOverview;
     if (data.techStack && Array.isArray(data.techStack)) {
       document.getElementById("techStack").value = data.techStack.join(", ");
+    }
+    if (data.benefits && Array.isArray(data.benefits)) {
+      document.getElementById("benefits").value = data.benefits.join(", ");
     }
   }
 
@@ -48,9 +52,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const salaryMin = parseInt(document.getElementById("salaryMin").value, 10) || null;
     const salaryMax = parseInt(document.getElementById("salaryMax").value, 10) || null;
     const roleSummary = document.getElementById("roleSummary").value.trim();
+    const companyOverview = document.getElementById("companyOverview").value.trim();
     const techStackInput = document.getElementById("techStack").value;
+    const benefitsInput = document.getElementById("benefits").value;
 
     const techStack = techStackInput
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const benefits = benefitsInput
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
@@ -67,7 +78,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       salaryMin,
       salaryMax,
       roleSummary,
+      companyOverview,
       techStack,
+      benefits,
       // Keep the detected source from scraping, don't override
     };
 
@@ -334,6 +347,18 @@ function scrapeJobDataInTab() {
     .filter((rule) => rule.regex.test(description))
     .map((rule) => rule.name);
 
+  // Extract benefits from description
+  const benefitsRegex = /\b(401k|health insurance|dental|vision|pto|paid time off|remote work|flexible schedule|stock options|equity|parental leave|gym membership|tuition reimbursement|professional development)\b/gi;
+  const benefitsMatches = description.match(benefitsRegex) || [];
+  const benefits = [...new Set(benefitsMatches.map(b => 
+    b.toLowerCase()
+      .replace(/\b401k\b/, "401k")
+      .replace(/\bpto\b/, "PTO")
+      .split(" ")
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ")
+  ))];
+
   return {
     title: (title || "").split("\n")[0].trim(),
     company: (company || "").split("\n")[0].trim(),
@@ -344,6 +369,7 @@ function scrapeJobDataInTab() {
     techStack: detectedStack,
     roleSummary: roleSummary || (description ? description.slice(0, 500) : ""),
     companyOverview: companyOverview || (description ? description.slice(500, 800) : ""),
+    benefits: benefits,
     originalUrls: [window.location.href],
     sources: [source],
   };

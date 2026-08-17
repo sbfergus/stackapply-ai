@@ -20,6 +20,7 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
   const [techStackInput, setTechStackInput] = useState("");
   const [roleSummary, setRoleSummary] = useState("");
   const [companyOverview, setCompanyOverview] = useState("");
+  const [benefitsInput, setBenefitsInput] = useState("");
   const [originalUrl, setOriginalUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -53,6 +54,11 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
       .map((s) => s.trim())
       .filter(Boolean);
 
+    const benefits = benefitsInput
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
     const payload = {
       title: title.trim(),
       company: company.trim(),
@@ -61,6 +67,7 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
       salaryMin: salaryMin ? Number(salaryMin) : null,
       salaryMax: salaryMax ? Number(salaryMax) : null,
       techStack,
+      benefits,
       roleSummary: roleSummary.trim() || null,
       companyOverview: companyOverview.trim() || null,
       originalUrls: originalUrl.trim() ? [originalUrl.trim()] : [],
@@ -89,6 +96,7 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
         setTechStackInput("");
         setRoleSummary("");
         setCompanyOverview("");
+        setBenefitsInput("");
         setOriginalUrl("");
         onClose();
       } else {
@@ -249,6 +257,21 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
               placeholder="Next.js, TypeScript, Tailwind CSS, Prisma"
               value={techStackInput}
               onChange={(e) => setTechStackInput(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+            />
+          </div>
+
+          {/* Perks & Benefits */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-slate-500" />
+              Perks & Benefits (Comma Separated)
+            </label>
+            <input
+              type="text"
+              placeholder="401k, Health Insurance, Remote Work, Stock Options"
+              value={benefitsInput}
+              onChange={(e) => setBenefitsInput(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
             />
           </div>
