@@ -218,28 +218,68 @@ function scrapeJobDataInTab() {
   let roleSummary = "";
   let companyOverview = "";
 
-  // LinkedIn often structures content as "About Us" followed by job details
-  // Try to split on common section headers
-  const aboutUsMatch = description.match(/About Us(.+?)(?:Job Details|Description|Essential Duties|Responsibilities|Qualifications|$)/is);
-  const jobDetailsMatch = description.match(/(?:Job Details|Description|Essential Duties|Responsibilities|Position Summary)(.+?)(?:About Us|Qualifications|Benefits|$)/is);
-  
-  if (aboutUsMatch && aboutUsMatch[1]) {
-    companyOverview = aboutUsMatch[1].trim().slice(0, 300);
-  }
-  
-  if (jobDetailsMatch && jobDetailsMatch[1]) {
-    roleSummary = jobDetailsMatch[1].trim().slice(0, 500);
-  } else {
-    // Fallback: if no clear structure, use first part as role summary
-    roleSummary = description.slice(0, 500);
-  }
+  // Remove common LinkedIn prefixes that appear before actual content
+  description = description
+    .replace(/^Job Details\s+Description\s+/i, "")
+    .trim();
 
-  // If we didn't find company overview but description mentions company, extract it
-  if (!companyOverview && description.length > 500) {
-    const companyMatch = description.match(/(?:About|Company|Organization)[\s\S]{0,50}?([A-Z][^.!?]{50,300})/i);
-    if (companyMatch) {
-      companyOverview = companyMatch[1].trim().slice(0, 300);
+  // Strategy: Look for section headers to split content
+  // "About Us" section = Company Overview
+  // "Position Summary" section = Role Summary
+  
+  const aboutUsIndex = description.search(/\bAbout Us\b/i);
+  const positionSummaryIndex = description.search(/\b(Position Summary|Role Summary|Job Summary)\b/i);
+  
+  if (aboutUsIndex !== -1 && positionSummaryIndex !== -1) {
+    // Both sections found - extract them properly
+    if (aboutUsIndex < positionSummaryIndex) {
+      // About Us comes first, Position Summary after
+      companyOverview = description
+        .slice(aboutUsIndex, positionSummaryIndex)
+        .replace(/^About Us\s*/i, "")
+        .trim();
+      roleSummary = description
+        .slice(positionSummaryIndex)
+        .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
+        .trim();
+    } else {
+      // Position Summary comes first, About Us after
+      roleSummary = description
+        .slice(positionSummaryIndex, aboutUsIndex)
+        .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
+        .trim();
+      companyOverview = description
+        .slice(aboutUsIndex)
+        .replace(/^About Us\s*/i, "")
+        .trim();
     }
+  } else if (aboutUsIndex !== -1) {
+    // Only About Us found - split there
+    companyOverview = description
+      .slice(aboutUsIndex)
+      .replace(/^About Us\s*/i, "")
+      .trim()
+      .slice(0, 800);
+    roleSummary = description
+      .slice(0, aboutUsIndex)
+      .trim()
+      .slice(0, 1000);
+  } else if (positionSummaryIndex !== -1) {
+    // Only Position Summary found - split there
+    roleSummary = description
+      .slice(positionSummaryIndex)
+      .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
+      .trim()
+      .slice(0, 1000);
+    companyOverview = description
+      .slice(0, positionSummaryIndex)
+      .trim()
+      .slice(0, 800);
+  } else {
+    // No clear sections - use fallback split
+    const midpoint = Math.min(Math.floor(description.length / 2), 800);
+    roleSummary = description.slice(0, midpoint).trim();
+    companyOverview = description.slice(midpoint).trim().slice(0, 800);
   }
 
   // Strict Work Setting Parsing (Strictly IN_OFFICE, HYBRID, REMOTE)
