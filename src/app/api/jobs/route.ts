@@ -107,6 +107,52 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Check for duplicate job (by URL or by title + company)
+    // First, try to find by URL if available
+    let existingJob = null;
+
+    if (originalUrls && Array.isArray(originalUrls) && originalUrls.length > 0) {
+      const cleanUrl = originalUrls[0];
+      
+      existingJob = await prisma.job.findFirst({
+        where: {
+          userId: user.id,
+          originalUrls: {
+            has: cleanUrl,
+          },
+        },
+      });
+    }
+
+    // If not found by URL, check by title + company (case-insensitive)
+    if (!existingJob) {
+      // Fetch all jobs for this user and do case-insensitive comparison in JavaScript
+      const allUserJobs = await prisma.job.findMany({
+        where: { userId: user.id },
+        select: { id: true, title: true, company: true },
+      });
+
+      // Case-insensitive comparison in JavaScript
+      const titleLower = title.toLowerCase().trim();
+      const companyLower = company.toLowerCase().trim();
+
+      existingJob = allUserJobs.find(job => 
+        job.title.toLowerCase().trim() === titleLower &&
+        job.company.toLowerCase().trim() === companyLower
+      );
+    }
+
+    if (existingJob) {
+      return NextResponse.json(
+        { 
+          error: "Duplicate job detected",
+          message: `You've already saved "${title}" at ${company}. Check your dashboard!`,
+          existingJobId: existingJob.id,
+        },
+        { status: 409, headers: corsHeaders() }
+      );
+    }
+
     // Normalizes work setting to enum WorkType (REMOTE | HYBRID | IN_OFFICE)
     const rawWorkType = workSetting || setting || workType;
     const validatedWorkSetting = parseWorkType(rawWorkType);

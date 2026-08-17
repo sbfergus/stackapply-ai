@@ -71,8 +71,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Keep the detected source from scraping, don't override
     };
 
-    // Live production Vercel API endpoint
+    // Production Vercel API endpoint
     const API_URL = "https://stackapply-ai.vercel.app/api/jobs";
+    
+    // For local testing, use: http://localhost:3000/api/jobs
 
     try {
       const res = await fetch(API_URL, {
@@ -83,12 +85,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const data = await res.json();
 
+      console.log("API Response:", res.status, data);
+
       if (res.ok && data.success) {
         statusEl.innerText = "✅ Saved to Dashboard!";
         statusEl.className = "status success";
         setTimeout(() => window.close(), 1200);
+      } else if (res.status === 409) {
+        // Duplicate detected
+        statusEl.innerText = "⚠️ Unable to Save, Duplicate Listing";
+        statusEl.className = "status error";
+        saveBtn.disabled = false;
+        saveBtn.innerText = "Save to Dashboard";
       } else {
-        statusEl.innerText = "❌ Error: " + (data.error || "Failed to save");
+        statusEl.innerText = "❌ Error: " + (data.message || data.error || "Failed to save");
         statusEl.className = "status error";
         saveBtn.disabled = false;
         saveBtn.innerText = "Save to Dashboard";
