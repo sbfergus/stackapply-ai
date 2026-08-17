@@ -87,6 +87,7 @@ export async function POST(req: NextRequest) {
       sources,
       originalUrls,
       status,
+      listedAt,
     } = body;
 
     if (!title || !company) {
@@ -196,6 +197,7 @@ export async function POST(req: NextRequest) {
         sources: Array.isArray(sources) ? sources : ["Extension"],
         originalUrls: Array.isArray(originalUrls) ? originalUrls : [],
         status: (status as JobStatus) || JobStatus.TO_REVIEW,
+        listedAt: listedAt ? new Date(listedAt) : null,
       },
     });
 

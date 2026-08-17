@@ -30,19 +30,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (data.workSetting) document.getElementById("workSetting").value = data.workSetting;
     if (data.salaryMin) document.getElementById("salaryMin").value = data.salaryMin;
     if (data.salaryMax) document.getElementById("salaryMax").value = data.salaryMax;
-    
-    // Debug: log the role summary to see if newlines are present
-    if (data.roleSummary) {
-      console.log("Role Summary character codes:", data.roleSummary.split('').slice(0, 200).map((c, i) => `${i}:${c.charCodeAt(0)}`));
-      console.log("Role Summary length:", data.roleSummary.length);
-      console.log("Newline count:", (data.roleSummary.match(/\n/g) || []).length);
-      document.getElementById("roleSummary").value = data.roleSummary;
-    }
-    
-    if (data.companyOverview) {
-      console.log("Company Overview newline count:", (data.companyOverview.match(/\n/g) || []).length);
-      document.getElementById("companyOverview").value = data.companyOverview;
-    }
+    if (data.roleSummary) document.getElementById("roleSummary").value = data.roleSummary;
+    if (data.companyOverview) document.getElementById("companyOverview").value = data.companyOverview;
     
     if (data.techStack && Array.isArray(data.techStack)) {
       document.getElementById("techStack").value = data.techStack.join(", ");
@@ -331,6 +320,7 @@ function scrapeJobDataInTab() {
     let roleSummary = "";
     let companyOverview = "";
     let benefits = [];
+    let listedAt = null;
     
     // JSON-LD structured data
     const jsonLdScripts = Array.from(document.querySelectorAll("script[type='application/ld+json']"));
@@ -353,6 +343,11 @@ function scrapeJobDataInTab() {
             }
           }
           description = data.description || description;
+          
+          // Extract datePosted if available
+          if (data.datePosted) {
+            listedAt = new Date(data.datePosted).toISOString();
+          }
         }
       } catch (e) {}
     }
@@ -385,6 +380,35 @@ function scrapeJobDataInTab() {
       if (locMatch) {
         const match = locMatch.innerText.match(cityStateRegex);
         if (match) location = match[1].trim();
+      }
+    }
+    
+    // Date extraction - look for "X days ago", "X weeks ago", etc.
+    if (!listedAt) {
+      const allText = Array.from(document.querySelectorAll("span, p"));
+      const timeAgoRegex = /(\d+)\s+(day|days|week|weeks|month|months|hour|hours)\s+ago/i;
+      const timeMatch = allText.find((el) => timeAgoRegex.test(el.innerText || ""));
+      
+      if (timeMatch) {
+        const match = timeMatch.innerText.match(timeAgoRegex);
+        if (match) {
+          const amount = parseInt(match[1], 10);
+          const unit = match[2].toLowerCase();
+          
+          // Calculate the date based on "X days/weeks/months ago"
+          const now = new Date();
+          if (unit.startsWith("hour")) {
+            now.setHours(now.getHours() - amount);
+          } else if (unit.startsWith("day")) {
+            now.setDate(now.getDate() - amount);
+          } else if (unit.startsWith("week")) {
+            now.setDate(now.getDate() - (amount * 7));
+          } else if (unit.startsWith("month")) {
+            now.setMonth(now.getMonth() - amount);
+          }
+          
+          listedAt = now.toISOString();
+        }
       }
     }
     
@@ -511,7 +535,8 @@ function scrapeJobDataInTab() {
       workSetting,
       roleSummary,
       companyOverview,
-      benefits
+      benefits,
+      listedAt
     };
   }
   
@@ -689,6 +714,7 @@ function scrapeJobDataInTab() {
     roleSummary: scrapedData.roleSummary || (scrapedData.description ? scrapedData.description.slice(0, 500) : ""),
     companyOverview: scrapedData.companyOverview || (scrapedData.description ? scrapedData.description.slice(500, 800) : ""),
     benefits: benefits,
+    listedAt: scrapedData.listedAt || null,
     originalUrls: [window.location.href],
     sources: [source],
   };
