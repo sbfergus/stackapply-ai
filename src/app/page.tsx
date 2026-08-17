@@ -272,6 +272,29 @@ export default function Dashboard() {
         </div>
 
         <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
+          {/* Use AI Toggle */}
+          <div className="relative group">
+            <button
+              disabled
+              className="w-full md:w-auto flex items-center justify-center gap-2 px-3.5 py-1.5 text-xs font-medium text-slate-400 bg-slate-900 border border-slate-800 rounded-lg cursor-not-allowed opacity-60 whitespace-nowrap"
+            >
+              <span className="text-xs font-semibold shrink-0">Use AI</span>
+              <div className="relative inline-block w-8 h-4 shrink-0">
+                <input
+                  type="checkbox"
+                  disabled
+                  className="opacity-0 w-0 h-0"
+                />
+                <span className="absolute cursor-not-allowed top-0 left-0 right-0 bottom-0 bg-slate-700 rounded-full transition-all"></span>
+                <span className="absolute left-0.5 bottom-0.5 bg-slate-500 w-3 h-3 rounded-full transition-all"></span>
+              </div>
+            </button>
+            <div className="invisible group-hover:visible absolute top-full left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 mt-2 bg-slate-800 text-slate-300 text-[10px] px-3 py-1.5 rounded-md border border-slate-700 whitespace-nowrap shadow-lg z-10">
+              Add AI Keys to Activate
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 md:left-4 md:translate-x-0 border-4 border-transparent border-b-slate-700"></div>
+            </div>
+          </div>
+
           <ExtensionDownloadButton />
 
           <button
