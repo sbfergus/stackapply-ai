@@ -11,6 +11,28 @@ function scrapeJobData() {
   let salaryMax = null;
   let workSetting = "REMOTE";
 
+  // Detect job board source from URL
+  let source = "Web";
+  if (url.includes("linkedin.com")) {
+    source = "LinkedIn";
+  } else if (url.includes("indeed.com")) {
+    source = "Indeed";
+  } else if (url.includes("glassdoor.com")) {
+    source = "Glassdoor";
+  } else if (url.includes("ziprecruiter.com")) {
+    source = "ZipRecruiter";
+  } else if (url.includes("monster.com")) {
+    source = "Monster";
+  } else if (url.includes("dice.com")) {
+    source = "Dice";
+  } else if (url.includes("wellfound.com") || url.includes("angel.co")) {
+    source = "Wellfound";
+  } else if (url.includes("lever.co")) {
+    source = "Lever";
+  } else if (url.includes("greenhouse.io")) {
+    source = "Greenhouse";
+  }
+
   // --- TIER 1: Try JSON-LD Schema (LinkedIn embeds structured job data) ---
   const jsonLdScripts = Array.from(document.querySelectorAll("script[type='application/ld+json']"));
   for (const script of jsonLdScripts) {
@@ -94,7 +116,7 @@ function scrapeJobData() {
   if (fullContent.includes("HYBRID")) {
     workSetting = "HYBRID";
   } else if (fullContent.includes("ON-SITE") || fullContent.includes("ONSITE") || fullContent.includes("IN OFFICE")) {
-    workSetting = "ONSITE";
+    workSetting = "IN_OFFICE";
   } else {
     workSetting = "REMOTE";
   }
@@ -134,6 +156,7 @@ function scrapeJobData() {
     roleSummary: description ? description.slice(0, 400) + "..." : "",
     companyOverview: description ? description.slice(0, 250) + "..." : "",
     originalUrls: [url],
+    sources: [source],
   };
 
   console.log("⚡ StackApply AI: Scraped result successfully:", scrapedResult);

@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       salaryMax,
       roleSummary,
       techStack,
-      sources: ["Chrome Extension"],
+      // Keep the detected source from scraping, don't override
     };
 
     // Live production Vercel API endpoint
@@ -113,6 +113,28 @@ function scrapeJobDataInTab() {
   let salaryMin = null;
   let salaryMax = null;
   let workSetting = "REMOTE";
+
+  // Detect job board source from URL
+  let source = "Web";
+  if (url.includes("linkedin.com")) {
+    source = "LinkedIn";
+  } else if (url.includes("indeed.com")) {
+    source = "Indeed";
+  } else if (url.includes("glassdoor.com")) {
+    source = "Glassdoor";
+  } else if (url.includes("ziprecruiter.com")) {
+    source = "ZipRecruiter";
+  } else if (url.includes("monster.com")) {
+    source = "Monster";
+  } else if (url.includes("dice.com")) {
+    source = "Dice";
+  } else if (url.includes("wellfound.com") || url.includes("angel.co")) {
+    source = "Wellfound";
+  } else if (url.includes("lever.co")) {
+    source = "Lever";
+  } else if (url.includes("greenhouse.io")) {
+    source = "Greenhouse";
+  }
 
   // 1. JSON-LD Structured Data Schema Parsing
   const jsonLdScripts = Array.from(document.querySelectorAll("script[type='application/ld+json']"));
@@ -245,5 +267,6 @@ function scrapeJobDataInTab() {
     roleSummary: description ? description.slice(0, 400) + "..." : "",
     companyOverview: description ? description.slice(0, 250) + "..." : "",
     originalUrls: [window.location.href],
+    sources: [source],
   };
 }

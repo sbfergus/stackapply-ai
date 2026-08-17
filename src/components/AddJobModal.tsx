@@ -200,7 +200,7 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
                 >
                 <option value="REMOTE">Remote</option>
                 <option value="HYBRID">Hybrid</option>
-                <option value="ONSITE">On-Site</option>
+                <option value="IN_OFFICE">In-Office</option>
                </select>
             </div>
           </div>

@@ -57,7 +57,8 @@ model Job {
   tailoredResumeText String?
   coverLetterText    String?
   notes              String?   // Personal notes about the job
-  appliedAt          DateTime?
+  listedAt           DateTime? // When the job was originally posted on the job board
+  appliedAt          DateTime? // When the user applied to this job
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 

@@ -40,6 +40,9 @@ export interface Job {
   sources?: string[];
   originalUrls?: string[];
   notes?: string | null;
+  listedAt?: string | null;
+  appliedAt?: string | null;
+  createdAt?: string | null;
   status: "TO_REVIEW" | "READY_TO_APPLY" | "APPLIED" | "INTERVIEWING";
 }
 

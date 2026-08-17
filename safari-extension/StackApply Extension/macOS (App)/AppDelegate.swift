@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  macOS (App)
 //
-//  Created by Ferguson, Scott on 8/14/26.
+//  Created by Ferguson, Scott on 8/17/26.
 //
 
 import Cocoa

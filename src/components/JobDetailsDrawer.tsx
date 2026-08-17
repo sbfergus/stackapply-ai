@@ -248,7 +248,23 @@ export function JobDetailsDrawer({
 
           <div className="flex items-center gap-2 text-slate-400">
             <Calendar className="w-4 h-4 text-slate-500 shrink-0" />
-            <span>Added to StackApply</span>
+            <span>
+              Job Listed: {job.listedAt ? new Date(job.listedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 text-slate-400">
+            <Calendar className="w-4 h-4 text-slate-500 shrink-0" />
+            <span>
+              Date Added: {job.createdAt ? new Date(job.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 text-slate-400">
+            <Calendar className="w-4 h-4 text-slate-500 shrink-0" />
+            <span>
+              Date Applied: {job.appliedAt ? new Date(job.appliedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD'}
+            </span>
           </div>
         </div>
 
