@@ -129,246 +129,515 @@ document.addEventListener("DOMContentLoaded", async () => {
 // Self-contained scraper function injected directly into active tab
 function scrapeJobDataInTab() {
   const url = window.location.href;
-  let title = "";
-  let company = "";
-  let location = "";
-  let description = "";
-  let salaryMin = null;
-  let salaryMax = null;
-  let workSetting = "REMOTE";
-
-  // Detect job board source from URL
-  let source = "Web";
-  if (url.includes("linkedin.com")) {
-    source = "LinkedIn";
-  } else if (url.includes("indeed.com")) {
-    source = "Indeed";
-  } else if (url.includes("glassdoor.com")) {
-    source = "Glassdoor";
-  } else if (url.includes("ziprecruiter.com")) {
-    source = "ZipRecruiter";
-  } else if (url.includes("monster.com")) {
-    source = "Monster";
-  } else if (url.includes("dice.com")) {
-    source = "Dice";
-  } else if (url.includes("wellfound.com") || url.includes("angel.co")) {
-    source = "Wellfound";
-  } else if (url.includes("lever.co")) {
-    source = "Lever";
-  } else if (url.includes("greenhouse.io")) {
-    source = "Greenhouse";
+  
+  // ============================================
+  // JOB BOARD DETECTION
+  // ============================================
+  
+  function detectJobBoard(url) {
+    if (url.includes("linkedin.com")) return "LinkedIn";
+    if (url.includes("indeed.com")) return "Indeed";
+    if (url.includes("glassdoor.com")) return "Glassdoor";
+    if (url.includes("ziprecruiter.com")) return "ZipRecruiter";
+    if (url.includes("monster.com")) return "Monster";
+    if (url.includes("dice.com")) return "Dice";
+    if (url.includes("wellfound.com") || url.includes("angel.co")) return "Wellfound";
+    if (url.includes("lever.co")) return "Lever";
+    if (url.includes("greenhouse.io")) return "Greenhouse";
+    return "Web";
   }
-
-  // 1. JSON-LD Structured Data Schema Parsing
-  const jsonLdScripts = Array.from(document.querySelectorAll("script[type='application/ld+json']"));
-  for (const script of jsonLdScripts) {
-    try {
-      const data = JSON.parse(script.innerText);
-      if (data["@type"] === "JobPosting" || data.title) {
-        title = data.title || title;
-        if (data.hiringOrganization) {
-          company = typeof data.hiringOrganization === "string"
-            ? data.hiringOrganization
-            : data.hiringOrganization.name || company;
-        }
-        if (data.jobLocation) {
-          const locObj = Array.isArray(data.jobLocation) ? data.jobLocation[0] : data.jobLocation;
-          if (locObj?.address) {
-            location = [locObj.address.addressLocality, locObj.address.addressRegion]
-              .filter(Boolean)
-              .join(", ");
+  
+  const source = detectJobBoard(url);
+  
+  // ============================================
+  // HELPER FUNCTIONS - Generic utilities
+  // ============================================
+  
+  /**
+   * Extract benefits from structured LinkedIn section
+   */
+  function extractLinkedInStructuredBenefits() {
+    const benefits = [];
+    const allParagraphs = Array.from(document.querySelectorAll('p'));
+    const benefitsHeadingP = allParagraphs.find(p => 
+      /^benefits\s+found\s+in\s+job\s+post$/i.test(p.innerText?.trim() || '')
+    );
+    
+    if (benefitsHeadingP) {
+      let nextElement = benefitsHeadingP.nextElementSibling;
+      let attempts = 0;
+      
+      while (nextElement && attempts < 5) {
+        const text = nextElement.innerText?.trim();
+        
+        if (text && text.length > 1 && text.length < 200) {
+          if (!/^(about|see more|show more|promoted|posted|apply)/i.test(text)) {
+            const benefitsList = text.split(/[,\n]/).map(b => b.trim()).filter(b => b.length > 1 && b.length < 100);
+            
+            if (benefitsList.length > 0) {
+              return benefitsList;
+            }
           }
         }
-        description = data.description || description;
+        
+        nextElement = nextElement.nextElementSibling;
+        attempts++;
       }
-    } catch (e) {}
-  }
-
-  // 2. Document Title / Open Graph Fallback
-  if (!title || !company) {
-    const docTitle = document.title || "";
-    if (docTitle && docTitle.includes("|") && !docTitle.toLowerCase().includes("feed")) {
-      const parts = docTitle.split("|").map((p) => p.trim());
-      if (!title && parts[0]) title = parts[0];
-      if (!company && parts[1] && !parts[1].toLowerCase().includes("linkedin")) company = parts[1];
     }
+    
+    return benefits;
   }
-
-  // 3. DOM Fallbacks
-  if (!title) {
-    title = document.querySelector("h1")?.innerText || "";
-  }
-
-  if (!company) {
-    const companyAnchor = document.querySelector("a[href*='/company/']");
-    if (companyAnchor) company = companyAnchor.innerText;
-  }
-
-  // 4. Location Extraction
-  if (!location) {
-    const spans = Array.from(document.querySelectorAll("span, p"));
-    const cityStateRegex = /([A-Z][a-zA-Z\s]+,\s*[A-Z]{2})/;
-    const locMatch = spans.find((s) => cityStateRegex.test(s.innerText || ""));
-
-    if (locMatch) {
-      const match = locMatch.innerText.match(cityStateRegex);
-      if (match) location = match[1].trim();
-    }
-  }
-
-  if (!description) {
-    description =
-      document.querySelector("[data-testid='expandable-text-box']")?.innerText ||
-      document.querySelector("#job-details")?.innerText ||
-      document.querySelector("main")?.innerText ||
-      "";
-  }
-
-  // Clean raw description
-  description = description.replace(/<[^>]*>?/gm, " ").replace(/\s+/g, " ").trim();
-
-  // Extract role summary and company overview from description
-  let roleSummary = "";
-  let companyOverview = "";
-
-  // Remove common LinkedIn prefixes that appear before actual content
-  description = description
-    .replace(/^Job Details\s+Description\s+/i, "")
-    .trim();
-
-  // Strategy: Look for section headers to split content
-  // "About Us" section = Company Overview
-  // "Position Summary" section = Role Summary
   
-  const aboutUsIndex = description.search(/\bAbout Us\b/i);
-  const positionSummaryIndex = description.search(/\b(Position Summary|Role Summary|Job Summary)\b/i);
+  /**
+   * Extract benefits from description text using pattern matching
+   * Works for any job board
+   */
+  function extractBenefitsFromDescription(description) {
+    const benefitPatterns = [
+      { regex: /\bmedical\s+insurance\b/gi, name: 'Medical Insurance' },
+      { regex: /\bdental\s+insurance\b/gi, name: 'Dental Insurance' },
+      { regex: /\bdental\b(?!\s+insurance)/gi, name: 'Dental' },
+      { regex: /\bvision\s+insurance\b/gi, name: 'Vision Insurance' },
+      { regex: /\bvision\b(?!\s+insurance)/gi, name: 'Vision' },
+      { regex: /\b401\(k\)\b/gi, name: '401(k)' },
+      { regex: /\b401k\b/gi, name: '401(k)' },
+      { regex: /\bemployer\s+match\b/gi, name: 'Employer Match' },
+      { regex: /\bpaid\s+time\s+off\b/gi, name: 'Paid Time Off' },
+      { regex: /\bpto\b/gi, name: 'PTO' },
+      { regex: /\bvacation\b/gi, name: 'Vacation' },
+      { regex: /\bholiday\s+program\b/gi, name: 'Holiday Program' },
+      { regex: /\bparking\b/gi, name: 'Parking' },
+      { regex: /\bfitness\b/gi, name: 'Fitness' },
+      { regex: /\bgym\s+membership\b/gi, name: 'Gym Membership' },
+      { regex: /\bemployee\s+discounts\b/gi, name: 'Employee Discounts' },
+      { regex: /\blife\s+insurance\b/gi, name: 'Life Insurance' },
+      { regex: /\bdisability\s+insurance\b/gi, name: 'Disability Insurance' },
+      { regex: /\bparental\s+leave\b/gi, name: 'Parental Leave' },
+      { regex: /\bstock\s+options\b/gi, name: 'Stock Options' },
+      { regex: /\bequity\b/gi, name: 'Equity' },
+      { regex: /\btuition\s+reimbursement\b/gi, name: 'Tuition Reimbursement' },
+      { regex: /\bprofessional\s+development\b/gi, name: 'Professional Development' },
+      { regex: /\bflexible\s+schedule\b/gi, name: 'Flexible Schedule' },
+      { regex: /\bremote\s+work\b/gi, name: 'Remote Work' },
+      { regex: /\bwork\s+from\s+home\b/gi, name: 'Work From Home' },
+      { regex: /\bbonus\b/gi, name: 'Bonus' },
+      { regex: /\bretirement\s+plan\b/gi, name: 'Retirement Plan' }
+    ];
+    
+    const found = [];
+    benefitPatterns.forEach(pattern => {
+      if (pattern.regex.test(description)) {
+        found.push(pattern.name);
+      }
+    });
+    
+    return found;
+  }
   
-  if (aboutUsIndex !== -1 && positionSummaryIndex !== -1) {
-    // Both sections found - extract them properly
-    if (aboutUsIndex < positionSummaryIndex) {
-      // About Us comes first, Position Summary after
-      companyOverview = description
-        .slice(aboutUsIndex, positionSummaryIndex)
-        .replace(/^About Us\s*/i, "")
-        .trim();
-      roleSummary = description
-        .slice(positionSummaryIndex)
-        .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
-        .trim();
+  /**
+   * Parse work setting from content
+   */
+  function parseWorkSetting(content) {
+    const upperContent = content.toUpperCase();
+    if (upperContent.includes("HYBRID")) {
+      return "HYBRID";
+    } else if (
+      upperContent.includes("ON-SITE") ||
+      upperContent.includes("ONSITE") ||
+      upperContent.includes("IN-OFFICE") ||
+      upperContent.includes("IN OFFICE")
+    ) {
+      return "IN_OFFICE";
     } else {
-      // Position Summary comes first, About Us after
-      roleSummary = description
-        .slice(positionSummaryIndex, aboutUsIndex)
-        .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
-        .trim();
+      return "REMOTE";
+    }
+  }
+  
+  /**
+   * Extract salary range from text
+   */
+  function extractSalaryRange(text) {
+    const salaryRegex = /\$(\d{2,3})[,\.]?(\d{3})?\s*(?:-|to)\s*\$(\d{2,3})[,\.]?(\d{3})?/i;
+    const salaryMatch = text.match(salaryRegex);
+    
+    if (salaryMatch) {
+      let rawMin = parseInt(salaryMatch[1].replace(/,/g, ""), 10);
+      let rawMax = parseInt(salaryMatch[3].replace(/,/g, ""), 10);
+      if (rawMin < 1000) rawMin *= 1000;
+      if (rawMax < 1000) rawMax *= 1000;
+      return { salaryMin: rawMin, salaryMax: rawMax };
+    }
+    
+    return { salaryMin: null, salaryMax: null };
+  }
+  
+  /**
+   * Extract tech stack from description
+   */
+  function extractTechStack(description) {
+    const techRules = [
+      { name: "React", regex: /\bReact(?:\.js)?\b/i },
+      { name: "Next.js", regex: /\bNext(?:\.js)?\b/i },
+      { name: "TypeScript", regex: /\bTypeScript\b|\bTS\b/ },
+      { name: "JavaScript", regex: /\bJavaScript\b|\bJS\b/ },
+      { name: "Node.js", regex: /\bNode(?:\.js)?\b/i },
+      { name: "Python", regex: /\bPython\b/i },
+      { name: "PostgreSQL", regex: /\bPostgres(?:QL)?\b/i },
+      { name: "Tailwind CSS", regex: /\bTailwind\b/i },
+      { name: "GraphQL", regex: /\bGraphQL\b/i },
+      { name: "AWS", regex: /\bAWS\b|\bAmazon Web Services\b/i },
+      { name: "Docker", regex: /\bDocker\b/i },
+      { name: "Prisma", regex: /\bPrisma\b/i },
+      { name: "SQL", regex: /\bSQL\b/ },
+      { name: "HTML", regex: /\bHTML5?\b/i },
+      { name: "CSS", regex: /\bCSS3?\b/i },
+      { name: "CDK", regex: /\bAWS CDK\b|\bCDK\b/ },
+      { name: "Terraform", regex: /\bTerraform\b/i }
+    ];
+
+    return techRules
+      .filter((rule) => rule.regex.test(description))
+      .map((rule) => rule.name);
+  }
+  
+  // ============================================
+  // JOB BOARD-SPECIFIC SCRAPERS
+  // ============================================
+  
+  /**
+   * LinkedIn-specific scraper
+   * Handles LinkedIn's unique DOM structure and data format
+   */
+  function scrapeLinkedIn() {
+    let title = "";
+    let company = "";
+    let location = "";
+    let description = "";
+    let salaryMin = null;
+    let salaryMax = null;
+    let workSetting = "REMOTE";
+    let roleSummary = "";
+    let companyOverview = "";
+    let benefits = [];
+    
+    // JSON-LD structured data
+    const jsonLdScripts = Array.from(document.querySelectorAll("script[type='application/ld+json']"));
+    for (const script of jsonLdScripts) {
+      try {
+        const data = JSON.parse(script.innerText);
+        if (data["@type"] === "JobPosting" || data.title) {
+          title = data.title || title;
+          if (data.hiringOrganization) {
+            company = typeof data.hiringOrganization === "string"
+              ? data.hiringOrganization
+              : data.hiringOrganization.name || company;
+          }
+          if (data.jobLocation) {
+            const locObj = Array.isArray(data.jobLocation) ? data.jobLocation[0] : data.jobLocation;
+            if (locObj?.address) {
+              location = [locObj.address.addressLocality, locObj.address.addressRegion]
+                .filter(Boolean)
+                .join(", ");
+            }
+          }
+          description = data.description || description;
+        }
+      } catch (e) {}
+    }
+    
+    // Document title fallback
+    if (!title || !company) {
+      const docTitle = document.title || "";
+      if (docTitle && docTitle.includes("|") && !docTitle.toLowerCase().includes("feed")) {
+        const parts = docTitle.split("|").map((p) => p.trim());
+        if (!title && parts[0]) title = parts[0];
+        if (!company && parts[1] && !parts[1].toLowerCase().includes("linkedin")) company = parts[1];
+      }
+    }
+    
+    // DOM fallbacks
+    if (!title) {
+      title = document.querySelector("h1")?.innerText || "";
+    }
+    
+    if (!company) {
+      const companyAnchor = document.querySelector("a[href*='/company/']");
+      if (companyAnchor) company = companyAnchor.innerText;
+    }
+    
+    // Location extraction
+    if (!location) {
+      const spans = Array.from(document.querySelectorAll("span, p"));
+      const cityStateRegex = /([A-Z][a-zA-Z\s]+,\s*[A-Z]{2})/;
+      const locMatch = spans.find((s) => cityStateRegex.test(s.innerText || ""));
+      if (locMatch) {
+        const match = locMatch.innerText.match(cityStateRegex);
+        if (match) location = match[1].trim();
+      }
+    }
+    
+    // Description extraction
+    if (!description) {
+      description =
+        document.querySelector("[data-testid='expandable-text-box']")?.innerText ||
+        document.querySelector("#job-details")?.innerText ||
+        document.querySelector("main")?.innerText ||
+        "";
+    }
+    
+    // Clean description
+    description = description.replace(/<[^>]*>?/gm, " ").replace(/\s+/g, " ").trim();
+    description = description.replace(/^Job Details\s+Description\s+/i, "").trim();
+    
+    // Parse role summary and company overview
+    const aboutUsIndex = description.search(/\bAbout Us\b/i);
+    const positionSummaryIndex = description.search(/\b(Position Summary|Role Summary|Job Summary)\b/i);
+    
+    if (aboutUsIndex !== -1 && positionSummaryIndex !== -1) {
+      if (aboutUsIndex < positionSummaryIndex) {
+        companyOverview = description
+          .slice(aboutUsIndex, positionSummaryIndex)
+          .replace(/^About Us\s*/i, "")
+          .trim();
+        roleSummary = description
+          .slice(positionSummaryIndex)
+          .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
+          .trim();
+      } else {
+        roleSummary = description
+          .slice(positionSummaryIndex, aboutUsIndex)
+          .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
+          .trim();
+        companyOverview = description
+          .slice(aboutUsIndex)
+          .replace(/^About Us\s*/i, "")
+          .trim();
+      }
+    } else if (aboutUsIndex !== -1) {
       companyOverview = description
         .slice(aboutUsIndex)
         .replace(/^About Us\s*/i, "")
-        .trim();
+        .trim()
+        .slice(0, 800);
+      roleSummary = description
+        .slice(0, aboutUsIndex)
+        .trim()
+        .slice(0, 1000);
+    } else if (positionSummaryIndex !== -1) {
+      roleSummary = description
+        .slice(positionSummaryIndex)
+        .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
+        .trim()
+        .slice(0, 1000);
+      companyOverview = description
+        .slice(0, positionSummaryIndex)
+        .trim()
+        .slice(0, 800);
+    } else {
+      const midpoint = Math.min(Math.floor(description.length / 2), 800);
+      roleSummary = description.slice(0, midpoint).trim();
+      companyOverview = description.slice(midpoint).trim().slice(0, 800);
     }
-  } else if (aboutUsIndex !== -1) {
-    // Only About Us found - split there
-    companyOverview = description
-      .slice(aboutUsIndex)
-      .replace(/^About Us\s*/i, "")
-      .trim()
-      .slice(0, 800);
-    roleSummary = description
-      .slice(0, aboutUsIndex)
-      .trim()
-      .slice(0, 1000);
-  } else if (positionSummaryIndex !== -1) {
-    // Only Position Summary found - split there
-    roleSummary = description
-      .slice(positionSummaryIndex)
-      .replace(/^(Position Summary|Role Summary|Job Summary)\s*/i, "")
-      .trim()
-      .slice(0, 1000);
-    companyOverview = description
-      .slice(0, positionSummaryIndex)
-      .trim()
-      .slice(0, 800);
-  } else {
-    // No clear sections - use fallback split
+    
+    // LinkedIn-specific structured benefits
+    benefits = extractLinkedInStructuredBenefits();
+    
+    // Work setting
+    const fullContent = (title + " " + location + " " + description);
+    workSetting = parseWorkSetting(fullContent);
+    
+    // Salary
+    const salaryData = extractSalaryRange(description);
+    salaryMin = salaryData.salaryMin;
+    salaryMax = salaryData.salaryMax;
+    
+    return {
+      title,
+      company,
+      location,
+      description,
+      salaryMin,
+      salaryMax,
+      workSetting,
+      roleSummary,
+      companyOverview,
+      benefits
+    };
+  }
+  
+  /**
+   * Indeed-specific scraper
+   * TODO: Implement Indeed-specific selectors and logic
+   */
+  function scrapeIndeed() {
+    // Placeholder for Indeed-specific scraping
+    // Will use generic scraper for now
+    return null;
+  }
+  
+  /**
+   * ZipRecruiter-specific scraper
+   * TODO: Implement ZipRecruiter-specific selectors and logic
+   */
+  function scrapeZipRecruiter() {
+    // Placeholder for ZipRecruiter-specific scraping
+    // Will use generic scraper for now
+    return null;
+  }
+  
+  /**
+   * Generic scraper - works for any job board
+   * Uses JSON-LD, meta tags, and common selectors
+   */
+  function scrapeGeneric() {
+    let title = "";
+    let company = "";
+    let location = "";
+    let description = "";
+    let salaryMin = null;
+    let salaryMax = null;
+    let workSetting = "REMOTE";
+    
+    // JSON-LD structured data
+    const jsonLdScripts = Array.from(document.querySelectorAll("script[type='application/ld+json']"));
+    for (const script of jsonLdScripts) {
+      try {
+        const data = JSON.parse(script.innerText);
+        if (data["@type"] === "JobPosting" || data.title) {
+          title = data.title || title;
+          if (data.hiringOrganization) {
+            company = typeof data.hiringOrganization === "string"
+              ? data.hiringOrganization
+              : data.hiringOrganization.name || company;
+          }
+          if (data.jobLocation) {
+            const locObj = Array.isArray(data.jobLocation) ? data.jobLocation[0] : data.jobLocation;
+            if (locObj?.address) {
+              location = [locObj.address.addressLocality, locObj.address.addressRegion]
+                .filter(Boolean)
+                .join(", ");
+            }
+          }
+          description = data.description || description;
+        }
+      } catch (e) {}
+    }
+    
+    // Document title fallback
+    if (!title) {
+      const docTitle = document.title || "";
+      if (docTitle && docTitle.includes("|")) {
+        const parts = docTitle.split("|").map((p) => p.trim());
+        if (parts[0]) title = parts[0];
+      } else {
+        title = document.querySelector("h1")?.innerText || "";
+      }
+    }
+    
+    // Company fallback
+    if (!company) {
+      company = document.querySelector("[itemprop='hiringOrganization']")?.innerText ||
+                document.querySelector("h2")?.innerText || "";
+    }
+    
+    // Location fallback
+    if (!location) {
+      const spans = Array.from(document.querySelectorAll("span, p"));
+      const cityStateRegex = /([A-Z][a-zA-Z\s]+,\s*[A-Z]{2})/;
+      const locMatch = spans.find((s) => cityStateRegex.test(s.innerText || ""));
+      if (locMatch) {
+        const match = locMatch.innerText.match(cityStateRegex);
+        if (match) location = match[1].trim();
+      }
+    }
+    
+    // Description fallback
+    if (!description) {
+      description =
+        document.querySelector("[itemprop='description']")?.innerText ||
+        document.querySelector("#job-details")?.innerText ||
+        document.querySelector("main")?.innerText ||
+        "";
+    }
+    
+    // Clean description
+    description = description.replace(/<[^>]*>?/gm, " ").replace(/\s+/g, " ").trim();
+    
+    // Work setting
+    const fullContent = (title + " " + location + " " + description);
+    workSetting = parseWorkSetting(fullContent);
+    
+    // Salary
+    const salaryData = extractSalaryRange(description);
+    salaryMin = salaryData.salaryMin;
+    salaryMax = salaryData.salaryMax;
+    
+    // Role summary and company overview (simple split)
     const midpoint = Math.min(Math.floor(description.length / 2), 800);
-    roleSummary = description.slice(0, midpoint).trim();
-    companyOverview = description.slice(midpoint).trim().slice(0, 800);
+    const roleSummary = description.slice(0, midpoint).trim();
+    const companyOverview = description.slice(midpoint).trim().slice(0, 800);
+    
+    return {
+      title,
+      company,
+      location,
+      description,
+      salaryMin,
+      salaryMax,
+      workSetting,
+      roleSummary,
+      companyOverview,
+      benefits: [] // Will be extracted generically later
+    };
   }
-
-  // Strict Work Setting Parsing (Strictly IN_OFFICE, HYBRID, REMOTE)
-  const fullContent = (title + " " + location + " " + description).toUpperCase();
-  if (fullContent.includes("HYBRID")) {
-    workSetting = "HYBRID";
-  } else if (
-    fullContent.includes("ON-SITE") ||
-    fullContent.includes("ONSITE") ||
-    fullContent.includes("IN-OFFICE") ||
-    fullContent.includes("IN OFFICE")
-  ) {
-    workSetting = "IN_OFFICE";
-  } else {
-    workSetting = "REMOTE";
+  
+  // ============================================
+  // MAIN SCRAPING ORCHESTRATION
+  // ============================================
+  
+  // Route to appropriate scraper based on job board
+  let scrapedData;
+  
+  switch (source) {
+    case "LinkedIn":
+      scrapedData = scrapeLinkedIn();
+      break;
+    case "Indeed":
+      scrapedData = scrapeIndeed() || scrapeGeneric();
+      break;
+    case "ZipRecruiter":
+      scrapedData = scrapeZipRecruiter() || scrapeGeneric();
+      break;
+    default:
+      scrapedData = scrapeGeneric();
   }
-
-  // Salary Range Extraction
-  const salaryRegex = /\$(\d{2,3})[,\.]?(\d{3})?\s*(?:-|to)\s*\$(\d{2,3})[,\.]?(\d{3})?/i;
-  const salaryMatch = description.match(salaryRegex);
-  if (salaryMatch) {
-    let rawMin = parseInt(salaryMatch[1].replace(/,/g, ""), 10);
-    let rawMax = parseInt(salaryMatch[3].replace(/,/g, ""), 10);
-    if (rawMin < 1000) rawMin *= 1000;
-    if (rawMax < 1000) rawMax *= 1000;
-    salaryMin = rawMin;
-    salaryMax = rawMax;
+  
+  // Extract tech stack (works for all job boards)
+  const detectedStack = extractTechStack(scrapedData.description);
+  
+  // Extract benefits (works for all job boards)
+  const benefitsFromDescription = extractBenefitsFromDescription(scrapedData.description);
+  
+  // Combine board-specific benefits with generic benefits
+  const allBenefits = [...scrapedData.benefits, ...benefitsFromDescription];
+  let benefits = [...new Set(allBenefits)].slice(0, 15); // Deduplicate and limit
+  
+  // Remove redundant Remote Work benefit if work setting is already REMOTE
+  if (scrapedData.workSetting === "REMOTE") {
+    benefits = benefits.filter(b => !/^(remote\s*work|work\s*from\s*home)$/i.test(b));
   }
-
-  // Strict Tech Stack Rules
-  const techRules = [
-    { name: "React", regex: /\bReact(?:\.js)?\b/i },
-    { name: "Next.js", regex: /\bNext(?:\.js)?\b/i },
-    { name: "TypeScript", regex: /\bTypeScript\b|\bTS\b/ },
-    { name: "JavaScript", regex: /\bJavaScript\b|\bJS\b/ },
-    { name: "Node.js", regex: /\bNode(?:\.js)?\b/i },
-    { name: "Python", regex: /\bPython\b/i },
-    { name: "PostgreSQL", regex: /\bPostgres(?:QL)?\b/i },
-    { name: "Tailwind CSS", regex: /\bTailwind\b/i },
-    { name: "GraphQL", regex: /\bGraphQL\b/i },
-    { name: "AWS", regex: /\bAWS\b|\bAmazon Web Services\b/i },
-    { name: "Docker", regex: /\bDocker\b/i },
-    { name: "Prisma", regex: /\bPrisma\b/i },
-    { name: "SQL", regex: /\bSQL\b/ },
-    { name: "HTML", regex: /\bHTML5?\b/i },
-    { name: "CSS", regex: /\bCSS3?\b/i },
-    { name: "CDK", regex: /\bAWS CDK\b|\bCDK\b/ },
-    { name: "Terraform", regex: /\bTerraform\b/i }
-  ];
-
-  const detectedStack = techRules
-    .filter((rule) => rule.regex.test(description))
-    .map((rule) => rule.name);
-
-  // Extract benefits from description
-  const benefitsRegex = /\b(401k|health insurance|dental|vision|pto|paid time off|remote work|flexible schedule|stock options|equity|parental leave|gym membership|tuition reimbursement|professional development)\b/gi;
-  const benefitsMatches = description.match(benefitsRegex) || [];
-  const benefits = [...new Set(benefitsMatches.map(b => 
-    b.toLowerCase()
-      .replace(/\b401k\b/, "401k")
-      .replace(/\bpto\b/, "PTO")
-      .split(" ")
-      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ")
-  ))];
-
+  
+  // Return final data
   return {
-    title: (title || "").split("\n")[0].trim(),
-    company: (company || "").split("\n")[0].trim(),
-    location: (location || "").split("\n")[0].trim(),
-    workSetting,
-    salaryMin,
-    salaryMax,
+    title: (scrapedData.title || "").split("\n")[0].trim(),
+    company: (scrapedData.company || "").split("\n")[0].trim(),
+    location: (scrapedData.location || "").split("\n")[0].trim(),
+    workSetting: scrapedData.workSetting,
+    salaryMin: scrapedData.salaryMin,
+    salaryMax: scrapedData.salaryMax,
     techStack: detectedStack,
-    roleSummary: roleSummary || (description ? description.slice(0, 500) : ""),
-    companyOverview: companyOverview || (description ? description.slice(500, 800) : ""),
+    roleSummary: scrapedData.roleSummary || (scrapedData.description ? scrapedData.description.slice(0, 500) : ""),
+    companyOverview: scrapedData.companyOverview || (scrapedData.description ? scrapedData.description.slice(500, 800) : ""),
     benefits: benefits,
     originalUrls: [window.location.href],
     sources: [source],
