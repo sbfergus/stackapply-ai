@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { JobStatus, WorkType } from "@prisma/client";
 
@@ -43,9 +45,37 @@ function parseWorkType(input?: string | null): WorkType {
 }
 
 // GET /api/jobs - List all jobs
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const isGuest = searchParams.get("guest") === "true";
+
+    let userId: string;
+
+    if (isGuest) {
+      // Guest mode - get the first/demo user
+      const demoUser = await prisma.user.findFirst();
+      if (!demoUser) {
+        return NextResponse.json(
+          { error: "No demo user found" },
+          { status: 404, headers: corsHeaders() }
+        );
+      }
+      userId = demoUser.id;
+    } else {
+      // Authenticated mode
+      const session = await getServerSession(authOptions);
+      if (!session?.user?.id) {
+        return NextResponse.json(
+          { error: "Unauthorized" },
+          { status: 401, headers: corsHeaders() }
+        );
+      }
+      userId = session.user.id;
+    }
+
     const jobs = await prisma.job.findMany({
+      where: { userId },
       orderBy: { createdAt: "desc" },
     });
 
@@ -68,6 +98,30 @@ export async function GET() {
 // POST /api/jobs - Create new job (from Chrome/Safari Extension or UI)
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    
+    // For extension usage, allow guest/demo user
+    let userId: string;
+    
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } else {
+      // No session - use demo user for extension
+      const demoUser = await prisma.user.findFirst();
+      if (!demoUser) {
+        // Create demo user if doesn't exist
+        const newDemoUser = await prisma.user.create({
+          data: {
+            email: "demo@stackapply.ai",
+            fullName: "Demo User",
+          },
+        });
+        userId = newDemoUser.id;
+      } else {
+        userId = demoUser.id;
+      }
+    }
+
     const body = await req.json();
     const {
       title,
@@ -97,17 +151,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get primary user (or demo user)
-    let user = await prisma.user.findFirst();
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email: "demo@stackapply.ai",
-          fullName: "Scott Ferguson",
-        },
-      });
-    }
-
     // Normalize text for fuzzy duplicate detection
     function normalizeText(text: string): string {
       return text
@@ -132,7 +175,7 @@ export async function POST(req: NextRequest) {
       
       existingJob = await prisma.job.findFirst({
         where: {
-          userId: user.id,
+          userId: userId,
           originalUrls: {
             has: cleanUrl,
           },
@@ -144,7 +187,7 @@ export async function POST(req: NextRequest) {
     if (!existingJob) {
       // Fetch all jobs for this user and do fuzzy comparison
       const allUserJobs = await prisma.job.findMany({
-        where: { userId: user.id },
+        where: { userId: userId },
         select: { id: true, title: true, company: true },
       });
 
@@ -179,7 +222,7 @@ export async function POST(req: NextRequest) {
     const newJob = await prisma.job.create({
       data: {
         user: {
-          connect: { id: user.id },
+          connect: { id: userId },
         },
         title,
         company,

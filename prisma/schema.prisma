@@ -12,6 +12,7 @@ datasource db {
 model User {
   id                  String     @id @default(uuid())
   email               String     @unique
+  password            String?    // For credentials auth
   fullName            String?
   avatarUrl           String?
   linkedinUrl         String?

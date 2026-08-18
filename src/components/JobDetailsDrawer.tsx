@@ -15,7 +15,7 @@ import {
   Check,
   FileText,
 } from "lucide-react";
-import { Job } from "@/app/page";
+import { Job } from "@/app/dashboard/page";
 
 interface JobDetailsDrawerProps {
   job: Job | null;
