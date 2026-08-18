@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createPortal } from "react-dom";
@@ -15,14 +15,12 @@ import {
   Building2,
   MapPin,
   Banknote,
-  Sparkles,
   RefreshCw,
   GripVertical,
   Plus,
   ChevronDown,
   FileText,
   FileUser,
-  User,
   LogOut,
 } from "lucide-react";
 import { JobDetailsDrawer } from "@/components/JobDetailsDrawer";
@@ -96,7 +94,7 @@ const SkeletonJobCard = () => (
   </div>
 );
 
-export default function Dashboard() {
+function DashboardContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -106,7 +104,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const [useAI, setUseAI] = useState(false);
+  const [useAI] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [skeletonCounts, setSkeletonCounts] = useState<Record<string, number>>({
     TO_REVIEW: 0,
@@ -645,5 +643,26 @@ export default function Dashboard() {
         onJobAdded={handleJobAdded}
       />
     </div>
+  );
+}
+
+// Loading fallback component
+function DashboardLoading() {
+  return (
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="text-center">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+        <p className="mt-4 text-slate-400 text-sm">Loading dashboard...</p>
+      </div>
+    </div>
+  );
+}
+
+// Default export with Suspense boundary
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <DashboardContent />
+    </Suspense>
   );
 }
