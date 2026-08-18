@@ -5,7 +5,7 @@
 
 // API Configuration
 const API_URL = "https://stackapply-ai.vercel.app";
-// For local testing, use: http://localhost:3000
+// const API_URL = "http://localhost:3000"; // For local testing
 
 // DOM Elements
 const signinTab = document.getElementById('signin-tab');

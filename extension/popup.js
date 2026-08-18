@@ -1,4 +1,10 @@
 // ============================================
+// API CONFIGURATION
+// ============================================
+// const API_BASE_URL = "${API_BASE_URL}";
+const API_BASE_URL = "https://stackapply-ai.vercel.app"; // For local testing
+
+// ============================================
 // AUTHENTICATION HELPERS (from storage.js)
 // ============================================
 
@@ -29,7 +35,7 @@ async function clearAuthState() {
  */
 async function validateToken(token) {
   try {
-    const response = await fetch('https://stackapply-ai.vercel.app/api/auth/extension/validate', {
+    const response = await fetch('${API_BASE_URL}/api/auth/extension/validate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -214,7 +220,7 @@ async function initializeAuthenticatedPopup(authState) {
       benefits,
     };
 
-    const API_URL = "https://stackapply-ai.vercel.app/api/jobs";
+    const API_URL = `${API_BASE_URL}/api/jobs`;
 
     try {
       const res = await fetch(API_URL, {
@@ -271,7 +277,7 @@ async function initializeAuthenticatedPopup(authState) {
  */
 async function validateToken(token) {
   try {
-    const response = await fetch('https://stackapply-ai.vercel.app/api/auth/extension/validate', {
+    const response = await fetch('${API_BASE_URL}/api/auth/extension/validate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -292,7 +298,7 @@ async function validateToken(token) {
 async function handleSignOut(token) {
   try {
     // Call API to revoke token
-    await fetch('https://stackapply-ai.vercel.app/api/auth/extension/signout', {
+    await fetch('${API_BASE_URL}/api/auth/extension/signout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
