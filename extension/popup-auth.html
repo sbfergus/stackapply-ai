@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StackApply AI - Sign In</title>
+  <link rel="stylesheet" href="popup-auth.css" />
+</head>
+<body>
+  <div class="auth-container">
+    <!-- Logo and Header -->
+    <div class="logo-section">
+      <div class="logo-icon">⚡</div>
+      <h1 class="logo-text">StackApply AI</h1>
+      <p class="tagline">Your AI-powered job tracker</p>
+    </div>
+
+    <!-- Auth Form Container -->
+    <div id="auth-form-container">
+      <!-- Tab Switcher -->
+      <div class="tab-switcher">
+        <button id="signin-tab" class="tab active" data-tab="signin">Sign In</button>
+        <button id="signup-tab" class="tab" data-tab="signup">Sign Up</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="signin-form" class="auth-form">
+        <div class="form-group">
+          <label for="signin-email">Email</label>
+          <input 
+            type="email" 
+            id="signin-email" 
+            placeholder="you@example.com" 
+            required 
+            autocomplete="email"
+          />
+        </div>
+        
+        <div class="form-group">
+          <label for="signin-password">Password</label>
+          <input 
+            type="password" 
+            id="signin-password" 
+            placeholder="••••••••" 
+            required 
+            autocomplete="current-password"
+          />
+        </div>
+
+        <a href="#" id="forgot-password" class="forgot-link">Forgot password?</a>
+
+        <button type="submit" id="signin-btn" class="auth-button">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Sign Up Form (hidden by default) -->
+      <form id="signup-form" class="auth-form hidden">
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input 
+            type="email" 
+            id="signup-email" 
+            placeholder="you@example.com" 
+            required 
+            autocomplete="email"
+          />
+        </div>
+        
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input 
+            type="password" 
+            id="signup-password" 
+            placeholder="Minimum 8 characters" 
+            required 
+            autocomplete="new-password"
+            minlength="8"
+          />
+        </div>
+
+        <button type="submit" id="signup-btn" class="auth-button">
+          Sign Up
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span>or</span>
+      </div>
+
+      <!-- Guest Mode Button -->
+      <button id="guest-btn" class="guest-button">
+        Continue as Guest
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="loading-state hidden">
+      <div class="spinner"></div>
+      <p id="loading-message">Signing in...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="error-message hidden"></div>
+
+    <!-- Success Message -->
+    <div id="success-message" class="success-message hidden"></div>
+  </div>
+
+  <script src="storage.js"></script>
+  <script src="popup-auth.js"></script>
+</body>
+</html>

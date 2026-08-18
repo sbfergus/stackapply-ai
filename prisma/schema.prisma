@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,32 +7,44 @@ datasource db {
 }
 
 model User {
-  id                  String     @id @default(uuid())
-  email               String     @unique
-  password            String?    // For credentials auth
-  fullName            String?
-  avatarUrl           String?
-  linkedinUrl         String?
-  linkedinData        Json?
-  baseResumeText      String?
-  baseCoverLetter     String?
-  writingStyle        Json?
+  id                 String              @id @default(uuid())
+  email              String              @unique
+  fullName           String?
+  avatarUrl          String?
+  linkedinUrl        String?
+  linkedinData       Json?
+  baseResumeText     String?
+  baseCoverLetter    String?
+  writingStyle       Json?
+  preferredWorkTypes WorkType[]          @default([REMOTE, HYBRID])
+  preferredTechStack String[]
+  targetSalaryMin    Int?
+  preferredLocations String[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  password           String?
+  jobs               Job[]
+  extensionSessions  ExtensionSession[]
+}
 
-  // 🎯 User Onboarding & Job Preferences
-  preferredWorkTypes  WorkType[] @default([REMOTE, HYBRID])
-  preferredTechStack  String[]   // e.g. ["Next.js", "TypeScript", "Tailwind"]
-  targetSalaryMin     Int?       // e.g. 140000
-  preferredLocations  String[]   // e.g. ["Denver, CO", "Remote"]
+model ExtensionSession {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token      String   @unique
+  expiresAt  DateTime
+  lastUsedAt DateTime @default(now())
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
 
-  jobs                Job[]
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  @@index([userId, expiresAt])
+  @@index([token])
 }
 
 model Job {
   id                 String    @id @default(uuid())
   userId             String
-  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   title              String
   company            String
   location           String
@@ -49,19 +58,17 @@ model Job {
   techStack          String[]
   benefits           Json
   status             JobStatus @default(TO_REVIEW)
-
-  // 📊 Scoring & Metrics
-  matchScore         Int?      // Candidate Fit (0-100%): Skills/Experience match
-  preferenceScore    Int?      // Job Fit (0-100%): Work type, Tech, Salary match
-  matchReasoning     String?   // Concise 1-sentence breakdown for UI hover tooltips
-
+  matchScore         Int?
+  preferenceScore    Int?
+  matchReasoning     String?
   tailoredResumeText String?
   coverLetterText    String?
-  notes              String?   // Personal notes about the job
-  listedAt           DateTime? // When the job was originally posted on the job board
-  appliedAt          DateTime? // When the user applied to this job
+  appliedAt          DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+  notes              String?
+  listedAt           DateTime?
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
 }

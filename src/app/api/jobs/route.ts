@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { ExtensionAuthService } from "@/lib/extensionAuth";
 import { prisma } from "@/lib/prisma";
 import { JobStatus, WorkType } from "@prisma/client";
 
@@ -98,28 +99,33 @@ export async function GET(req: NextRequest) {
 // POST /api/jobs - Create new job (from Chrome/Safari Extension or UI)
 export async function POST(req: NextRequest) {
   try {
+    let userId: string | null = null;
+    
+    // 1. Try NextAuth session (web application)
     const session = await getServerSession(authOptions);
-    
-    // For extension usage, allow guest/demo user
-    let userId: string;
-    
     if (session?.user?.id) {
       userId = session.user.id;
-    } else {
-      // No session - use demo user for extension
-      const demoUser = await prisma.user.findFirst();
-      if (!demoUser) {
-        // Create demo user if doesn't exist
-        const newDemoUser = await prisma.user.create({
-          data: {
-            email: "demo@stackapply.ai",
-            fullName: "Demo User",
-          },
-        });
-        userId = newDemoUser.id;
-      } else {
-        userId = demoUser.id;
+    }
+    
+    // 2. Try extension token (Authorization header)
+    if (!userId) {
+      const authHeader = req.headers.get('Authorization');
+      if (authHeader?.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const decoded = await ExtensionAuthService.validateToken(token);
+        
+        if (decoded) {
+          userId = decoded.sub;
+        }
       }
+    }
+    
+    // 3. No authentication - return 401
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Unauthorized. Please sign in." },
+        { status: 401, headers: corsHeaders() }
+      );
     }
 
     const body = await req.json();

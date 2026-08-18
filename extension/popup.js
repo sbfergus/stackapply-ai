@@ -1,16 +1,145 @@
+// ============================================
+// AUTHENTICATION HELPERS (from storage.js)
+// ============================================
+
+/**
+ * Load authentication state from Chrome Storage
+ */
+async function loadAuthState() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get('auth', (result) => {
+      resolve(result.auth || null);
+    });
+  });
+}
+
+/**
+ * Clear authentication state from Chrome Storage
+ */
+async function clearAuthState() {
+  return new Promise((resolve) => {
+    chrome.storage.local.remove('auth', () => {
+      resolve();
+    });
+  });
+}
+
+/**
+ * Validate token with API
+ */
+async function validateToken(token) {
+  try {
+    const response = await fetch('https://stackapply-ai.vercel.app/api/auth/extension/validate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      return data.success === true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Token validation error:', error);
+    return false;
+  }
+}
+
+// ============================================
+// DOM CONTENT LOADED
+// ============================================
+
 document.addEventListener("DOMContentLoaded", async () => {
+  // Check authentication status first
+  const authState = await loadAuthState();
+  
+  if (!authState || !authState.token) {
+    // Not authenticated - redirect to auth screen
+    window.location.href = 'popup-auth.html';
+    return;
+  }
+
+  // Validate token with API
+  const isValid = await validateToken(authState.token);
+  if (!isValid) {
+    // Token invalid/expired - clear and redirect to auth
+    await clearAuthState();
+    window.location.href = 'popup-auth.html';
+    return;
+  }
+
+  // User is authenticated - proceed with normal popup functionality
+  initializeAuthenticatedPopup(authState);
+});
+
+/**
+ * Initialize popup for authenticated users
+ */
+async function initializeAuthenticatedPopup(authState) {
   const saveBtn = document.getElementById("save-btn");
   const statusEl = document.getElementById("status");
-  const useAiToggle = document.getElementById("use-ai-toggle");
+  const userHeaderEl = document.getElementById("user-header");
+  const userEmailEl = document.getElementById("user-email");
+  const guestBadgeEl = document.getElementById("guest-badge");
+  const settingsBtn = document.getElementById("settings-btn");
+  const settingsMenu = document.getElementById("settings-menu");
+  const signoutBtn = document.getElementById("signout-btn");
+  const switchAccountBtn = document.getElementById("switch-account-btn");
+
+  // Show user header
+  userHeaderEl.style.display = 'flex';
+
+  // Display user info in header
+  if (authState.isGuest) {
+    userEmailEl.textContent = "Guest User";
+    guestBadgeEl.style.display = 'inline-block';
+  } else {
+    userEmailEl.textContent = authState.user.email;
+    guestBadgeEl.style.display = 'none';
+  }
+
+  // Settings menu toggle
+  settingsBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isHidden = settingsMenu.style.display === 'none';
+    settingsMenu.style.display = isHidden ? 'block' : 'none';
+  });
+  
+  // Close menu when clicking outside
+  document.addEventListener("click", () => {
+    settingsMenu.style.display = 'none';
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener("click", () => {
+    if (!settingsMenu.classList.contains("hidden")) {
+      settingsMenu.classList.add("hidden");
+    }
+  });
+
+  // Sign out handler
+  signoutBtn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    await handleSignOut(authState.token);
+  });
+
+  // Switch account handler
+  switchAccountBtn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    await handleSignOut(authState.token);
+  });
 
   let scrapedData = {};
-  const useAI = false; // Disabled until AI keys are added
 
+  // Scrape job data from current tab
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     if (tab?.id) {
-      // Direct injection into active tab DOM
       const results = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: scrapeJobDataInTab,
@@ -51,7 +180,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const title = document.getElementById("title").value.trim();
     const company = document.getElementById("company").value.trim();
     const location = document.getElementById("location").value.trim();
-    const selectedWorkSetting = document.getElementById("workSetting").value; // IN_OFFICE, HYBRID, REMOTE
+    const selectedWorkSetting = document.getElementById("workSetting").value;
     const salaryMin = parseInt(document.getElementById("salaryMin").value, 10) || null;
     const salaryMax = parseInt(document.getElementById("salaryMax").value, 10) || null;
     const roleSummary = document.getElementById("roleSummary").value.trim();
@@ -69,13 +198,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       .map((s) => s.trim())
       .filter(Boolean);
 
-    // Spread scrapedData FIRST, then explicitly override with user form selections SECOND
     const payload = {
       ...scrapedData,
       title,
       company,
       location,
-      workSetting: selectedWorkSetting, // Hard overrides with selected dropdown option
+      workSetting: selectedWorkSetting,
       setting: selectedWorkSetting,
       workType: selectedWorkSetting,
       salaryMin,
@@ -84,31 +212,40 @@ document.addEventListener("DOMContentLoaded", async () => {
       companyOverview,
       techStack,
       benefits,
-      // Keep the detected source from scraping, don't override
     };
 
-    // Production Vercel API endpoint
     const API_URL = "https://stackapply-ai.vercel.app/api/jobs";
-    
-    // For local testing, use: http://localhost:3000/api/jobs
 
     try {
       const res = await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${authState.token}`
+        },
         body: JSON.stringify(payload),
       });
 
       const data = await res.json();
 
-      console.log("API Response:", res.status, data);
+      if (res.status === 401) {
+        // Token expired - redirect to auth
+        await clearAuthState();
+        statusEl.innerText = "⚠️ Session expired. Please sign in again.";
+        statusEl.className = "status error";
+        setTimeout(() => {
+          window.location.href = 'popup-auth.html';
+        }, 1500);
+        return;
+      }
 
       if (res.ok && data.success) {
-        statusEl.innerText = "✅ Saved to Dashboard!";
+        statusEl.innerText = authState.isGuest 
+          ? "✅ Saved to Guest Dashboard!" 
+          : "✅ Saved to Your Dashboard!";
         statusEl.className = "status success";
         setTimeout(() => window.close(), 1200);
       } else if (res.status === 409) {
-        // Duplicate detected
         statusEl.innerText = "Already in your dashboard";
         statusEl.className = "status error";
         saveBtn.disabled = false;
@@ -127,7 +264,51 @@ document.addEventListener("DOMContentLoaded", async () => {
       saveBtn.innerText = "Save to Dashboard";
     }
   });
-});
+}
+
+/**
+ * Validate token with API
+ */
+async function validateToken(token) {
+  try {
+    const response = await fetch('https://stackapply-ai.vercel.app/api/auth/extension/validate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    return response.ok;
+  } catch (error) {
+    console.error('Token validation error:', error);
+    return false;
+  }
+}
+
+/**
+ * Handle sign out
+ */
+async function handleSignOut(token) {
+  try {
+    // Call API to revoke token
+    await fetch('https://stackapply-ai.vercel.app/api/auth/extension/signout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  } catch (error) {
+    console.error('Sign out error:', error);
+  }
+  
+  // Clear local storage regardless of API result
+  await clearAuthState();
+  
+  // Redirect to auth screen
+  window.location.href = 'popup-auth.html';
+}
 
 // Self-contained scraper function injected directly into active tab
 function scrapeJobDataInTab() {
