@@ -7,6 +7,48 @@
 const API_URL = "https://stackapply-ai.vercel.app";
 // const API_URL = "http://localhost:3000"; // For local testing
 
+// ============================================
+// CHROME STORAGE HELPERS
+// ============================================
+
+/**
+ * Save authentication state to Chrome Storage
+ */
+async function saveAuthState(token, user, expiresAt, isGuest = false) {
+  return new Promise((resolve) => {
+    chrome.storage.local.set({
+      auth: {
+        token,
+        user,
+        expiresAt,
+        isGuest
+      }
+    }, () => {
+      resolve();
+    });
+  });
+}
+
+/**
+ * Load authentication state from Chrome Storage
+ */
+async function loadAuthState() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get('auth', (result) => {
+      resolve(result.auth || null);
+    });
+  });
+}
+
+/**
+ * Calculate expiration date (30 days from now)
+ */
+function calculateExpiresAt() {
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
+  return expiresAt.toISOString();
+}
+
 // DOM Elements
 const signinTab = document.getElementById('signin-tab');
 const signupTab = document.getElementById('signup-tab');
