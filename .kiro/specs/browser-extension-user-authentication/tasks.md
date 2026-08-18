@@ -99,7 +99,7 @@ This implementation plan converts the authentication design into executable codi
     - Test rejection for expired tokens
     - _Requirements: 8.5, 8.6_
 
-  - [ ] 2.9 Create signout endpoint
+  - [x] 2.9 Create signout endpoint
     - Create `src/app/api/auth/extension/signout/route.ts`
     - Extract and validate token from Authorization header
     - Delete ExtensionSession record from database
