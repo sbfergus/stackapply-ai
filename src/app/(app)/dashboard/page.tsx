@@ -24,6 +24,7 @@ import {
   FileUser,
   LogOut,
   User,
+  Lightbulb,
 } from "lucide-react";
 import { JobDetailsDrawer } from "@/components/JobDetailsDrawer";
 import { AddJobModal } from "@/components/AddJobModal";
@@ -515,6 +516,28 @@ function DashboardContent() {
                                       >
                                         <FileUser className="w-3 h-3 shrink-0" />
                                         <span className="whitespace-nowrap">Generate Resume</span>
+                                      </button>
+                                    </div>
+                                  )}
+
+                                  {/* Interview Notes Button - Only show in INTERVIEWING */}
+                                  {job.status === "INTERVIEWING" && (
+                                    <div className="mt-3 pt-3 border-t border-slate-800/60">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          // TODO: Implement interview notes generation
+                                          console.log("Generate interview notes for:", job.id);
+                                        }}
+                                        disabled={!useAI}
+                                        className={`w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
+                                          useAI
+                                            ? "bg-amber-600/20 text-amber-400 border border-amber-500/40 hover:bg-amber-600/30"
+                                            : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
+                                        }`}
+                                      >
+                                        <Lightbulb className="w-3 h-3 shrink-0" />
+                                        <span className="whitespace-nowrap">Generate Interview Notes</span>
                                       </button>
                                     </div>
                                   )}
