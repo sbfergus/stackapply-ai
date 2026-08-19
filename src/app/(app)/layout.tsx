@@ -63,27 +63,25 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
       {/* Shared Header */}
-      <header className="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <div className="p-2 bg-indigo-600/20 rounded-xl border border-indigo-500/30 text-indigo-400">
-              <Briefcase className="w-6 h-6" />
+      <header className="max-w-7xl mx-auto mb-8 space-y-4">
+        {/* Top Row: Logo/Title and Avatar - Always horizontal */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="p-2 bg-indigo-600/20 rounded-xl border border-indigo-500/30 text-indigo-400">
+                <Briefcase className="w-6 h-6" />
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent whitespace-nowrap">
+                StackApply.ai
+              </h1>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent whitespace-nowrap">
-              StackApply.ai
-            </h1>
+            <p className="hidden md:block text-xs text-slate-400 ml-11">
+              Automated job tracking, candidate matching, and AI resume tailoring
+            </p>
           </div>
-          <p className="hidden md:block text-xs text-slate-400 ml-11">
-            Automated job tracking, candidate matching, and AI resume tailoring
-          </p>
-        </div>
 
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
-          {/* Page-specific actions will be inserted here by children via a slot pattern */}
-          <div id="header-actions" className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3" />
-
-          {/* User Avatar */}
-          <div className="relative">
+          {/* User Avatar - Always in top right */}
+          <div className="relative shrink-0">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -149,6 +147,9 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
             )}
           </div>
         </div>
+
+        {/* Action Buttons Row - Can stack on mobile if needed */}
+        <div id="header-actions" className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3" />
       </header>
 
       {/* Page Content */}
