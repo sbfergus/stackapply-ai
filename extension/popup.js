@@ -61,6 +61,8 @@ async function validateToken(token) {
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Check authentication status first
+document.addEventListener("DOMContentLoaded", async () => {
+  // Check authentication status first
   const authState = await loadAuthState();
   
   if (!authState || !authState.token) {
@@ -71,8 +73,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Token exists - proceed to authenticated popup
   // (Skip validation on load for better UX - will validate on API calls)
-  initializeAuthenticatedPopup(authState);
-});  // User is authenticated - proceed with normal popup functionality
   initializeAuthenticatedPopup(authState);
 });
 
@@ -112,13 +112,6 @@ async function initializeAuthenticatedPopup(authState) {
   // Close menu when clicking outside
   document.addEventListener("click", () => {
     settingsMenu.style.display = 'none';
-  });
-
-  // Close menu when clicking outside
-  document.addEventListener("click", () => {
-    if (!settingsMenu.classList.contains("hidden")) {
-      settingsMenu.classList.add("hidden");
-    }
   });
 
   // Sign out handler
