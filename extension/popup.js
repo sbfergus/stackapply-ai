@@ -69,16 +69,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Validate token with API
-  const isValid = await validateToken(authState.token);
-  if (!isValid) {
-    // Token invalid/expired - clear and redirect to auth
-    await clearAuthState();
-    window.location.href = 'popup-auth.html';
-    return;
-  }
-
-  // User is authenticated - proceed with normal popup functionality
+  // Token exists - proceed to authenticated popup
+  // (Skip validation on load for better UX - will validate on API calls)
+  initializeAuthenticatedPopup(authState);
+});  // User is authenticated - proceed with normal popup functionality
   initializeAuthenticatedPopup(authState);
 });
 
