@@ -1,8 +1,8 @@
 // ============================================
 // API CONFIGURATION
 // ============================================
-// const API_BASE_URL = "${API_BASE_URL}";
-const API_BASE_URL = "https://stackapply-ai.vercel.app"; // For local testing
+// const API_BASE_URL = "https://stackapply-ai.vercel.app";
+const API_BASE_URL = "http://localhost:3000"; // For local testing
 
 // ============================================
 // AUTHENTICATION HELPERS (from storage.js)
