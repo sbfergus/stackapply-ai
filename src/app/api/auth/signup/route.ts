@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { resend } from "@/lib/resend";
-import { WelcomeEmail } from "@/emails/WelcomeEmail";
+import WelcomeEmail from "@/emails/WelcomeEmail";
+import { createElement } from "react";
 
 export async function POST(req: NextRequest) {
   try {
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
         from: process.env.RESEND_FROM_EMAIL || "StackApply <onboarding@resend.dev>",
         to: email,
         subject: "Welcome to StackApply! 🎉",
-        react: WelcomeEmail({ userEmail: email }),
+        react: createElement(WelcomeEmail, { userEmail: email }),
       });
     } catch (emailError) {
       console.error("Failed to send welcome email:", emailError);
