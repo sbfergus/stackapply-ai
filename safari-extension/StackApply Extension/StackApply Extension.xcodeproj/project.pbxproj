@@ -7,82 +7,82 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FF7BC36330350CF200B451D7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7BC36230350CF200B451D7 /* AppDelegate.swift */; };
-		FF7BC36530350CF200B451D7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7BC36430350CF200B451D7 /* SceneDelegate.swift */; };
-		FF7BC36830350CF200B451D7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC36630350CF200B451D7 /* LaunchScreen.storyboard */; };
-		FF7BC36B30350CF200B451D7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC36930350CF200B451D7 /* Main.storyboard */; };
-		FF7BC37430350CF200B451D7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7BC37330350CF200B451D7 /* AppDelegate.swift */; };
-		FF7BC37730350CF200B451D7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC37530350CF200B451D7 /* Main.storyboard */; };
-		FF7BC37E30350CF200B451D7 /* StackApply Extension Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FF7BC37D30350CF200B451D7 /* StackApply Extension Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		FF7BC38830350CF200B451D7 /* StackApply Extension Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FF7BC38730350CF200B451D7 /* StackApply Extension Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		FF7BC38D30350CF200B451D7 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC35230350CF000B451D7 /* Main.html */; };
-		FF7BC38E30350CF200B451D7 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC35230350CF000B451D7 /* Main.html */; };
-		FF7BC38F30350CF200B451D7 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC35430350CF000B451D7 /* Icon.png */; };
-		FF7BC39030350CF200B451D7 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC35430350CF000B451D7 /* Icon.png */; };
-		FF7BC39130350CF200B451D7 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC35530350CF000B451D7 /* Style.css */; };
-		FF7BC39230350CF200B451D7 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC35530350CF000B451D7 /* Style.css */; };
-		FF7BC39330350CF200B451D7 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC35630350CF000B451D7 /* Script.js */; };
-		FF7BC39430350CF200B451D7 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC35630350CF000B451D7 /* Script.js */; };
-		FF7BC39530350CF200B451D7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7BC35730350CF000B451D7 /* ViewController.swift */; };
-		FF7BC39630350CF200B451D7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7BC35730350CF000B451D7 /* ViewController.swift */; };
-		FF7BC39730350CF200B451D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC35830350CF200B451D7 /* Assets.xcassets */; };
-		FF7BC39830350CF200B451D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC35830350CF200B451D7 /* Assets.xcassets */; };
-		FF7BC39930350CF200B451D7 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7BC35A30350CF200B451D7 /* SafariWebExtensionHandler.swift */; };
-		FF7BC39A30350CF200B451D7 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7BC35A30350CF200B451D7 /* SafariWebExtensionHandler.swift */; };
-		FF7BC3B430350CF200B451D7 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3AC30350CF200B451D7 /* popup.js */; };
-		FF7BC3B530350CF200B451D7 /* popup-auth.html in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3AD30350CF200B451D7 /* popup-auth.html */; };
-		FF7BC3B630350CF200B451D7 /* popup-auth.js in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3AE30350CF200B451D7 /* popup-auth.js */; };
-		FF7BC3B730350CF200B451D7 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3AF30350CF200B451D7 /* popup.html */; };
-		FF7BC3B830350CF200B451D7 /* popup-auth.css in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3B030350CF200B451D7 /* popup-auth.css */; };
-		FF7BC3B930350CF200B451D7 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3B130350CF200B451D7 /* manifest.json */; };
-		FF7BC3BA30350CF200B451D7 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3B230350CF200B451D7 /* content.js */; };
-		FF7BC3BB30350CF200B451D7 /* storage.js in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3B330350CF200B451D7 /* storage.js */; };
-		FF7BC3BC30350CF200B451D7 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3AC30350CF200B451D7 /* popup.js */; };
-		FF7BC3BD30350CF200B451D7 /* popup-auth.html in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3AD30350CF200B451D7 /* popup-auth.html */; };
-		FF7BC3BE30350CF200B451D7 /* popup-auth.js in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3AE30350CF200B451D7 /* popup-auth.js */; };
-		FF7BC3BF30350CF200B451D7 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3AF30350CF200B451D7 /* popup.html */; };
-		FF7BC3C030350CF200B451D7 /* popup-auth.css in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3B030350CF200B451D7 /* popup-auth.css */; };
-		FF7BC3C130350CF200B451D7 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3B130350CF200B451D7 /* manifest.json */; };
-		FF7BC3C230350CF200B451D7 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3B230350CF200B451D7 /* content.js */; };
-		FF7BC3C330350CF200B451D7 /* storage.js in Resources */ = {isa = PBXBuildFile; fileRef = FF7BC3B330350CF200B451D7 /* storage.js */; };
+		FF0595873035F6D100EF5D3C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0595863035F6D100EF5D3C /* AppDelegate.swift */; };
+		FF0595893035F6D100EF5D3C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0595883035F6D100EF5D3C /* SceneDelegate.swift */; };
+		FF05958C3035F6D100EF5D3C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF05958A3035F6D100EF5D3C /* LaunchScreen.storyboard */; };
+		FF05958F3035F6D100EF5D3C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF05958D3035F6D100EF5D3C /* Main.storyboard */; };
+		FF0595983035F6D100EF5D3C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0595973035F6D100EF5D3C /* AppDelegate.swift */; };
+		FF05959B3035F6D100EF5D3C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF0595993035F6D100EF5D3C /* Main.storyboard */; };
+		FF0595A23035F6D100EF5D3C /* StackApply Extension Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FF0595A13035F6D100EF5D3C /* StackApply Extension Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FF0595AC3035F6D100EF5D3C /* StackApply Extension Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FF0595AB3035F6D100EF5D3C /* StackApply Extension Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FF0595B13035F6D100EF5D3C /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = FF0595763035F6CF00EF5D3C /* Main.html */; };
+		FF0595B23035F6D100EF5D3C /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = FF0595763035F6CF00EF5D3C /* Main.html */; };
+		FF0595B33035F6D100EF5D3C /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = FF0595783035F6CF00EF5D3C /* Icon.png */; };
+		FF0595B43035F6D100EF5D3C /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = FF0595783035F6CF00EF5D3C /* Icon.png */; };
+		FF0595B53035F6D100EF5D3C /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = FF0595793035F6CF00EF5D3C /* Style.css */; };
+		FF0595B63035F6D100EF5D3C /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = FF0595793035F6CF00EF5D3C /* Style.css */; };
+		FF0595B73035F6D100EF5D3C /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = FF05957A3035F6CF00EF5D3C /* Script.js */; };
+		FF0595B83035F6D100EF5D3C /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = FF05957A3035F6CF00EF5D3C /* Script.js */; };
+		FF0595B93035F6D100EF5D3C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF05957B3035F6CF00EF5D3C /* ViewController.swift */; };
+		FF0595BA3035F6D100EF5D3C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF05957B3035F6CF00EF5D3C /* ViewController.swift */; };
+		FF0595BB3035F6D100EF5D3C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF05957C3035F6D100EF5D3C /* Assets.xcassets */; };
+		FF0595BC3035F6D100EF5D3C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF05957C3035F6D100EF5D3C /* Assets.xcassets */; };
+		FF0595BD3035F6D100EF5D3C /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF05957E3035F6D100EF5D3C /* SafariWebExtensionHandler.swift */; };
+		FF0595BE3035F6D100EF5D3C /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF05957E3035F6D100EF5D3C /* SafariWebExtensionHandler.swift */; };
+		FF0595D83035F6D100EF5D3C /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D03035F6D100EF5D3C /* popup.js */; };
+		FF0595D93035F6D100EF5D3C /* popup-auth.html in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D13035F6D100EF5D3C /* popup-auth.html */; };
+		FF0595DA3035F6D100EF5D3C /* popup-auth.js in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D23035F6D100EF5D3C /* popup-auth.js */; };
+		FF0595DB3035F6D100EF5D3C /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D33035F6D100EF5D3C /* popup.html */; };
+		FF0595DC3035F6D100EF5D3C /* popup-auth.css in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D43035F6D100EF5D3C /* popup-auth.css */; };
+		FF0595DD3035F6D100EF5D3C /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D53035F6D100EF5D3C /* manifest.json */; };
+		FF0595DE3035F6D100EF5D3C /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D63035F6D100EF5D3C /* content.js */; };
+		FF0595DF3035F6D100EF5D3C /* storage.js in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D73035F6D100EF5D3C /* storage.js */; };
+		FF0595E03035F6D100EF5D3C /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D03035F6D100EF5D3C /* popup.js */; };
+		FF0595E13035F6D100EF5D3C /* popup-auth.html in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D13035F6D100EF5D3C /* popup-auth.html */; };
+		FF0595E23035F6D100EF5D3C /* popup-auth.js in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D23035F6D100EF5D3C /* popup-auth.js */; };
+		FF0595E33035F6D100EF5D3C /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D33035F6D100EF5D3C /* popup.html */; };
+		FF0595E43035F6D100EF5D3C /* popup-auth.css in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D43035F6D100EF5D3C /* popup-auth.css */; };
+		FF0595E53035F6D100EF5D3C /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D53035F6D100EF5D3C /* manifest.json */; };
+		FF0595E63035F6D100EF5D3C /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D63035F6D100EF5D3C /* content.js */; };
+		FF0595E73035F6D100EF5D3C /* storage.js in Resources */ = {isa = PBXBuildFile; fileRef = FF0595D73035F6D100EF5D3C /* storage.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		FF7BC37F30350CF200B451D7 /* PBXContainerItemProxy */ = {
+		FF0595A33035F6D100EF5D3C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = FF7BC34C30350CF000B451D7 /* Project object */;
+			containerPortal = FF0595703035F6CF00EF5D3C /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = FF7BC37C30350CF200B451D7;
+			remoteGlobalIDString = FF0595A03035F6D100EF5D3C;
 			remoteInfo = "StackApply Extension Extension (iOS)";
 		};
-		FF7BC38930350CF200B451D7 /* PBXContainerItemProxy */ = {
+		FF0595AD3035F6D100EF5D3C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = FF7BC34C30350CF000B451D7 /* Project object */;
+			containerPortal = FF0595703035F6CF00EF5D3C /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = FF7BC38630350CF200B451D7;
+			remoteGlobalIDString = FF0595AA3035F6D100EF5D3C;
 			remoteInfo = "StackApply Extension Extension (macOS)";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		FF7BC3A030350CF200B451D7 /* Embed Foundation Extensions */ = {
+		FF0595C43035F6D100EF5D3C /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				FF7BC37E30350CF200B451D7 /* StackApply Extension Extension.appex in Embed Foundation Extensions */,
+				FF0595A23035F6D100EF5D3C /* StackApply Extension Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF7BC3A730350CF200B451D7 /* Embed Foundation Extensions */ = {
+		FF0595CB3035F6D100EF5D3C /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				FF7BC38830350CF200B451D7 /* StackApply Extension Extension.appex in Embed Foundation Extensions */,
+				FF0595AC3035F6D100EF5D3C /* StackApply Extension Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -90,60 +90,60 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		FF7BC35330350CF000B451D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
-		FF7BC35430350CF000B451D7 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
-		FF7BC35530350CF000B451D7 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
-		FF7BC35630350CF000B451D7 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
-		FF7BC35730350CF000B451D7 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		FF7BC35830350CF200B451D7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		FF7BC35A30350CF200B451D7 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
-		FF7BC35F30350CF200B451D7 /* StackApply Extension.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "StackApply Extension.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF7BC36230350CF200B451D7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		FF7BC36430350CF200B451D7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		FF7BC36730350CF200B451D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		FF7BC36A30350CF200B451D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		FF7BC36C30350CF200B451D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FF7BC37130350CF200B451D7 /* StackApply Extension.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "StackApply Extension.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF7BC37330350CF200B451D7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		FF7BC37630350CF200B451D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		FF7BC37830350CF200B451D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FF7BC37D30350CF200B451D7 /* StackApply Extension Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "StackApply Extension Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF7BC38230350CF200B451D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FF7BC38730350CF200B451D7 /* StackApply Extension Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "StackApply Extension Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF7BC38C30350CF200B451D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FF7BC3AC30350CF200B451D7 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = ../../../extension/popup.js; sourceTree = "<group>"; };
-		FF7BC3AD30350CF200B451D7 /* popup-auth.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = "popup-auth.html"; path = "../../../extension/popup-auth.html"; sourceTree = "<group>"; };
-		FF7BC3AE30350CF200B451D7 /* popup-auth.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "popup-auth.js"; path = "../../../extension/popup-auth.js"; sourceTree = "<group>"; };
-		FF7BC3AF30350CF200B451D7 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../extension/popup.html; sourceTree = "<group>"; };
-		FF7BC3B030350CF200B451D7 /* popup-auth.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = "popup-auth.css"; path = "../../../extension/popup-auth.css"; sourceTree = "<group>"; };
-		FF7BC3B130350CF200B451D7 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../extension/manifest.json; sourceTree = "<group>"; };
-		FF7BC3B230350CF200B451D7 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = ../../../extension/content.js; sourceTree = "<group>"; };
-		FF7BC3B330350CF200B451D7 /* storage.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = storage.js; path = ../../../extension/storage.js; sourceTree = "<group>"; };
+		FF0595773035F6CF00EF5D3C /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		FF0595783035F6CF00EF5D3C /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		FF0595793035F6CF00EF5D3C /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		FF05957A3035F6CF00EF5D3C /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		FF05957B3035F6CF00EF5D3C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		FF05957C3035F6D100EF5D3C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FF05957E3035F6D100EF5D3C /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		FF0595833035F6D100EF5D3C /* StackApply Extension.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "StackApply Extension.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF0595863035F6D100EF5D3C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		FF0595883035F6D100EF5D3C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		FF05958B3035F6D100EF5D3C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		FF05958E3035F6D100EF5D3C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FF0595903035F6D100EF5D3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FF0595953035F6D100EF5D3C /* StackApply Extension.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "StackApply Extension.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF0595973035F6D100EF5D3C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		FF05959A3035F6D100EF5D3C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FF05959C3035F6D100EF5D3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FF0595A13035F6D100EF5D3C /* StackApply Extension Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "StackApply Extension Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF0595A63035F6D100EF5D3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FF0595AB3035F6D100EF5D3C /* StackApply Extension Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "StackApply Extension Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF0595B03035F6D100EF5D3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FF0595D03035F6D100EF5D3C /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = ../../../extension/popup.js; sourceTree = "<group>"; };
+		FF0595D13035F6D100EF5D3C /* popup-auth.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = "popup-auth.html"; path = "../../../extension/popup-auth.html"; sourceTree = "<group>"; };
+		FF0595D23035F6D100EF5D3C /* popup-auth.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "popup-auth.js"; path = "../../../extension/popup-auth.js"; sourceTree = "<group>"; };
+		FF0595D33035F6D100EF5D3C /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../extension/popup.html; sourceTree = "<group>"; };
+		FF0595D43035F6D100EF5D3C /* popup-auth.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = "popup-auth.css"; path = "../../../extension/popup-auth.css"; sourceTree = "<group>"; };
+		FF0595D53035F6D100EF5D3C /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../extension/manifest.json; sourceTree = "<group>"; };
+		FF0595D63035F6D100EF5D3C /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = ../../../extension/content.js; sourceTree = "<group>"; };
+		FF0595D73035F6D100EF5D3C /* storage.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = storage.js; path = ../../../extension/storage.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		FF7BC35C30350CF200B451D7 /* Frameworks */ = {
+		FF0595803035F6D100EF5D3C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF7BC36E30350CF200B451D7 /* Frameworks */ = {
+		FF0595923035F6D100EF5D3C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF7BC37A30350CF200B451D7 /* Frameworks */ = {
+		FF05959E3035F6D100EF5D3C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF7BC38430350CF200B451D7 /* Frameworks */ = {
+		FF0595A83035F6D100EF5D3C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -153,109 +153,109 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		FF7BC34B30350CF000B451D7 = {
+		FF05956F3035F6CF00EF5D3C = {
 			isa = PBXGroup;
 			children = (
-				FF7BC35030350CF000B451D7 /* Shared (App) */,
-				FF7BC35930350CF200B451D7 /* Shared (Extension) */,
-				FF7BC36130350CF200B451D7 /* iOS (App) */,
-				FF7BC37230350CF200B451D7 /* macOS (App) */,
-				FF7BC38130350CF200B451D7 /* iOS (Extension) */,
-				FF7BC38B30350CF200B451D7 /* macOS (Extension) */,
-				FF7BC36030350CF200B451D7 /* Products */,
+				FF0595743035F6CF00EF5D3C /* Shared (App) */,
+				FF05957D3035F6D100EF5D3C /* Shared (Extension) */,
+				FF0595853035F6D100EF5D3C /* iOS (App) */,
+				FF0595963035F6D100EF5D3C /* macOS (App) */,
+				FF0595A53035F6D100EF5D3C /* iOS (Extension) */,
+				FF0595AF3035F6D100EF5D3C /* macOS (Extension) */,
+				FF0595843035F6D100EF5D3C /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		FF7BC35030350CF000B451D7 /* Shared (App) */ = {
+		FF0595743035F6CF00EF5D3C /* Shared (App) */ = {
 			isa = PBXGroup;
 			children = (
-				FF7BC35730350CF000B451D7 /* ViewController.swift */,
-				FF7BC35830350CF200B451D7 /* Assets.xcassets */,
-				FF7BC35130350CF000B451D7 /* Resources */,
+				FF05957B3035F6CF00EF5D3C /* ViewController.swift */,
+				FF05957C3035F6D100EF5D3C /* Assets.xcassets */,
+				FF0595753035F6CF00EF5D3C /* Resources */,
 			);
 			path = "Shared (App)";
 			sourceTree = "<group>";
 		};
-		FF7BC35130350CF000B451D7 /* Resources */ = {
+		FF0595753035F6CF00EF5D3C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				FF7BC35230350CF000B451D7 /* Main.html */,
-				FF7BC35430350CF000B451D7 /* Icon.png */,
-				FF7BC35530350CF000B451D7 /* Style.css */,
-				FF7BC35630350CF000B451D7 /* Script.js */,
+				FF0595763035F6CF00EF5D3C /* Main.html */,
+				FF0595783035F6CF00EF5D3C /* Icon.png */,
+				FF0595793035F6CF00EF5D3C /* Style.css */,
+				FF05957A3035F6CF00EF5D3C /* Script.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		FF7BC35930350CF200B451D7 /* Shared (Extension) */ = {
+		FF05957D3035F6D100EF5D3C /* Shared (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				FF7BC3AB30350CF200B451D7 /* Resources */,
-				FF7BC35A30350CF200B451D7 /* SafariWebExtensionHandler.swift */,
+				FF0595CF3035F6D100EF5D3C /* Resources */,
+				FF05957E3035F6D100EF5D3C /* SafariWebExtensionHandler.swift */,
 			);
 			path = "Shared (Extension)";
 			sourceTree = "<group>";
 		};
-		FF7BC36030350CF200B451D7 /* Products */ = {
+		FF0595843035F6D100EF5D3C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FF7BC35F30350CF200B451D7 /* StackApply Extension.app */,
-				FF7BC37130350CF200B451D7 /* StackApply Extension.app */,
-				FF7BC37D30350CF200B451D7 /* StackApply Extension Extension.appex */,
-				FF7BC38730350CF200B451D7 /* StackApply Extension Extension.appex */,
+				FF0595833035F6D100EF5D3C /* StackApply Extension.app */,
+				FF0595953035F6D100EF5D3C /* StackApply Extension.app */,
+				FF0595A13035F6D100EF5D3C /* StackApply Extension Extension.appex */,
+				FF0595AB3035F6D100EF5D3C /* StackApply Extension Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		FF7BC36130350CF200B451D7 /* iOS (App) */ = {
+		FF0595853035F6D100EF5D3C /* iOS (App) */ = {
 			isa = PBXGroup;
 			children = (
-				FF7BC36230350CF200B451D7 /* AppDelegate.swift */,
-				FF7BC36430350CF200B451D7 /* SceneDelegate.swift */,
-				FF7BC36630350CF200B451D7 /* LaunchScreen.storyboard */,
-				FF7BC36930350CF200B451D7 /* Main.storyboard */,
-				FF7BC36C30350CF200B451D7 /* Info.plist */,
+				FF0595863035F6D100EF5D3C /* AppDelegate.swift */,
+				FF0595883035F6D100EF5D3C /* SceneDelegate.swift */,
+				FF05958A3035F6D100EF5D3C /* LaunchScreen.storyboard */,
+				FF05958D3035F6D100EF5D3C /* Main.storyboard */,
+				FF0595903035F6D100EF5D3C /* Info.plist */,
 			);
 			path = "iOS (App)";
 			sourceTree = "<group>";
 		};
-		FF7BC37230350CF200B451D7 /* macOS (App) */ = {
+		FF0595963035F6D100EF5D3C /* macOS (App) */ = {
 			isa = PBXGroup;
 			children = (
-				FF7BC37330350CF200B451D7 /* AppDelegate.swift */,
-				FF7BC37530350CF200B451D7 /* Main.storyboard */,
-				FF7BC37830350CF200B451D7 /* Info.plist */,
+				FF0595973035F6D100EF5D3C /* AppDelegate.swift */,
+				FF0595993035F6D100EF5D3C /* Main.storyboard */,
+				FF05959C3035F6D100EF5D3C /* Info.plist */,
 			);
 			path = "macOS (App)";
 			sourceTree = "<group>";
 		};
-		FF7BC38130350CF200B451D7 /* iOS (Extension) */ = {
+		FF0595A53035F6D100EF5D3C /* iOS (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				FF7BC38230350CF200B451D7 /* Info.plist */,
+				FF0595A63035F6D100EF5D3C /* Info.plist */,
 			);
 			path = "iOS (Extension)";
 			sourceTree = "<group>";
 		};
-		FF7BC38B30350CF200B451D7 /* macOS (Extension) */ = {
+		FF0595AF3035F6D100EF5D3C /* macOS (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				FF7BC38C30350CF200B451D7 /* Info.plist */,
+				FF0595B03035F6D100EF5D3C /* Info.plist */,
 			);
 			path = "macOS (Extension)";
 			sourceTree = "<group>";
 		};
-		FF7BC3AB30350CF200B451D7 /* Resources */ = {
+		FF0595CF3035F6D100EF5D3C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				FF7BC3AC30350CF200B451D7 /* popup.js */,
-				FF7BC3AD30350CF200B451D7 /* popup-auth.html */,
-				FF7BC3AE30350CF200B451D7 /* popup-auth.js */,
-				FF7BC3AF30350CF200B451D7 /* popup.html */,
-				FF7BC3B030350CF200B451D7 /* popup-auth.css */,
-				FF7BC3B130350CF200B451D7 /* manifest.json */,
-				FF7BC3B230350CF200B451D7 /* content.js */,
-				FF7BC3B330350CF200B451D7 /* storage.js */,
+				FF0595D03035F6D100EF5D3C /* popup.js */,
+				FF0595D13035F6D100EF5D3C /* popup-auth.html */,
+				FF0595D23035F6D100EF5D3C /* popup-auth.js */,
+				FF0595D33035F6D100EF5D3C /* popup.html */,
+				FF0595D43035F6D100EF5D3C /* popup-auth.css */,
+				FF0595D53035F6D100EF5D3C /* manifest.json */,
+				FF0595D63035F6D100EF5D3C /* content.js */,
+				FF0595D73035F6D100EF5D3C /* storage.js */,
 			);
 			name = Resources;
 			path = "Shared (Extension)";
@@ -264,55 +264,55 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		FF7BC35E30350CF200B451D7 /* StackApply Extension (iOS) */ = {
+		FF0595823035F6D100EF5D3C /* StackApply Extension (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FF7BC3A130350CF200B451D7 /* Build configuration list for PBXNativeTarget "StackApply Extension (iOS)" */;
+			buildConfigurationList = FF0595C53035F6D100EF5D3C /* Build configuration list for PBXNativeTarget "StackApply Extension (iOS)" */;
 			buildPhases = (
-				FF7BC35B30350CF200B451D7 /* Sources */,
-				FF7BC35C30350CF200B451D7 /* Frameworks */,
-				FF7BC35D30350CF200B451D7 /* Resources */,
-				FF7BC3A030350CF200B451D7 /* Embed Foundation Extensions */,
+				FF05957F3035F6D100EF5D3C /* Sources */,
+				FF0595803035F6D100EF5D3C /* Frameworks */,
+				FF0595813035F6D100EF5D3C /* Resources */,
+				FF0595C43035F6D100EF5D3C /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				FF7BC38030350CF200B451D7 /* PBXTargetDependency */,
+				FF0595A43035F6D100EF5D3C /* PBXTargetDependency */,
 			);
 			name = "StackApply Extension (iOS)";
 			packageProductDependencies = (
 			);
 			productName = "StackApply Extension (iOS)";
-			productReference = FF7BC35F30350CF200B451D7 /* StackApply Extension.app */;
+			productReference = FF0595833035F6D100EF5D3C /* StackApply Extension.app */;
 			productType = "com.apple.product-type.application";
 		};
-		FF7BC37030350CF200B451D7 /* StackApply Extension (macOS) */ = {
+		FF0595943035F6D100EF5D3C /* StackApply Extension (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FF7BC3A830350CF200B451D7 /* Build configuration list for PBXNativeTarget "StackApply Extension (macOS)" */;
+			buildConfigurationList = FF0595CC3035F6D100EF5D3C /* Build configuration list for PBXNativeTarget "StackApply Extension (macOS)" */;
 			buildPhases = (
-				FF7BC36D30350CF200B451D7 /* Sources */,
-				FF7BC36E30350CF200B451D7 /* Frameworks */,
-				FF7BC36F30350CF200B451D7 /* Resources */,
-				FF7BC3A730350CF200B451D7 /* Embed Foundation Extensions */,
+				FF0595913035F6D100EF5D3C /* Sources */,
+				FF0595923035F6D100EF5D3C /* Frameworks */,
+				FF0595933035F6D100EF5D3C /* Resources */,
+				FF0595CB3035F6D100EF5D3C /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				FF7BC38A30350CF200B451D7 /* PBXTargetDependency */,
+				FF0595AE3035F6D100EF5D3C /* PBXTargetDependency */,
 			);
 			name = "StackApply Extension (macOS)";
 			packageProductDependencies = (
 			);
 			productName = "StackApply Extension (macOS)";
-			productReference = FF7BC37130350CF200B451D7 /* StackApply Extension.app */;
+			productReference = FF0595953035F6D100EF5D3C /* StackApply Extension.app */;
 			productType = "com.apple.product-type.application";
 		};
-		FF7BC37C30350CF200B451D7 /* StackApply Extension Extension (iOS) */ = {
+		FF0595A03035F6D100EF5D3C /* StackApply Extension Extension (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FF7BC39D30350CF200B451D7 /* Build configuration list for PBXNativeTarget "StackApply Extension Extension (iOS)" */;
+			buildConfigurationList = FF0595C13035F6D100EF5D3C /* Build configuration list for PBXNativeTarget "StackApply Extension Extension (iOS)" */;
 			buildPhases = (
-				FF7BC37930350CF200B451D7 /* Sources */,
-				FF7BC37A30350CF200B451D7 /* Frameworks */,
-				FF7BC37B30350CF200B451D7 /* Resources */,
+				FF05959D3035F6D100EF5D3C /* Sources */,
+				FF05959E3035F6D100EF5D3C /* Frameworks */,
+				FF05959F3035F6D100EF5D3C /* Resources */,
 			);
 			buildRules = (
 			);
@@ -322,16 +322,16 @@
 			packageProductDependencies = (
 			);
 			productName = "StackApply Extension Extension (iOS)";
-			productReference = FF7BC37D30350CF200B451D7 /* StackApply Extension Extension.appex */;
+			productReference = FF0595A13035F6D100EF5D3C /* StackApply Extension Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		FF7BC38630350CF200B451D7 /* StackApply Extension Extension (macOS) */ = {
+		FF0595AA3035F6D100EF5D3C /* StackApply Extension Extension (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FF7BC3A430350CF200B451D7 /* Build configuration list for PBXNativeTarget "StackApply Extension Extension (macOS)" */;
+			buildConfigurationList = FF0595C83035F6D100EF5D3C /* Build configuration list for PBXNativeTarget "StackApply Extension Extension (macOS)" */;
 			buildPhases = (
-				FF7BC38330350CF200B451D7 /* Sources */,
-				FF7BC38430350CF200B451D7 /* Frameworks */,
-				FF7BC38530350CF200B451D7 /* Resources */,
+				FF0595A73035F6D100EF5D3C /* Sources */,
+				FF0595A83035F6D100EF5D3C /* Frameworks */,
+				FF0595A93035F6D100EF5D3C /* Resources */,
 			);
 			buildRules = (
 			);
@@ -341,195 +341,195 @@
 			packageProductDependencies = (
 			);
 			productName = "StackApply Extension Extension (macOS)";
-			productReference = FF7BC38730350CF200B451D7 /* StackApply Extension Extension.appex */;
+			productReference = FF0595AB3035F6D100EF5D3C /* StackApply Extension Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		FF7BC34C30350CF000B451D7 /* Project object */ = {
+		FF0595703035F6CF00EF5D3C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
-					FF7BC35E30350CF200B451D7 = {
+					FF0595823035F6D100EF5D3C = {
 						CreatedOnToolsVersion = 26.6;
 					};
-					FF7BC37030350CF200B451D7 = {
+					FF0595943035F6D100EF5D3C = {
 						CreatedOnToolsVersion = 26.6;
 					};
-					FF7BC37C30350CF200B451D7 = {
+					FF0595A03035F6D100EF5D3C = {
 						CreatedOnToolsVersion = 26.6;
 					};
-					FF7BC38630350CF200B451D7 = {
+					FF0595AA3035F6D100EF5D3C = {
 						CreatedOnToolsVersion = 26.6;
 					};
 				};
 			};
-			buildConfigurationList = FF7BC34F30350CF000B451D7 /* Build configuration list for PBXProject "StackApply Extension" */;
+			buildConfigurationList = FF0595733035F6CF00EF5D3C /* Build configuration list for PBXProject "StackApply Extension" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = FF7BC34B30350CF000B451D7;
+			mainGroup = FF05956F3035F6CF00EF5D3C;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = FF7BC36030350CF200B451D7 /* Products */;
+			productRefGroup = FF0595843035F6D100EF5D3C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				FF7BC35E30350CF200B451D7 /* StackApply Extension (iOS) */,
-				FF7BC37030350CF200B451D7 /* StackApply Extension (macOS) */,
-				FF7BC37C30350CF200B451D7 /* StackApply Extension Extension (iOS) */,
-				FF7BC38630350CF200B451D7 /* StackApply Extension Extension (macOS) */,
+				FF0595823035F6D100EF5D3C /* StackApply Extension (iOS) */,
+				FF0595943035F6D100EF5D3C /* StackApply Extension (macOS) */,
+				FF0595A03035F6D100EF5D3C /* StackApply Extension Extension (iOS) */,
+				FF0595AA3035F6D100EF5D3C /* StackApply Extension Extension (macOS) */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		FF7BC35D30350CF200B451D7 /* Resources */ = {
+		FF0595813035F6D100EF5D3C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF7BC38F30350CF200B451D7 /* Icon.png in Resources */,
-				FF7BC36830350CF200B451D7 /* LaunchScreen.storyboard in Resources */,
-				FF7BC38D30350CF200B451D7 /* Main.html in Resources */,
-				FF7BC39330350CF200B451D7 /* Script.js in Resources */,
-				FF7BC39730350CF200B451D7 /* Assets.xcassets in Resources */,
-				FF7BC36B30350CF200B451D7 /* Main.storyboard in Resources */,
-				FF7BC39130350CF200B451D7 /* Style.css in Resources */,
+				FF0595B33035F6D100EF5D3C /* Icon.png in Resources */,
+				FF05958C3035F6D100EF5D3C /* LaunchScreen.storyboard in Resources */,
+				FF0595B13035F6D100EF5D3C /* Main.html in Resources */,
+				FF0595B73035F6D100EF5D3C /* Script.js in Resources */,
+				FF0595BB3035F6D100EF5D3C /* Assets.xcassets in Resources */,
+				FF05958F3035F6D100EF5D3C /* Main.storyboard in Resources */,
+				FF0595B53035F6D100EF5D3C /* Style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF7BC36F30350CF200B451D7 /* Resources */ = {
+		FF0595933035F6D100EF5D3C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF7BC39030350CF200B451D7 /* Icon.png in Resources */,
-				FF7BC39230350CF200B451D7 /* Style.css in Resources */,
-				FF7BC37730350CF200B451D7 /* Main.storyboard in Resources */,
-				FF7BC39430350CF200B451D7 /* Script.js in Resources */,
-				FF7BC39830350CF200B451D7 /* Assets.xcassets in Resources */,
-				FF7BC38E30350CF200B451D7 /* Main.html in Resources */,
+				FF0595B43035F6D100EF5D3C /* Icon.png in Resources */,
+				FF0595B63035F6D100EF5D3C /* Style.css in Resources */,
+				FF05959B3035F6D100EF5D3C /* Main.storyboard in Resources */,
+				FF0595B83035F6D100EF5D3C /* Script.js in Resources */,
+				FF0595BC3035F6D100EF5D3C /* Assets.xcassets in Resources */,
+				FF0595B23035F6D100EF5D3C /* Main.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF7BC37B30350CF200B451D7 /* Resources */ = {
+		FF05959F3035F6D100EF5D3C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF7BC3BC30350CF200B451D7 /* popup.js in Resources */,
-				FF7BC3BF30350CF200B451D7 /* popup.html in Resources */,
-				FF7BC3C330350CF200B451D7 /* storage.js in Resources */,
-				FF7BC3BD30350CF200B451D7 /* popup-auth.html in Resources */,
-				FF7BC3BE30350CF200B451D7 /* popup-auth.js in Resources */,
-				FF7BC3C130350CF200B451D7 /* manifest.json in Resources */,
-				FF7BC3C230350CF200B451D7 /* content.js in Resources */,
-				FF7BC3C030350CF200B451D7 /* popup-auth.css in Resources */,
+				FF0595E03035F6D100EF5D3C /* popup.js in Resources */,
+				FF0595E33035F6D100EF5D3C /* popup.html in Resources */,
+				FF0595E73035F6D100EF5D3C /* storage.js in Resources */,
+				FF0595E13035F6D100EF5D3C /* popup-auth.html in Resources */,
+				FF0595E23035F6D100EF5D3C /* popup-auth.js in Resources */,
+				FF0595E53035F6D100EF5D3C /* manifest.json in Resources */,
+				FF0595E63035F6D100EF5D3C /* content.js in Resources */,
+				FF0595E43035F6D100EF5D3C /* popup-auth.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF7BC38530350CF200B451D7 /* Resources */ = {
+		FF0595A93035F6D100EF5D3C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF7BC3B430350CF200B451D7 /* popup.js in Resources */,
-				FF7BC3B730350CF200B451D7 /* popup.html in Resources */,
-				FF7BC3BB30350CF200B451D7 /* storage.js in Resources */,
-				FF7BC3B530350CF200B451D7 /* popup-auth.html in Resources */,
-				FF7BC3B630350CF200B451D7 /* popup-auth.js in Resources */,
-				FF7BC3B930350CF200B451D7 /* manifest.json in Resources */,
-				FF7BC3BA30350CF200B451D7 /* content.js in Resources */,
-				FF7BC3B830350CF200B451D7 /* popup-auth.css in Resources */,
+				FF0595D83035F6D100EF5D3C /* popup.js in Resources */,
+				FF0595DB3035F6D100EF5D3C /* popup.html in Resources */,
+				FF0595DF3035F6D100EF5D3C /* storage.js in Resources */,
+				FF0595D93035F6D100EF5D3C /* popup-auth.html in Resources */,
+				FF0595DA3035F6D100EF5D3C /* popup-auth.js in Resources */,
+				FF0595DD3035F6D100EF5D3C /* manifest.json in Resources */,
+				FF0595DE3035F6D100EF5D3C /* content.js in Resources */,
+				FF0595DC3035F6D100EF5D3C /* popup-auth.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		FF7BC35B30350CF200B451D7 /* Sources */ = {
+		FF05957F3035F6D100EF5D3C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF7BC39530350CF200B451D7 /* ViewController.swift in Sources */,
-				FF7BC36330350CF200B451D7 /* AppDelegate.swift in Sources */,
-				FF7BC36530350CF200B451D7 /* SceneDelegate.swift in Sources */,
+				FF0595B93035F6D100EF5D3C /* ViewController.swift in Sources */,
+				FF0595873035F6D100EF5D3C /* AppDelegate.swift in Sources */,
+				FF0595893035F6D100EF5D3C /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF7BC36D30350CF200B451D7 /* Sources */ = {
+		FF0595913035F6D100EF5D3C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF7BC39630350CF200B451D7 /* ViewController.swift in Sources */,
-				FF7BC37430350CF200B451D7 /* AppDelegate.swift in Sources */,
+				FF0595BA3035F6D100EF5D3C /* ViewController.swift in Sources */,
+				FF0595983035F6D100EF5D3C /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF7BC37930350CF200B451D7 /* Sources */ = {
+		FF05959D3035F6D100EF5D3C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF7BC39930350CF200B451D7 /* SafariWebExtensionHandler.swift in Sources */,
+				FF0595BD3035F6D100EF5D3C /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF7BC38330350CF200B451D7 /* Sources */ = {
+		FF0595A73035F6D100EF5D3C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF7BC39A30350CF200B451D7 /* SafariWebExtensionHandler.swift in Sources */,
+				FF0595BE3035F6D100EF5D3C /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		FF7BC38030350CF200B451D7 /* PBXTargetDependency */ = {
+		FF0595A43035F6D100EF5D3C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = FF7BC37C30350CF200B451D7 /* StackApply Extension Extension (iOS) */;
-			targetProxy = FF7BC37F30350CF200B451D7 /* PBXContainerItemProxy */;
+			target = FF0595A03035F6D100EF5D3C /* StackApply Extension Extension (iOS) */;
+			targetProxy = FF0595A33035F6D100EF5D3C /* PBXContainerItemProxy */;
 		};
-		FF7BC38A30350CF200B451D7 /* PBXTargetDependency */ = {
+		FF0595AE3035F6D100EF5D3C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = FF7BC38630350CF200B451D7 /* StackApply Extension Extension (macOS) */;
-			targetProxy = FF7BC38930350CF200B451D7 /* PBXContainerItemProxy */;
+			target = FF0595AA3035F6D100EF5D3C /* StackApply Extension Extension (macOS) */;
+			targetProxy = FF0595AD3035F6D100EF5D3C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		FF7BC35230350CF000B451D7 /* Main.html */ = {
+		FF0595763035F6CF00EF5D3C /* Main.html */ = {
 			isa = PBXVariantGroup;
 			children = (
-				FF7BC35330350CF000B451D7 /* Base */,
+				FF0595773035F6CF00EF5D3C /* Base */,
 			);
 			name = Main.html;
 			sourceTree = "<group>";
 		};
-		FF7BC36630350CF200B451D7 /* LaunchScreen.storyboard */ = {
+		FF05958A3035F6D100EF5D3C /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				FF7BC36730350CF200B451D7 /* Base */,
+				FF05958B3035F6D100EF5D3C /* Base */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
-		FF7BC36930350CF200B451D7 /* Main.storyboard */ = {
+		FF05958D3035F6D100EF5D3C /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				FF7BC36A30350CF200B451D7 /* Base */,
+				FF05958E3035F6D100EF5D3C /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
-		FF7BC37530350CF200B451D7 /* Main.storyboard */ = {
+		FF0595993035F6D100EF5D3C /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				FF7BC37630350CF200B451D7 /* Base */,
+				FF05959A3035F6D100EF5D3C /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -537,7 +537,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		FF7BC39B30350CF200B451D7 /* Debug */ = {
+		FF0595BF3035F6D100EF5D3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -598,7 +598,7 @@
 			};
 			name = Debug;
 		};
-		FF7BC39C30350CF200B451D7 /* Release */ = {
+		FF0595C03035F6D100EF5D3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -651,7 +651,7 @@
 			};
 			name = Release;
 		};
-		FF7BC39E30350CF200B451D7 /* Debug */ = {
+		FF0595C23035F6D100EF5D3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -684,7 +684,7 @@
 			};
 			name = Debug;
 		};
-		FF7BC39F30350CF200B451D7 /* Release */ = {
+		FF0595C33035F6D100EF5D3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -718,7 +718,7 @@
 			};
 			name = Release;
 		};
-		FF7BC3A230350CF200B451D7 /* Debug */ = {
+		FF0595C63035F6D100EF5D3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -758,7 +758,7 @@
 			};
 			name = Debug;
 		};
-		FF7BC3A330350CF200B451D7 /* Release */ = {
+		FF0595C73035F6D100EF5D3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -799,7 +799,7 @@
 			};
 			name = Release;
 		};
-		FF7BC3A530350CF200B451D7 /* Debug */ = {
+		FF0595C93035F6D100EF5D3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -834,7 +834,7 @@
 			};
 			name = Debug;
 		};
-		FF7BC3A630350CF200B451D7 /* Release */ = {
+		FF0595CA3035F6D100EF5D3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -869,7 +869,7 @@
 			};
 			name = Release;
 		};
-		FF7BC3A930350CF200B451D7 /* Debug */ = {
+		FF0595CD3035F6D100EF5D3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -910,7 +910,7 @@
 			};
 			name = Debug;
 		};
-		FF7BC3AA30350CF200B451D7 /* Release */ = {
+		FF0595CE3035F6D100EF5D3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -954,52 +954,52 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		FF7BC34F30350CF000B451D7 /* Build configuration list for PBXProject "StackApply Extension" */ = {
+		FF0595733035F6CF00EF5D3C /* Build configuration list for PBXProject "StackApply Extension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FF7BC39B30350CF200B451D7 /* Debug */,
-				FF7BC39C30350CF200B451D7 /* Release */,
+				FF0595BF3035F6D100EF5D3C /* Debug */,
+				FF0595C03035F6D100EF5D3C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FF7BC39D30350CF200B451D7 /* Build configuration list for PBXNativeTarget "StackApply Extension Extension (iOS)" */ = {
+		FF0595C13035F6D100EF5D3C /* Build configuration list for PBXNativeTarget "StackApply Extension Extension (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FF7BC39E30350CF200B451D7 /* Debug */,
-				FF7BC39F30350CF200B451D7 /* Release */,
+				FF0595C23035F6D100EF5D3C /* Debug */,
+				FF0595C33035F6D100EF5D3C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FF7BC3A130350CF200B451D7 /* Build configuration list for PBXNativeTarget "StackApply Extension (iOS)" */ = {
+		FF0595C53035F6D100EF5D3C /* Build configuration list for PBXNativeTarget "StackApply Extension (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FF7BC3A230350CF200B451D7 /* Debug */,
-				FF7BC3A330350CF200B451D7 /* Release */,
+				FF0595C63035F6D100EF5D3C /* Debug */,
+				FF0595C73035F6D100EF5D3C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FF7BC3A430350CF200B451D7 /* Build configuration list for PBXNativeTarget "StackApply Extension Extension (macOS)" */ = {
+		FF0595C83035F6D100EF5D3C /* Build configuration list for PBXNativeTarget "StackApply Extension Extension (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FF7BC3A530350CF200B451D7 /* Debug */,
-				FF7BC3A630350CF200B451D7 /* Release */,
+				FF0595C93035F6D100EF5D3C /* Debug */,
+				FF0595CA3035F6D100EF5D3C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FF7BC3A830350CF200B451D7 /* Build configuration list for PBXNativeTarget "StackApply Extension (macOS)" */ = {
+		FF0595CC3035F6D100EF5D3C /* Build configuration list for PBXNativeTarget "StackApply Extension (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FF7BC3A930350CF200B451D7 /* Debug */,
-				FF7BC3AA30350CF200B451D7 /* Release */,
+				FF0595CD3035F6D100EF5D3C /* Debug */,
+				FF0595CE3035F6D100EF5D3C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = FF7BC34C30350CF000B451D7 /* Project object */;
+	rootObject = FF0595703035F6CF00EF5D3C /* Project object */;
 }

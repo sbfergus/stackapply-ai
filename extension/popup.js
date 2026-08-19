@@ -61,8 +61,6 @@ async function validateToken(token) {
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Check authentication status first
-document.addEventListener("DOMContentLoaded", async () => {
-  // Check authentication status first
   const authState = await loadAuthState();
   
   if (!authState || !authState.token) {
@@ -244,13 +242,15 @@ async function initializeAuthenticatedPopup(authState) {
         saveBtn.disabled = false;
         saveBtn.innerText = "Save to Dashboard";
       } else {
+        // Log full error for debugging
+        console.error('Job save failed:', { status: res.status, data });
         statusEl.innerText = "❌ Error: " + (data.message || data.error || "Failed to save");
         statusEl.className = "status error";
         saveBtn.disabled = false;
         saveBtn.innerText = "Save to Dashboard";
       }
     } catch (err) {
-      console.error(err);
+      console.error('Job save exception:', err);
       statusEl.innerText = "❌ Could not connect to StackApply API";
       statusEl.className = "status error";
       saveBtn.disabled = false;
