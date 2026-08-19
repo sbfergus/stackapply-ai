@@ -2,20 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Briefcase, LogOut, User } from "lucide-react";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [isGuest, setIsGuest] = useState(false);
-
-  useEffect(() => {
-    const guestFlag = localStorage.getItem("isGuest") === "true";
-    setIsGuest(guestFlag);
-  }, []);
+  
+  const isGuest = searchParams.get("guest") === "true";
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -96,7 +93,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   </Link>
                 )}
 
-                {pathname === "/account" && (
+                {!isGuest && pathname === "/account" && (
                   <Link
                     href="/dashboard"
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 transition"

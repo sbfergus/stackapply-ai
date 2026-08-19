@@ -5,10 +5,22 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Mail, Calendar, Key, Trash2 } from "lucide-react";
 
+interface JobStats {
+  totalJobs: number;
+  appliedJobs: number;
+  interviewingJobs: number;
+}
+
 export default function AccountPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [stats, setStats] = useState<JobStats>({
+    totalJobs: 0,
+    appliedJobs: 0,
+    interviewingJobs: 0,
+  });
+  const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -19,6 +31,33 @@ export default function AccountPage() {
       router.push("/");
     }
   }, [status, router]);
+
+  // Fetch job statistics
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/jobs");
+        const data = await res.json();
+        
+        if (data.success) {
+          const jobs = data.jobs;
+          setStats({
+            totalJobs: jobs.length,
+            appliedJobs: jobs.filter((j: any) => j.status === "APPLIED").length,
+            interviewingJobs: jobs.filter((j: any) => j.status === "INTERVIEWING").length,
+          });
+        }
+      } catch (err) {
+        console.error("Error loading job stats:", err);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    if (status === "authenticated") {
+      fetchStats();
+    }
+  }, [status]);
 
   if (!mounted || status === "loading") {
     return (
@@ -122,15 +161,21 @@ export default function AccountPage() {
               </h3>
               <div className="space-y-4">
                 <div>
-                  <div className="text-2xl font-bold text-white">0</div>
+                  <div className="text-2xl font-bold text-white">
+                    {loadingStats ? "..." : stats.totalJobs}
+                  </div>
                   <div className="text-xs text-slate-400">Jobs Saved</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-white">0</div>
-                  <div className="text-xs text-slate-400">Applications</div>
+                  <div className="text-2xl font-bold text-white">
+                    {loadingStats ? "..." : stats.appliedJobs + stats.interviewingJobs}
+                  </div>
+                  <div className="text-xs text-slate-400">Jobs Applied To</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-white">0</div>
+                  <div className="text-2xl font-bold text-white">
+                    {loadingStats ? "..." : stats.interviewingJobs}
+                  </div>
                   <div className="text-xs text-slate-400">Interviews</div>
                 </div>
               </div>
