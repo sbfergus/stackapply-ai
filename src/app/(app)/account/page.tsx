@@ -3,7 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import { Mail, Calendar, Key, Trash2, Camera, Pencil } from "lucide-react";
+import { Mail, Calendar, Key, Trash2, Camera, Pencil, FileText, Upload } from "lucide-react";
 import DeleteAccountModal from "@/components/DeleteAccountModal";
 import EditEmailModal from "@/components/EditEmailModal";
 import EditPasswordModal from "@/components/EditPasswordModal";
@@ -33,7 +33,10 @@ export default function AccountPage() {
   const [showToast, setShowToast] = useState(false);
   const [toastExiting, setToastExiting] = useState(false);
   const [toastMessage, setToastMessage] = useState({ title: "", description: "" });
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+  const [uploadingResume, setUploadingResume] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const resumeInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -87,8 +90,11 @@ export default function AccountPage() {
         if (data.success && data.user?.avatarUrl) {
           setAvatarUrl(data.user.avatarUrl);
         }
+        if (data.success && data.user?.resumeUrl) {
+          setResumeUrl(data.user.resumeUrl);
+        }
       } catch (err) {
-        console.error("Error fetching user avatar:", err);
+        console.error("Error fetching user data:", err);
       }
     };
 
@@ -243,6 +249,83 @@ export default function AccountPage() {
     }, 3000);
   };
 
+  const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (file.type !== "application/pdf") {
+      alert("Please select a PDF file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size must be less than 5MB");
+      return;
+    }
+
+    setUploadingResume(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("resume", file);
+
+      const res = await fetch("/api/user/resume", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.success && data.resumeUrl) {
+        setResumeUrl(data.resumeUrl);
+        setToastMessage({
+          title: "Resume Uploaded!",
+          description: "Your resume has been successfully uploaded."
+        });
+        showToastNotification();
+      } else {
+        alert(data.error || "Failed to upload resume");
+      }
+    } catch (error) {
+      console.error("Resume upload error:", error);
+      alert("Failed to upload resume");
+    } finally {
+      setUploadingResume(false);
+    }
+  };
+
+  const handleResumeClick = () => {
+    resumeInputRef.current?.click();
+  };
+
+  const handleDeleteResume = async () => {
+    if (!confirm("Are you sure you want to delete your resume?")) return;
+
+    try {
+      const res = await fetch("/api/user/resume", {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setResumeUrl(null);
+        setToastMessage({
+          title: "Resume Deleted",
+          description: "Your resume has been removed."
+        });
+        showToastNotification();
+      } else {
+        alert(data.error || "Failed to delete resume");
+      }
+    } catch (error) {
+      console.error("Resume deletion error:", error);
+      alert("Failed to delete resume");
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
@@ -378,6 +461,99 @@ export default function AccountPage() {
                     Change
                   </button>
                 </div>
+              </div>
+            </section>
+
+            {/* Resume Section */}
+            <section className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-white">Resume</h2>
+                {resumeUrl && !uploadingResume && (
+                  <a
+                    href={resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-indigo-400 hover:text-indigo-300 transition"
+                  >
+                    View Resume
+                  </a>
+                )}
+              </div>
+              
+              <div className="space-y-3">
+                {resumeUrl ? (
+                  <div className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg border border-slate-700/50">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-5 h-5 text-green-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-200 truncate">
+                          {resumeUrl.split('/').pop()?.split('?')[0] || 'Resume.pdf'}
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          PDF • Used for job matching
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button 
+                        onClick={handleResumeClick}
+                        disabled={uploadingResume}
+                        className="px-4 py-2 text-sm font-medium text-white bg-slate-700 hover:bg-slate-600 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Replace
+                      </button>
+                      <button 
+                        onClick={handleDeleteResume}
+                        disabled={uploadingResume}
+                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-6 bg-slate-900/50 rounded-lg border-2 border-dashed border-slate-700 hover:border-indigo-500/50 transition">
+                    <div className="text-center">
+                      <div className="w-12 h-12 mx-auto rounded-lg bg-indigo-500/10 flex items-center justify-center mb-3">
+                        <Upload className="w-6 h-6 text-indigo-400" />
+                      </div>
+                      <p className="text-sm font-medium text-slate-200 mb-1">
+                        Upload your resume
+                      </p>
+                      <p className="text-xs text-slate-400 mb-4">
+                        PDF up to 5MB • Used for job matching & resume generation
+                      </p>
+                      <button
+                        onClick={handleResumeClick}
+                        disabled={uploadingResume}
+                        className="px-6 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+                      >
+                        {uploadingResume ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4" />
+                            Choose File
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Hidden File Input */}
+                <input
+                  ref={resumeInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handleResumeUpload}
+                  className="hidden"
+                />
               </div>
             </section>
           </div>

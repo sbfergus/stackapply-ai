@@ -21,6 +21,7 @@ export async function GET() {
         email: true,
         fullName: true,
         avatarUrl: true,
+        resumeUrl: true,
         createdAt: true,
       },
     });

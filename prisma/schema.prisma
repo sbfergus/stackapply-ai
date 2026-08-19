@@ -11,6 +11,7 @@ model User {
   email              String              @unique
   fullName           String?
   avatarUrl          String?
+  resumeUrl          String?
   linkedinUrl        String?
   linkedinData       Json?
   baseResumeText     String?
