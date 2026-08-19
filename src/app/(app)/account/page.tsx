@@ -3,8 +3,9 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import { Mail, Calendar, Key, Trash2, Camera } from "lucide-react";
+import { Mail, Calendar, Key, Trash2, Camera, Pencil } from "lucide-react";
 import DeleteAccountModal from "@/components/DeleteAccountModal";
+import EditEmailModal from "@/components/EditEmailModal";
 
 interface JobStats {
   totalJobs: number;
@@ -13,7 +14,7 @@ interface JobStats {
 }
 
 export default function AccountPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [stats, setStats] = useState<JobStats>({
@@ -25,12 +26,19 @@ export default function AccountPage() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditEmailModal, setShowEditEmailModal] = useState(false);
+  const [currentEmail, setCurrentEmail] = useState(session?.user?.email || "");
+  const [showToast, setShowToast] = useState(false);
+  const [toastExiting, setToastExiting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMounted(true);
     // Avatar will be loaded from session
-  }, []);
+    if (session?.user?.email) {
+      setCurrentEmail(session.user.email);
+    }
+  }, [session]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -98,7 +106,7 @@ export default function AccountPage() {
     return null;
   }
 
-  const userEmail = session.user?.email || "No email";
+  const userEmail = currentEmail || session.user?.email || "No email";
   const userInitial = userEmail.charAt(0).toUpperCase();
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -192,6 +200,29 @@ export default function AccountPage() {
     }
   };
 
+  const handleEmailUpdate = async (newEmail: string) => {
+    // Update local state immediately
+    setCurrentEmail(newEmail);
+    
+    // Trigger NextAuth session update to fetch new email from database
+    await update();
+    
+    // Show toast notification
+    setShowToast(true);
+    setToastExiting(false);
+    
+    // Start exit animation after 2.7 seconds (total 3 seconds including animation)
+    setTimeout(() => {
+      setToastExiting(true);
+    }, 2700);
+    
+    // Remove toast after exit animation completes
+    setTimeout(() => {
+      setShowToast(false);
+      setToastExiting(false);
+    }, 3000);
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
@@ -273,7 +304,16 @@ export default function AccountPage() {
                       <Mail className="w-4 h-4" />
                       Email Address
                     </label>
-                    <div className="text-slate-200 font-medium">{userEmail}</div>
+                    <div className="flex items-center justify-between group">
+                      <div className="text-slate-200 font-medium">{userEmail}</div>
+                      <button
+                        onClick={() => setShowEditEmailModal(true)}
+                        className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-slate-700/50 rounded-lg transition opacity-0 group-hover:opacity-100"
+                        title="Edit email address"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   <div>
@@ -385,6 +425,31 @@ export default function AccountPage() {
         onConfirm={handleDeleteAccount}
         userEmail={userEmail}
       />
+
+      {/* Edit Email Modal */}
+      <EditEmailModal
+        isOpen={showEditEmailModal}
+        onClose={() => setShowEditEmailModal(false)}
+        onSuccess={handleEmailUpdate}
+        currentEmail={userEmail}
+      />
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className={`fixed top-4 right-4 z-50 ${toastExiting ? 'animate-slide-out' : 'animate-slide-in'}`}>
+          <div className="flex items-start gap-3 p-4 bg-green-950/90 border border-green-900/50 rounded-lg shadow-2xl backdrop-blur-sm min-w-[300px]">
+            <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-green-200">Email Updated!</p>
+              <p className="text-xs text-green-300 mt-0.5">Your email address has been successfully updated.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
