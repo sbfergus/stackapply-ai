@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from "react";
 import { Mail, Calendar, Key, Trash2, Camera, Pencil } from "lucide-react";
 import DeleteAccountModal from "@/components/DeleteAccountModal";
 import EditEmailModal from "@/components/EditEmailModal";
+import EditPasswordModal from "@/components/EditPasswordModal";
 
 interface JobStats {
   totalJobs: number;
@@ -27,9 +28,11 @@ export default function AccountPage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditEmailModal, setShowEditEmailModal] = useState(false);
+  const [showEditPasswordModal, setShowEditPasswordModal] = useState(false);
   const [currentEmail, setCurrentEmail] = useState(session?.user?.email || "");
   const [showToast, setShowToast] = useState(false);
   const [toastExiting, setToastExiting] = useState(false);
+  const [toastMessage, setToastMessage] = useState({ title: "", description: "" });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -208,6 +211,23 @@ export default function AccountPage() {
     await update();
     
     // Show toast notification
+    setToastMessage({
+      title: "Email Updated!",
+      description: "Your email address has been successfully updated."
+    });
+    showToastNotification();
+  };
+
+  const handlePasswordUpdate = () => {
+    // Show toast notification
+    setToastMessage({
+      title: "Password Updated!",
+      description: "Your password has been successfully changed."
+    });
+    showToastNotification();
+  };
+
+  const showToastNotification = () => {
     setShowToast(true);
     setToastExiting(false);
     
@@ -351,7 +371,10 @@ export default function AccountPage() {
                       </p>
                     </div>
                   </div>
-                  <button className="px-4 py-2 text-sm font-medium text-white bg-slate-700 hover:bg-slate-600 rounded-lg transition">
+                  <button 
+                    onClick={() => setShowEditPasswordModal(true)}
+                    className="px-4 py-2 text-sm font-medium text-white bg-slate-700 hover:bg-slate-600 rounded-lg transition"
+                  >
                     Change
                   </button>
                 </div>
@@ -434,6 +457,13 @@ export default function AccountPage() {
         currentEmail={userEmail}
       />
 
+      {/* Edit Password Modal */}
+      <EditPasswordModal
+        isOpen={showEditPasswordModal}
+        onClose={() => setShowEditPasswordModal(false)}
+        onSuccess={handlePasswordUpdate}
+      />
+
       {/* Toast Notification */}
       {showToast && (
         <div className={`fixed top-4 right-4 z-50 ${toastExiting ? 'animate-slide-out' : 'animate-slide-in'}`}>
@@ -444,8 +474,8 @@ export default function AccountPage() {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-semibold text-green-200">Email Updated!</p>
-              <p className="text-xs text-green-300 mt-0.5">Your email address has been successfully updated.</p>
+              <p className="text-sm font-semibold text-green-200">{toastMessage.title}</p>
+              <p className="text-xs text-green-300 mt-0.5">{toastMessage.description}</p>
             </div>
           </div>
         </div>
