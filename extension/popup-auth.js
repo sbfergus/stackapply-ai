@@ -302,3 +302,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'popup.html';
   }
 });
+
+
+// ============================================
+// PASSWORD TOGGLE FUNCTIONALITY
+// ============================================
+
+/**
+ * Initialize password toggle buttons
+ */
+function initPasswordToggles() {
+  const toggleButtons = document.querySelectorAll('.toggle-password');
+  
+  toggleButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      const eyeIcon = this.querySelector('.eye-icon');
+      const eyeOffIcon = this.querySelector('.eye-off-icon');
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        eyeIcon.classList.add('hidden');
+        eyeOffIcon.classList.remove('hidden');
+      } else {
+        input.type = 'password';
+        eyeIcon.classList.remove('hidden');
+        eyeOffIcon.classList.add('hidden');
+      }
+    });
+  });
+}
+
+// Initialize password toggles when DOM is ready
+document.addEventListener('DOMContentLoaded', initPasswordToggles);

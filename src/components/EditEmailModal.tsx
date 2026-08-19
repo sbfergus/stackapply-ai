@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, AlertCircle, X } from "lucide-react";
+import { Mail, AlertCircle, X, Eye, EyeOff } from "lucide-react";
 
 interface EditEmailModalProps {
   isOpen: boolean;
@@ -21,6 +21,7 @@ export default function EditEmailModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,16 +137,29 @@ export default function EditEmailModal({
             <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
               Current Password
             </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="Confirm with your password"
-              disabled={loading}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 pr-12 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Confirm with your password"
+                disabled={loading}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
             <p className="text-xs text-slate-400 mt-2">
               For security, please confirm your current password
             </p>

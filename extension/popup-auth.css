@@ -120,6 +120,39 @@ body {
   color: #64748b;
 }
 
+/* Password Input Wrapper */
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper input {
+  padding-right: 48px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.toggle-password:hover {
+  color: #cbd5e1;
+}
+
+.toggle-password .hidden {
+  display: none;
+}
+
 /* Forgot Password Link */
 .forgot-link {
   display: block;
