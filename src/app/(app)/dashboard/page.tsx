@@ -484,7 +484,7 @@ function DashboardContent() {
 
                                   {/* PDF Generation Buttons - Only show in READY_TO_APPLY */}
                                   {job.status === "READY_TO_APPLY" && (
-                                    <div className="mt-3 pt-3 border-t border-slate-800/60 flex md:flex-col gap-2">
+                                    <div className="mt-3 pt-3 border-t border-slate-800/60 flex flex-col gap-2">
                                       <button
                                         onClick={(e) => {
                                           e.stopPropagation();
@@ -492,7 +492,7 @@ function DashboardContent() {
                                           console.log("Generate cover letter for:", job.id);
                                         }}
                                         disabled={!useAI}
-                                        className={`flex-1 md:flex-auto flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
+                                        className={`flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
                                           useAI
                                             ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 hover:bg-indigo-600/30"
                                             : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
@@ -508,7 +508,7 @@ function DashboardContent() {
                                           console.log("Generate resume for:", job.id);
                                         }}
                                         disabled={!useAI}
-                                        className={`flex-1 md:flex-auto flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
+                                        className={`flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
                                           useAI
                                             ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-600/30"
                                             : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
