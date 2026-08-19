@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X, Plus, Sparkles, Building2, Briefcase, MapPin, DollarSign, Wrench } from "lucide-react";
-import { Job } from "@/app/dashboard/page";
+import { Job } from "@/types/job";
 
 interface AddJobModalProps {
   isOpen: boolean;

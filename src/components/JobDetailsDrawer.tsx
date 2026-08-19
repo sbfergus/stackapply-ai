@@ -15,7 +15,7 @@ import {
   Check,
   FileText,
 } from "lucide-react";
-import { Job } from "@/app/dashboard/page";
+import { Job } from "@/types/job";
 
 interface JobDetailsDrawerProps {
   job: Job | null;
@@ -275,7 +275,7 @@ export function JobDetailsDrawer({
               Required Tech Stack ({job.techStack.length})
             </h3>
             <div className="flex flex-wrap gap-1.5">
-              {job.techStack.map((tech) => (
+              {job.techStack.map((tech: string) => (
                 <span
                   key={tech}
                   className="text-xs bg-slate-800 text-slate-200 px-2.5 py-1 rounded-lg border border-slate-700/60 font-mono"
@@ -318,7 +318,7 @@ export function JobDetailsDrawer({
               Perks & Benefits
             </h3>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {job.benefits.map((benefit, i) => (
+              {job.benefits.map((benefit: string, i: number) => (
                 <li
                   key={i}
                   className="flex items-center gap-2 text-xs text-slate-300 bg-slate-950/40 px-3 py-2 rounded-lg border border-slate-800/60"
