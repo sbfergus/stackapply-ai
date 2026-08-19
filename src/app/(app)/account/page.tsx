@@ -1,9 +1,10 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { Mail, Calendar, Key, Trash2, Camera } from "lucide-react";
+import DeleteAccountModal from "@/components/DeleteAccountModal";
 
 interface JobStats {
   totalJobs: number;
@@ -23,6 +24,7 @@ export default function AccountPage() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -165,6 +167,28 @@ export default function AccountPage() {
     } catch (error) {
       console.error("Avatar deletion error:", error);
       alert("Failed to delete avatar");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const res = await fetch("/api/user/delete", {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Sign out and redirect to home
+        await signOut({ callbackUrl: "/" });
+      } else {
+        alert(data.error || "Failed to delete account");
+        setShowDeleteModal(false);
+      }
+    } catch (error) {
+      console.error("Account deletion error:", error);
+      alert("Failed to delete account");
+      setShowDeleteModal(false);
     }
   };
 
@@ -345,11 +369,22 @@ export default function AccountPage() {
                 </p>
               </div>
             </div>
-            <button className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition shadow-lg shadow-red-600/20">
+            <button 
+              onClick={() => setShowDeleteModal(true)}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition shadow-lg shadow-red-600/20"
+            >
               Delete Account
             </button>
           </div>
         </section>
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteAccount}
+        userEmail={userEmail}
+      />
     </div>
   );
 }

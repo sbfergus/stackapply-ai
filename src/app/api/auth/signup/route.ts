@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { resend } from "@/lib/resend";
+import { WelcomeEmail } from "@/emails/WelcomeEmail";
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,6 +38,19 @@ export async function POST(req: NextRequest) {
         fullName: fullName || null,
       },
     });
+
+    // Send welcome email (don't block signup if email fails)
+    try {
+      await resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL || "StackApply <onboarding@resend.dev>",
+        to: email,
+        subject: "Welcome to StackApply! 🎉",
+        react: WelcomeEmail({ userEmail: email }),
+      });
+    } catch (emailError) {
+      console.error("Failed to send welcome email:", emailError);
+      // Don't fail signup if email fails
+    }
 
     return NextResponse.json(
       {
