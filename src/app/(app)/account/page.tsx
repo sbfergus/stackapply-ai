@@ -2,8 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Mail, Calendar, Key, Trash2 } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { Mail, Calendar, Key, Trash2, Camera } from "lucide-react";
 
 interface JobStats {
   totalJobs: number;
@@ -21,9 +21,13 @@ export default function AccountPage() {
     interviewingJobs: 0,
   });
   const [loadingStats, setLoadingStats] = useState(true);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMounted(true);
+    // Avatar will be loaded from session
   }, []);
 
   useEffect(() => {
@@ -59,6 +63,27 @@ export default function AccountPage() {
     }
   }, [status]);
 
+  // Fetch user avatar
+  useEffect(() => {
+    const fetchUserAvatar = async () => {
+      if (!session?.user?.email) return;
+      
+      try {
+        const res = await fetch("/api/user");
+        const data = await res.json();
+        if (data.success && data.user?.avatarUrl) {
+          setAvatarUrl(data.user.avatarUrl);
+        }
+      } catch (err) {
+        console.error("Error fetching user avatar:", err);
+      }
+    };
+
+    if (status === "authenticated") {
+      fetchUserAvatar();
+    }
+  }, [session, status]);
+
   if (!mounted || status === "loading") {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
@@ -73,6 +98,75 @@ export default function AccountPage() {
 
   const userEmail = session.user?.email || "No email";
   const userInitial = userEmail.charAt(0).toUpperCase();
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size must be less than 5MB");
+      return;
+    }
+
+    setUploadingAvatar(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const res = await fetch("/api/user/avatar", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.success && data.avatarUrl) {
+        setAvatarUrl(data.avatarUrl);
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent("avatarUpdated", { detail: { avatarUrl: data.avatarUrl } }));
+      } else {
+        alert(data.error || "Failed to upload avatar");
+      }
+    } catch (error) {
+      console.error("Avatar upload error:", error);
+      alert("Failed to upload avatar");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleDeleteAvatar = async () => {
+    try {
+      const res = await fetch("/api/user/avatar", {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setAvatarUrl(null);
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent("avatarUpdated", { detail: { avatarUrl: null } }));
+      } else {
+        alert(data.error || "Failed to delete avatar");
+      }
+    } catch (error) {
+      console.error("Avatar deletion error:", error);
+      alert("Failed to delete avatar");
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -93,10 +187,58 @@ export default function AccountPage() {
               <div className="flex items-start gap-6">
                 {/* Avatar */}
                 <div className="flex-shrink-0">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                    <span className="text-3xl font-bold text-white">
-                      {userInitial}
-                    </span>
+                  <div className="relative group">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 overflow-hidden">
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-3xl font-bold text-white">
+                          {userInitial}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Overlay with Upload/Delete Buttons */}
+                    <div className="absolute inset-0 w-24 h-24 rounded-full bg-slate-900/70 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={handleAvatarClick}
+                        disabled={uploadingAvatar}
+                        className="p-2 hover:bg-slate-800 rounded-full transition-colors"
+                        title="Upload avatar"
+                      >
+                        <Camera className="w-5 h-5 text-white" />
+                      </button>
+                      
+                      {avatarUrl && (
+                        <button
+                          onClick={handleDeleteAvatar}
+                          disabled={uploadingAvatar}
+                          className="p-2 hover:bg-red-600 rounded-full transition-colors"
+                          title="Remove avatar"
+                        >
+                          <Trash2 className="w-5 h-5 text-white" />
+                        </button>
+                      )}
+                    </div>
+                    
+                    {/* Hidden File Input */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                    />
+                    
+                    {uploadingAvatar && (
+                      <div className="absolute inset-0 w-24 h-24 rounded-full bg-slate-900/90 flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
                   </div>
                 </div>
 

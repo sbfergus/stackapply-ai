@@ -11,8 +11,35 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   
   const isGuest = searchParams.get("guest") === "true";
+
+  // Load avatar from API
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      try {
+        const res = await fetch("/api/user");
+        const data = await res.json();
+        if (data.success && data.user?.avatarUrl) {
+          setAvatarUrl(data.user.avatarUrl);
+        }
+      } catch (error) {
+        console.error("Error fetching avatar:", error);
+      }
+    };
+
+    fetchAvatar();
+
+    // Listen for avatar updates
+    const handleAvatarUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      setAvatarUrl(customEvent.detail?.avatarUrl || null);
+    };
+
+    window.addEventListener("avatarUpdated", handleAvatarUpdate);
+    return () => window.removeEventListener("avatarUpdated", handleAvatarUpdate);
+  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -62,11 +89,19 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                 e.stopPropagation();
                 setShowUserMenu(!showUserMenu);
               }}
-              className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 border-2 border-slate-800 shadow-lg hover:border-indigo-500 transition-all cursor-pointer"
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 border-2 border-slate-800 shadow-lg hover:border-indigo-500 transition-all cursor-pointer overflow-hidden"
             >
-              <span className="text-sm font-bold text-white">
-                {userInitial}
-              </span>
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-sm font-bold text-white">
+                  {userInitial}
+                </span>
+              )}
             </button>
 
             {/* User Menu Dropdown */}
