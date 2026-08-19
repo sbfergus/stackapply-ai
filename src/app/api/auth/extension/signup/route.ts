@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { ExtensionAuthService } from "@/lib/extensionAuth";
+import { resend } from "@/lib/resend";
+import WelcomeEmail from "@/emails/WelcomeEmail";
+import { createElement } from "react";
 
 /**
  * CORS headers for extension requests
@@ -77,6 +80,19 @@ export async function POST(req: NextRequest) {
         password: hashedPassword,
       },
     });
+
+    // Send welcome email (don't block signup if email fails)
+    try {
+      await resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL || "StackApply <onboarding@resend.dev>",
+        to: email,
+        subject: "Welcome to StackApply! 🎉",
+        react: createElement(WelcomeEmail, { userEmail: email }),
+      });
+    } catch (emailError) {
+      console.error("Failed to send welcome email:", emailError);
+      // Don't fail signup if email fails
+    }
 
     // Extract IP address and user agent for audit logging
     const ipAddress = req.headers.get("x-forwarded-for") || 
