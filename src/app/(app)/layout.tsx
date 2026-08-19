@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Briefcase, LogOut, User } from "lucide-react";
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+function AppLayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -119,5 +119,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Page Content */}
       {children}
     </div>
+  );
+}
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-slate-400">Loading...</div>
+        </div>
+      </div>
+    }>
+      <AppLayoutContent>{children}</AppLayoutContent>
+    </Suspense>
   );
 }
