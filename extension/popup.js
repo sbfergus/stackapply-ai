@@ -35,7 +35,7 @@ async function clearAuthState() {
  */
 async function validateToken(token) {
   try {
-    const response = await fetch('${API_BASE_URL}/api/auth/extension/validate', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/extension/validate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -69,8 +69,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Token exists - proceed to authenticated popup
-  // (Skip validation on load for better UX - will validate on API calls)
+  // Token exists - validate it with the API before showing authenticated UI
+  const isValid = await validateToken(authState.token);
+  
+  if (!isValid) {
+    // Token is invalid/expired - clear and redirect to auth
+    await clearAuthState();
+    window.location.href = 'popup-auth.html';
+    return;
+  }
+
+  // Token is valid - proceed to authenticated popup
   initializeAuthenticatedPopup(authState);
 });
 
@@ -334,13 +343,18 @@ async function initializeAuthenticatedPopup(authState) {
       const data = await res.json();
 
       if (res.status === 401) {
-        // Token expired - redirect to auth
-        await clearAuthState();
-        statusEl.innerText = "⚠️ Session expired. Please sign in again.";
+        // Token expired or unauthorized - show clickable sign in message
+        statusEl.innerHTML = "⚠️ Unauthorized. <span id='signin-link' style='color: #6366f1; text-decoration: underline; cursor: pointer;'>Please sign in</span>.";
         statusEl.className = "status error";
-        setTimeout(() => {
+        
+        // Add click handler to sign in link
+        document.getElementById('signin-link').addEventListener('click', async () => {
+          await clearAuthState();
           window.location.href = 'popup-auth.html';
-        }, 1500);
+        });
+        
+        saveBtn.disabled = false;
+        saveBtn.innerText = "Save to Dashboard";
         return;
       }
 
@@ -377,32 +391,12 @@ async function initializeAuthenticatedPopup(authState) {
 }
 
 /**
- * Validate token with API
- */
-async function validateToken(token) {
-  try {
-    const response = await fetch('${API_BASE_URL}/api/auth/extension/validate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    return response.ok;
-  } catch (error) {
-    console.error('Token validation error:', error);
-    return false;
-  }
-}
-
-/**
  * Handle sign out
  */
 async function handleSignOut(token) {
   try {
     // Call API to revoke token
-    await fetch('${API_BASE_URL}/api/auth/extension/signout', {
+    await fetch(`${API_BASE_URL}/api/auth/extension/signout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
