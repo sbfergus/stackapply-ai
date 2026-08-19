@@ -87,6 +87,7 @@ async function initializeAuthenticatedPopup(authState) {
   const settingsMenu = document.getElementById("settings-menu");
   const signoutBtn = document.getElementById("signout-btn");
   const switchAccountBtn = document.getElementById("switch-account-btn");
+  const rescrapeBtn = document.getElementById("refresh-btn");
 
   // Show user header
   userHeaderEl.style.display = 'flex';
@@ -126,7 +127,48 @@ async function initializeAuthenticatedPopup(authState) {
 
   let scrapedData = {};
 
-  // Scrape job data from current tab
+  // Function to scrape and populate form
+  async function scrapeAndPopulate() {
+    rescrapeBtn.disabled = true;
+    rescrapeBtn.classList.add('spinning');
+    statusEl.innerText = "";
+    statusEl.className = "status";
+    
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+      if (tab?.id) {
+        const results = await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: scrapeJobDataInTab,
+        });
+
+        if (results && results[0] && results[0].result) {
+          scrapedData = results[0].result;
+          populateForm(scrapedData);
+          statusEl.innerText = "✅ Job data refreshed!";
+          statusEl.className = "status success";
+          setTimeout(() => {
+            statusEl.innerText = "";
+            statusEl.className = "status";
+          }, 2000);
+        } else {
+          statusEl.innerText = "⚠️ No job data found on this page";
+          statusEl.className = "status error";
+        }
+      }
+    } catch (err) {
+      console.error("Refresh error:", err);
+      statusEl.innerText = "❌ Failed to refresh job data";
+      statusEl.className = "status error";
+    } finally {
+      rescrapeBtn.disabled = false;
+      rescrapeBtn.classList.remove('spinning');
+      updateButtonState();
+    }
+  }
+
+  // Scrape job data from current tab on load
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -144,6 +186,9 @@ async function initializeAuthenticatedPopup(authState) {
   } catch (err) {
     console.error("ExecuteScript error:", err);
   }
+
+  // Rescrape button click handler
+  rescrapeBtn.addEventListener("click", scrapeAndPopulate);
 
   function populateForm(data) {
     if (data.title) document.getElementById("title").value = data.title;
@@ -163,8 +208,77 @@ async function initializeAuthenticatedPopup(authState) {
     }
   }
 
-  // Handle Save Button Click
+  // Check if form has any data
+  function hasFormData() {
+    const title = document.getElementById("title").value.trim();
+    const company = document.getElementById("company").value.trim();
+    const location = document.getElementById("location").value.trim();
+    const salaryMin = document.getElementById("salaryMin").value.trim();
+    const salaryMax = document.getElementById("salaryMax").value.trim();
+    const techStack = document.getElementById("techStack").value.trim();
+    const roleSummary = document.getElementById("roleSummary").value.trim();
+    const companyOverview = document.getElementById("companyOverview").value.trim();
+    const benefits = document.getElementById("benefits").value.trim();
+    
+    return !!(title || company || location || salaryMin || salaryMax || 
+              techStack || roleSummary || companyOverview || benefits);
+  }
+  
+  // Clear all form fields
+  function clearForm() {
+    document.getElementById("title").value = "";
+    document.getElementById("company").value = "";
+    document.getElementById("location").value = "";
+    document.getElementById("workSetting").value = "REMOTE";
+    document.getElementById("salaryMin").value = "";
+    document.getElementById("salaryMax").value = "";
+    document.getElementById("techStack").value = "";
+    document.getElementById("roleSummary").value = "";
+    document.getElementById("companyOverview").value = "";
+    document.getElementById("benefits").value = "";
+    statusEl.innerText = "";
+    statusEl.className = "status";
+    scrapedData = {}; // Clear scraped data
+  }
+  
+  // Update button state based on form data
+  function updateButtonState() {
+    const hasData = hasFormData();
+    
+    if (saveBtn.innerText === "🔄 Reset") {
+      // Reset button is always enabled
+      saveBtn.disabled = false;
+    } else {
+      // Save button disabled if no data
+      saveBtn.disabled = !hasData;
+    }
+  }
+  
+  // Listen to form changes to enable/disable button
+  const formFields = [
+    "title", "company", "location", "salaryMin", "salaryMax",
+    "techStack", "roleSummary", "companyOverview", "benefits"
+  ];
+  
+  formFields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    field.addEventListener("input", updateButtonState);
+  });
+  
+  // Set initial button state
+  updateButtonState();
+
+  // Handle Save/Reset Button Click
   saveBtn.addEventListener("click", async () => {
+    // If button is in Reset mode, clear form
+    if (saveBtn.innerText === "🔄 Reset") {
+      clearForm();
+      saveBtn.innerText = "Save to Dashboard";
+      updateButtonState();
+      return;
+    }
+    
+    // Otherwise, save the job
     saveBtn.disabled = true;
     saveBtn.innerText = "Saving...";
 
@@ -235,7 +349,10 @@ async function initializeAuthenticatedPopup(authState) {
           ? "✅ Saved to Guest Dashboard!" 
           : "✅ Saved to Your Dashboard!";
         statusEl.className = "status success";
-        setTimeout(() => window.close(), 1200);
+        
+        // Change button to Reset mode
+        saveBtn.innerText = "🔄 Reset";
+        saveBtn.disabled = false;
       } else if (res.status === 409) {
         statusEl.innerText = "Already in your dashboard";
         statusEl.className = "status error";

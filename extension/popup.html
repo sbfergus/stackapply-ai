@@ -107,6 +107,50 @@
       color: #f8fafc;
     }
     
+    /* Header Actions Container */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    /* Refresh/Rescrape Button */
+    .refresh-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      margin: 0;
+      width: auto;
+      height: auto;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      line-height: 1;
+    }
+    .refresh-btn:hover:not(:disabled) {
+      color: #6366f1;
+      background-color: rgba(99, 102, 241, 0.1);
+    }
+    .refresh-btn:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+    .refresh-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+    .refresh-btn.spinning {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
     /* Toggle Switch Styles */
     .toggle-container {
       display: flex;
@@ -285,13 +329,18 @@
 
   <div class="header">
     <h2>⚡ StackApply AI</h2>
-    <div class="toggle-container">
-      <span class="toggle-label">Use AI</span>
-      <label class="toggle-switch">
-        <input type="checkbox" id="use-ai-toggle" disabled>
-        <span class="toggle-slider"></span>
-      </label>
-      <span class="tooltip">Add AI Keys to Activate</span>
+    <div class="header-actions">
+      <button id="refresh-btn" class="refresh-btn" title="Refresh job data from page" aria-label="Refresh job data">
+        🔄
+      </button>
+      <div class="toggle-container">
+        <span class="toggle-label">Use AI</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="use-ai-toggle" disabled>
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="tooltip">Add AI Keys to Activate</span>
+      </div>
     </div>
   </div>
 
