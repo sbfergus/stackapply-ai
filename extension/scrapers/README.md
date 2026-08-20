@@ -1,8 +1,16 @@
 # StackApply AI Scraper Architecture
 
+## ⚠️ Note: LinkedIn Profile Scraping Removed
+
+**LinkedIn profile scraping has been removed** from this extension and replaced with a PDF upload approach on the web app. See [LINKEDIN_PDF_UPLOAD.md](../../LINKEDIN_PDF_UPLOAD.md) for details.
+
+This architecture document now focuses on **job listing scrapers only**.
+
+---
+
 ## Overview
 
-This extension uses a **modular scraper architecture** to handle multiple job boards and LinkedIn profiles. Each scraper is optimized for its target site using **structural selectors** (IDs, semantic HTML, JSON-LD) rather than fragile CSS classes.
+This extension uses a **modular scraper architecture** to handle multiple job boards. Each scraper is optimized for its target site using **structural selectors** (IDs, semantic HTML, JSON-LD) rather than fragile CSS classes.
 
 ## Architecture
 
@@ -10,7 +18,6 @@ This extension uses a **modular scraper architecture** to handle multiple job bo
 extension/
 ├── scrapers/               # Individual scraper modules (reference only)
 │   ├── core.js            # Shared utilities
-│   ├── linkedin-profile.js # LinkedIn profile scraper  
 │   ├── linkedin-jobs.js   # LinkedIn job listings
 │   ├── indeed-jobs.js     # Indeed job listings
 │   ├── ziprecruiter-jobs.js # ZipRecruiter job listings
@@ -19,7 +26,7 @@ extension/
 └── popup.js               # Extension UI logic
 ```
 
-**Note:** The `scrapers/` directory contains the **source modules** for reference and future bundling. Currently, all scraper code is **compiled inline** into `content.js` because Chrome extensions don't support ES modules in content scripts without a bundler.
+**Note:** The `scrapers/` directory contains the **source modules** for reference and future bundling. Currently, all scraper code is **compiled inline** into `content.js` because Chrome extensions don't support ES modules in content scripts without a bundler. The `linkedin-profile.js` module has been removed.
 
 ## Scraping Strategy
 
@@ -51,7 +58,6 @@ extension/
 | LinkedIn Jobs | ✅ Primary | `scrapeLinkedInJob()` | `/jobs/view/` |
 | Indeed | ✅ Primary | `scrapeIndeedJob()` | `/viewjob`, `/rc/clk` |
 | ZipRecruiter | ✅ Primary | `scrapeZipRecruiterJob()` | `/c/`, `/jobs/` |
-| LinkedIn Profile | ✅ Primary | `scrapeLinkedInProfile()` | `/in/` |
 | Glassdoor | 🟡 Generic | `scrapeGenericJob()` | `glassdoor.com` |
 | Monster | 🟡 Generic | `scrapeGenericJob()` | `monster.com` |
 | Dice | 🟡 Generic | `scrapeGenericJob()` | `dice.com` |
@@ -59,6 +65,8 @@ extension/
 | Lever | 🟡 Generic | `scrapeGenericJob()` | `lever.co` |
 | Greenhouse | 🟡 Generic | `scrapeGenericJob()` | `greenhouse.io` |
 | Other | 🟡 Generic | `scrapeGenericJob()` | Fallback |
+
+**Note:** LinkedIn Profile scraping was removed. Users now upload LinkedIn profile PDFs via the web app.
 
 ## Data Schema
 
@@ -79,34 +87,7 @@ extension/
 }
 ```
 
-### LinkedIn Profile
-```javascript
-{
-  name: string,
-  headline: string,
-  location: string,
-  about: string,
-  experience: Array<{
-    title: string,
-    company: string,
-    dates: string,
-    description: string
-  }>,
-  education: Array<{
-    school: string,
-    degree: string,
-    dates: string
-  }>,
-  skills: string[],
-  certifications: Array<{
-    name: string,
-    issuer: string,
-    date: string
-  }>,
-  profileUrl: string,
-  scrapedAt: string (ISO 8601)
-}
-```
+**Note:** LinkedIn Profile data schema has been moved to the web application. See [LINKEDIN_PDF_UPLOAD.md](../../LINKEDIN_PDF_UPLOAD.md#data-schema) for the profile data structure.
 
 ## Adding a New Scraper
 

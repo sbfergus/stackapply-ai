@@ -1,6 +1,22 @@
 # Extension Improvements Summary
 
-## LinkedIn Profile Sync UX Improvements
+## ⚠️ DEPRECATED: LinkedIn Profile Sync Feature Removed
+
+**Note:** The LinkedIn Profile Sync feature described in this document has been **removed** and replaced with a PDF upload approach. See [LINKEDIN_PDF_UPLOAD.md](./LINKEDIN_PDF_UPLOAD.md) for the new implementation.
+
+The extension-based LinkedIn scraping was replaced due to:
+- Fragile DOM selectors that broke with LinkedIn UI changes
+- Incomplete data extraction (missing experience, education, skills)
+- Maintenance burden
+- Privacy concerns with real-time browser scraping
+
+**New Approach:** Users now upload their LinkedIn profile as a PDF, which is parsed using AI on the backend for 95%+ accuracy and zero maintenance.
+
+---
+
+## Historical Documentation: LinkedIn Profile Sync UX Improvements (Removed)
+
+_This section documents the old implementation for reference only._
 
 ### Changes Made
 
