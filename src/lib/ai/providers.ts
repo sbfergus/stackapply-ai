@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import { ParsedJobData } from './parser';
 
 export interface AIProvider {
-  parseJobPosting(rawText: string, userResumeText?: string): Promise<ParsedJobData>;
+  parseJobPosting(rawText: string, userProfileText?: string): Promise<ParsedJobData>;
   testConnection(): Promise<boolean>;
 }
 
@@ -31,8 +31,8 @@ export class AnthropicProvider implements AIProvider {
     }
   }
 
-  async parseJobPosting(rawText: string, userResumeText?: string): Promise<ParsedJobData> {
-    const prompt = buildPrompt(rawText, userResumeText);
+  async parseJobPosting(rawText: string, userProfileText?: string): Promise<ParsedJobData> {
+    const prompt = buildPrompt(rawText, userProfileText);
 
     const response = await this.client.messages.create({
       model: 'claude-3-5-haiku-20241022',
@@ -74,8 +74,8 @@ export class OpenAIProvider implements AIProvider {
     }
   }
 
-  async parseJobPosting(rawText: string, userResumeText?: string): Promise<ParsedJobData> {
-    const prompt = buildPrompt(rawText, userResumeText);
+  async parseJobPosting(rawText: string, userProfileText?: string): Promise<ParsedJobData> {
+    const prompt = buildPrompt(rawText, userProfileText);
 
     const response = await this.client.chat.completions.create({
       model: 'gpt-4o-mini',
@@ -98,21 +98,41 @@ export class OpenAIProvider implements AIProvider {
 }
 
 /**
- * Shared prompt builder
+ * Shared prompt builder with comprehensive profile matching
  */
-function buildPrompt(rawText: string, userResumeText?: string): string {
+function buildPrompt(rawText: string, userProfileText?: string): string {
   return `
-You are an expert technical recruiter and resume analyst.
-Analyze the following job posting raw text (and optional candidate resume).
+You are an expert technical recruiter and resume analyst with deep knowledge of software engineering roles.
+Analyze the following job posting and candidate profile to provide accurate matching and extraction.
 
-Job Posting Text:
+JOB POSTING:
 """
 ${rawText}
 """
 
-${userResumeText ? `Candidate Resume:\n"""\n${userResumeText}\n"""` : ''}
+${userProfileText ? `CANDIDATE PROFILE:\n"""\n${userProfileText}\n"""` : 'No candidate profile provided.'}
 
-Extract and analyze the job posting into structured JSON adhering to this EXACT schema:
+TASK:
+Extract job details and calculate a precise match score based on the candidate's profile.
+
+MATCHING CRITERIA (when profile is provided):
+1. **Technical Skills Match** (40%): How well do the candidate's skills align with required/preferred technologies?
+2. **Experience Level** (30%): Does the candidate's years and type of experience match the seniority level?
+3. **Domain Experience** (15%): Has the candidate worked in similar industries or problem domains?
+4. **Education & Certifications** (10%): Does education/certs meet requirements?
+5. **Location & Work Setting** (5%): Does location/remote preference align?
+
+SCORING GUIDELINES:
+- 90-100: Exceptional match, candidate exceeds requirements
+- 80-89: Strong match, candidate meets all key requirements
+- 70-79: Good match, candidate meets most requirements with minor gaps
+- 60-69: Moderate match, candidate has potential but missing some key skills
+- 50-59: Weak match, significant gaps in experience or skills
+- Below 50: Poor match, not qualified for this role
+
+If NO profile is provided, default to matchScore: 50 and note that in reasoning.
+
+Return ONLY valid JSON adhering to this EXACT schema:
 {
   "title": "Job Title (string)",
   "company": "Company Name (string)",
@@ -124,13 +144,12 @@ Extract and analyze the job posting into structured JSON adhering to this EXACT 
   "roleSummary": "Concise 2-3 sentence summary of core responsibilities",
   "techStack": ["Next.js", "TypeScript", "Tailwind", etc.],
   "benefits": ["Health Insurance", "401k", etc.],
-  "matchScore": integer between 0 and 100 representing candidate qualification fit (default 75 if no resume provided),
-  "matchReasoning": "One concise sentence explaining the match score reasoning."
+  "matchScore": integer between 0 and 100,
+  "matchReasoning": "2-3 sentences explaining match score, highlighting strongest alignments and any significant gaps"
 }
 
 Return ONLY valid JSON. Do not wrap in backticks or markdown codeblocks.
 `;
-}
 
 /**
  * Factory function to create provider

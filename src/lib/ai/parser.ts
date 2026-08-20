@@ -1,6 +1,7 @@
 import { createAIProvider } from './providers';
 import { decryptApiKey } from '../encryption';
 import { prisma } from '../prisma';
+import { buildComprehensiveProfile, formatProfileForAI } from './profile-builder';
 
 export interface ParsedJobData {
   title: string;
@@ -18,12 +19,11 @@ export interface ParsedJobData {
 }
 
 /**
- * Parse job posting with dynamic key resolution
+ * Parse job posting with dynamic key resolution and comprehensive profile matching
  */
 export async function parseJobPosting(
   rawText: string,
-  userId: string,
-  userResumeText?: string
+  userId: string
 ): Promise<ParsedJobData> {
   // Get free tier configuration from environment variables
   const FREE_TIER_LIMIT = parseInt(process.env.FREE_TIER_LIMIT || '5', 10);
@@ -69,10 +69,14 @@ export async function parseJobPosting(
     shouldIncrementCount = true;
   }
 
-  // 3. Execute AI parsing (use FREE_TIER_MODEL for system key)
-  const result = await provider.parseJobPosting(rawText, userResumeText);
+  // 3. Build comprehensive user profile (combines resume + LinkedIn)
+  const userProfile = await buildComprehensiveProfile(userId);
+  const formattedProfile = formatProfileForAI(userProfile);
 
-  // 4. Increment usage counter if system key was used
+  // 4. Execute AI parsing with comprehensive profile
+  const result = await provider.parseJobPosting(rawText, formattedProfile);
+
+  // 5. Increment usage counter if system key was used
   if (shouldIncrementCount) {
     await prisma.user.update({
       where: { id: userId },
