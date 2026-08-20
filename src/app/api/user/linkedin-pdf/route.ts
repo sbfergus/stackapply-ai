@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { put, del } from "@vercel/blob";
 import Anthropic from "@anthropic-ai/sdk";
+import { Prisma } from "@prisma/client";
 
 /**
  * POST /api/user/linkedin-pdf
@@ -221,7 +222,7 @@ export async function DELETE(req: NextRequest) {
     await prisma.user.update({
       where: { id: user.id },
       data: { 
-        linkedinData: null,
+        linkedinData: Prisma.JsonNull,
         linkedinSyncedAt: null,
       },
     });
