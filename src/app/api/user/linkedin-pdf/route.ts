@@ -89,8 +89,8 @@ export async function POST(req: NextRequest) {
 
     // Get free tier config
     const FREE_TIER_LIMIT = parseInt(process.env.FREE_TIER_LIMIT || '5', 10);
-    const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL || 'claude-3-5-haiku-20241022';
-    const LINKEDIN_PDF_MODEL = process.env.LINKEDIN_PDF_MODEL || 'claude-3-5-sonnet-latest';
+    const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL!;
+    const LINKEDIN_PDF_MODEL = process.env.LINKEDIN_PDF_MODEL!;
 
     // Check if user has exceeded free tier (only if not using custom Anthropic key)
     if (!hasCustomKey) {

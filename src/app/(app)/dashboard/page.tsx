@@ -104,6 +104,7 @@ function DashboardContent() {
     hasResume: boolean;
     hasLinkedInProfile: boolean;
   } | null>(null);
+  const [calculatingMatchForJob, setCalculatingMatchForJob] = useState<string | null>(null);
 
   // Auth check - redirect to sign in if not authenticated and not guest
   useEffect(() => {
@@ -299,6 +300,56 @@ function DashboardContent() {
     } catch (err) {
       console.error("Failed to update job status:", err);
       fetchJobs();
+    }
+  };
+
+  const handleCalculateMatch = async (job: Job, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // Check prerequisites
+    if (!userData?.hasResume && !userData?.hasLinkedInProfile) {
+      alert("Please upload your Resume or LinkedIn profile to calculate match scores.");
+      router.push("/account");
+      return;
+    }
+
+    if (!useAI) {
+      alert("Please enable the 'Use AI' toggle to calculate match scores.");
+      return;
+    }
+
+    setCalculatingMatchForJob(job.id);
+
+    try {
+      // Call the job parsing API with the existing job data
+      const res = await fetch(`/api/jobs/${job.id}/calculate-match`, {
+        method: "POST",
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // Update the job in state with new match score
+        setJobs((prevJobs) =>
+          prevJobs.map((j) => 
+            j.id === job.id 
+              ? { ...j, matchScore: data.matchScore, matchReasoning: data.matchReasoning } 
+              : j
+          )
+        );
+        
+        // Update selected job if it's open
+        if (selectedJob?.id === job.id) {
+          setSelectedJob({ ...selectedJob, matchScore: data.matchScore, matchReasoning: data.matchReasoning });
+        }
+      } else {
+        alert(data.error || "Failed to calculate match score");
+      }
+    } catch (err) {
+      console.error("Failed to calculate match:", err);
+      alert("An error occurred while calculating match score");
+    } finally {
+      setCalculatingMatchForJob(null);
     }
   };
 
@@ -521,6 +572,15 @@ function DashboardContent() {
                                       >
                                         Upload Profile
                                       </Link>
+                                    ) : !job.matchScore && (userData?.hasResume || userData?.hasLinkedInProfile) ? (
+                                      <button
+                                        onClick={(e) => handleCalculateMatch(job, e)}
+                                        disabled={calculatingMatchForJob === job.id || !useAI}
+                                        className="shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 hover:bg-indigo-900/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                        title={useAI ? "Click to calculate match score" : "Enable 'Use AI' toggle to calculate match"}
+                                      >
+                                        {calculatingMatchForJob === job.id ? "..." : "Calculate Match"}
+                                      </button>
                                     ) : null}
                                   </div>
 

@@ -27,7 +27,7 @@ export async function parseJobPosting(
 ): Promise<ParsedJobData> {
   // Get free tier configuration from environment variables
   const FREE_TIER_LIMIT = parseInt(process.env.FREE_TIER_LIMIT || '5', 10);
-  const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL || 'claude-3-5-haiku-20241022';
+  const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL!;
 
   // 1. Fetch user's API key config
   const user = await prisma.user.findUnique({
@@ -65,7 +65,7 @@ export async function parseJobPosting(
       throw new Error('System AI key not configured');
     }
 
-    provider = createAIProvider('ANTHROPIC', systemKey);
+    provider = createAIProvider('ANTHROPIC', systemKey, FREE_TIER_MODEL);
     shouldIncrementCount = true;
   }
 

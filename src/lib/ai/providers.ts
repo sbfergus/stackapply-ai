@@ -12,15 +12,17 @@ export interface AIProvider {
  */
 export class AnthropicProvider implements AIProvider {
   private client: Anthropic;
+  private model: string;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, model?: string) {
     this.client = new Anthropic({ apiKey });
+    this.model = model || process.env.FREE_TIER_MODEL!;
   }
 
   async testConnection(): Promise<boolean> {
     try {
       await this.client.messages.create({
-        model: 'claude-3-5-haiku-20241022',
+        model: this.model,
         max_tokens: 10,
         messages: [{ role: 'user', content: 'test' }],
       });
@@ -35,7 +37,7 @@ export class AnthropicProvider implements AIProvider {
     const prompt = buildPrompt(rawText, userProfileText);
 
     const response = await this.client.messages.create({
-      model: 'claude-3-5-haiku-20241022',
+      model: this.model,
       max_tokens: 1500,
       temperature: 0.2,
       messages: [{ role: 'user', content: prompt }],
@@ -55,15 +57,17 @@ export class AnthropicProvider implements AIProvider {
  */
 export class OpenAIProvider implements AIProvider {
   private client: OpenAI;
+  private model: string;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, model?: string) {
     this.client = new OpenAI({ apiKey });
+    this.model = model || 'gpt-4o-mini';
   }
 
   async testConnection(): Promise<boolean> {
     try {
       await this.client.chat.completions.create({
-        model: 'gpt-4o-mini',
+        model: this.model,
         max_tokens: 10,
         messages: [{ role: 'user', content: 'test' }],
       });
@@ -78,7 +82,7 @@ export class OpenAIProvider implements AIProvider {
     const prompt = buildPrompt(rawText, userProfileText);
 
     const response = await this.client.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: this.model,
       max_tokens: 1500,
       temperature: 0.2,
       messages: [
@@ -157,13 +161,14 @@ Return ONLY valid JSON. Do not wrap in backticks or markdown codeblocks.
  */
 export function createAIProvider(
   provider: 'ANTHROPIC' | 'OPENAI',
-  apiKey: string
+  apiKey: string,
+  model?: string
 ): AIProvider {
   switch (provider) {
     case 'ANTHROPIC':
-      return new AnthropicProvider(apiKey);
+      return new AnthropicProvider(apiKey, model);
     case 'OPENAI':
-      return new OpenAIProvider(apiKey);
+      return new OpenAIProvider(apiKey, model);
     default:
       throw new Error(`Unsupported provider: ${provider}`);
   }
