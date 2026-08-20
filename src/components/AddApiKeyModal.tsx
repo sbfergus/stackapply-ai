@@ -155,7 +155,7 @@ export default function AddApiKeyModal({ isOpen, onClose, onSuccess }: AddApiKey
           {/* Info Box */}
           <div className="p-3 bg-indigo-950/30 border border-indigo-900/50 rounded-lg">
             <p className="text-xs text-indigo-300">
-              <strong>Why add your own key?</strong> Get unlimited AI job analyses without hitting the 5-per-account free tier limit. Your key is encrypted and never shared.
+              <strong>Why add your own key?</strong> Get unlimited AI job analyses without hitting the free tier limit. Your key is encrypted and never shared.
             </p>
           </div>
 

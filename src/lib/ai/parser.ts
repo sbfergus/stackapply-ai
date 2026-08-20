@@ -25,6 +25,10 @@ export async function parseJobPosting(
   userId: string,
   userResumeText?: string
 ): Promise<ParsedJobData> {
+  // Get free tier configuration from environment variables
+  const FREE_TIER_LIMIT = parseInt(process.env.FREE_TIER_LIMIT || '5', 10);
+  const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL || 'claude-3-5-haiku-20241022';
+
   // 1. Fetch user's API key config
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -49,13 +53,13 @@ export async function parseJobPosting(
     provider = createAIProvider(user.apiKeyProvider, decryptedKey);
   } else {
     // No custom key - check free tier limit
-    if (user.aiAnalysisCount >= 5) {
+    if (user.aiAnalysisCount >= FREE_TIER_LIMIT) {
       throw new Error(
-        'FREE_TIER_LIMIT_EXCEEDED: You have used all 5 free AI analyses. Please add your own API key in Account Settings to continue.'
+        `FREE_TIER_LIMIT_EXCEEDED: You have used all ${FREE_TIER_LIMIT} free AI analyses. Please add your own API key in Account Settings to continue.`
       );
     }
 
-    // Use system key with ultra-low-cost model
+    // Use system key with configured model
     const systemKey = process.env.ANTHROPIC_API_KEY;
     if (!systemKey) {
       throw new Error('System AI key not configured');
@@ -65,7 +69,7 @@ export async function parseJobPosting(
     shouldIncrementCount = true;
   }
 
-  // 3. Execute AI parsing
+  // 3. Execute AI parsing (use FREE_TIER_MODEL for system key)
   const result = await provider.parseJobPosting(rawText, userResumeText);
 
   // 4. Increment usage counter if system key was used

@@ -21,6 +21,7 @@ interface ApiKeyData {
   keyMasked: string;
   aiAnalysisCount: number;
   freeAnalysesRemaining: number;
+  freeTierLimit: number;
 }
 
 export default function AccountPage() {
@@ -51,6 +52,7 @@ export default function AccountPage() {
     keyMasked: '',
     aiAnalysisCount: 0,
     freeAnalysesRemaining: 5,
+    freeTierLimit: 5,
   });
   const [loadingApiKey, setLoadingApiKey] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -384,7 +386,7 @@ export default function AccountPage() {
   };
 
   const handleRemoveApiKey = async () => {
-    if (!confirm('Are you sure you want to remove your API key? You will fall back to the free tier (5 analyses).')) {
+    if (!confirm(`Are you sure you want to remove your API key? You will fall back to the free tier (${apiKeyData.freeTierLimit} analyses).`)) {
       return;
     }
 
@@ -401,7 +403,8 @@ export default function AccountPage() {
           provider: null,
           keyMasked: '',
           aiAnalysisCount: apiKeyData.aiAnalysisCount,
-          freeAnalysesRemaining: Math.max(0, 5 - apiKeyData.aiAnalysisCount),
+          freeAnalysesRemaining: Math.max(0, (apiKeyData.freeTierLimit || 5) - apiKeyData.aiAnalysisCount),
+          freeTierLimit: apiKeyData.freeTierLimit || 5,
         });
         setToastMessage({
           title: 'API Key Removed',
@@ -561,7 +564,7 @@ export default function AccountPage() {
                 <h2 className="text-lg font-semibold text-white">API Keys</h2>
                 {!loadingApiKey && !apiKeyData.hasKey && (
                   <span className="text-xs text-slate-400">
-                    {apiKeyData.freeAnalysesRemaining} of 5 free analyses remaining
+                    {apiKeyData.freeAnalysesRemaining} of {apiKeyData.freeTierLimit} free analyses remaining
                   </span>
                 )}
               </div>
@@ -579,7 +582,7 @@ export default function AccountPage() {
                         <Sparkles className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
                         <div className="flex-1">
                           <p className="text-sm font-medium text-indigo-300 mb-1">
-                            Free Tier: <strong>{apiKeyData.freeAnalysesRemaining} of 5</strong> AI analyses remaining
+                            Free Tier: <strong>{apiKeyData.freeAnalysesRemaining} of {apiKeyData.freeTierLimit}</strong> AI analyses remaining
                           </p>
                           <p className="text-xs text-indigo-400/80">
                             Add your own API key below for unlimited analyses

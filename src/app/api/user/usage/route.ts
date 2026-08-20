@@ -23,7 +23,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const freeAnalysesRemaining = Math.max(0, 5 - user.aiAnalysisCount);
+    const freeTierLimit = parseInt(process.env.FREE_TIER_LIMIT || '5', 10);
+    const freeAnalysesRemaining = Math.max(0, freeTierLimit - user.aiAnalysisCount);
     const hasCustomKey = !!user.apiKeyEncrypted;
 
     return NextResponse.json({
@@ -31,6 +32,7 @@ export async function GET(req: NextRequest) {
       data: {
         aiAnalysisCount: user.aiAnalysisCount,
         freeAnalysesRemaining,
+        freeTierLimit,
         hasCustomKey,
       },
     });
