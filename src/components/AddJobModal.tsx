@@ -73,7 +73,7 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
       originalUrls: originalUrl.trim() ? [originalUrl.trim()] : [],
       sources: ["Manual Entry"],
       status: "TO_REVIEW",
-      matchScore: Math.floor(Math.random() * 10) + 88, // Default demo match score 88-97%
+      // Note: matchScore will be null unless AI analysis is performed
     };
 
     try {

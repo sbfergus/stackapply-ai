@@ -240,9 +240,8 @@ export async function POST(req: NextRequest) {
         companyOverview: companyOverview || "",
         roleSummary: roleSummary || "",
         benefits: Array.isArray(benefits) ? benefits : [],
-        matchScore: matchScore ? Number(matchScore) : 85,
-        matchReasoning:
-          matchReasoning || "Saved directly via StackApply Extension.",
+        matchScore: matchScore ? Number(matchScore) : null,
+        matchReasoning: matchReasoning || null,
         sources: Array.isArray(sources) ? sources : ["Extension"],
         originalUrls: Array.isArray(originalUrls) ? originalUrls : [],
         status: (status as JobStatus) || JobStatus.TO_REVIEW,
