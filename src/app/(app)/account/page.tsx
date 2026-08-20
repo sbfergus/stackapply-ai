@@ -834,17 +834,17 @@ export default function AccountPage() {
               </div>
               
               <div className="space-y-3">
-                {/* Warning for OpenAI Users */}
-                {apiKeyData.hasKey && apiKeyData.provider === 'OPENAI' && (
-                  <div className="p-4 bg-amber-950/30 border border-amber-900/50 rounded-lg">
+                {/* Warning for users without Anthropic API key */}
+                {(!apiKeyData.hasKey || apiKeyData.provider === 'OPENAI') && (
+                  <div className="p-4 bg-indigo-950/30 border border-indigo-900/50 rounded-lg">
                     <div className="flex items-start gap-3">
-                      <div className="text-amber-400 text-lg shrink-0">⚠️</div>
+                      <div className="text-indigo-400 text-lg shrink-0">ℹ️</div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-amber-300 mb-1">
-                          PDF parsing requires Anthropic
+                        <p className="text-sm font-medium text-indigo-300 mb-1">
+                          Anthropic API Key Required
                         </p>
-                        <p className="text-xs text-amber-400/80">
-                          LinkedIn PDF parsing uses Claude's document vision. Please add an Anthropic API key or use the free tier to upload your LinkedIn profile.
+                        <p className="text-xs text-indigo-400/80">
+                          LinkedIn PDF parsing requires your own Anthropic API key. {apiKeyData.provider === 'OPENAI' ? 'OpenAI does not support PDF document parsing.' : 'This feature is not available on the free tier.'}
                         </p>
                       </div>
                     </div>
@@ -900,7 +900,7 @@ export default function AccountPage() {
                       </p>
                       <button
                         onClick={handleLinkedinClick}
-                        disabled={uploadingLinkedin || (apiKeyData.hasKey && apiKeyData.provider === 'OPENAI')}
+                        disabled={uploadingLinkedin || !apiKeyData.hasKey || apiKeyData.provider !== 'ANTHROPIC'}
                         className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
                       >
                         {uploadingLinkedin ? (

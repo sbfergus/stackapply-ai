@@ -75,53 +75,22 @@ export async function POST(req: NextRequest) {
     const hasCustomKey = !!user.apiKeyEncrypted;
     const userProvider = user.apiKeyProvider;
 
-    // PDF parsing requires Anthropic (Claude) for document vision
-    // OpenAI doesn't support PDF document input yet
-    if (hasCustomKey && userProvider === 'OPENAI') {
+    // PDF parsing requires custom Anthropic API key (not available on free tier)
+    if (!hasCustomKey || userProvider !== 'ANTHROPIC') {
       return NextResponse.json(
         { 
-          error: "PDF parsing not supported with OpenAI",
-          message: "LinkedIn PDF parsing requires Anthropic's Claude model for document vision. Please add an Anthropic API key or use the free tier.",
+          error: "API key required",
+          message: "LinkedIn PDF parsing requires your own Anthropic API key. Please add one in Account Settings to use this feature.",
         },
-        { status: 400 }
+        { status: 403 }
       );
     }
 
-    // Get free tier config
-    const FREE_TIER_LIMIT = parseInt(process.env.FREE_TIER_LIMIT || '5', 10);
-    const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL!;
-
-    // Check if user has exceeded free tier (only if not using custom Anthropic key)
-    if (!hasCustomKey) {
-      if (user.aiAnalysisCount >= FREE_TIER_LIMIT) {
-        return NextResponse.json(
-          { 
-            error: "Free tier limit reached",
-            message: `You've used all ${FREE_TIER_LIMIT} free AI analyses. Add your own Anthropic API key to continue.`,
-            freeAnalysesUsed: user.aiAnalysisCount,
-            freeAnalysesLimit: FREE_TIER_LIMIT,
-          },
-          { status: 403 }
-        );
-      }
-    }
-
-    // Use appropriate API key and model
-    if (!hasCustomKey && !process.env.ANTHROPIC_API_KEY) {
-      return NextResponse.json(
-        { error: "AI service not configured" },
-        { status: 500 }
-      );
-    }
-
-    const apiKey = hasCustomKey && userProvider === 'ANTHROPIC'
-      ? decryptApiKey(user.apiKeyEncrypted!) 
-      : process.env.ANTHROPIC_API_KEY!;
+    const apiKey = decryptApiKey(user.apiKeyEncrypted!);
     
-    // Use better model (Sonnet) for users with custom keys, Haiku for free tier
-    const modelToUse = hasCustomKey && userProvider === 'ANTHROPIC'
-      ? 'claude-3-5-sonnet-latest'  // Better model for paying customers
-      : FREE_TIER_MODEL;             // Cost-effective model for free tier
+    // PDF parsing requires Claude Sonnet (Haiku doesn't support PDFs)
+    // Use sonnet-latest alias which always points to current version
+    const modelToUse = 'claude-3-5-sonnet-latest';
 
     // Extract text from PDF using Anthropic's PDF support
     const anthropic = new Anthropic({ apiKey });
@@ -217,14 +186,13 @@ Important:
     linkedinData.scrapedAt = new Date().toISOString();
     linkedinData.source = 'pdf_upload';
 
-    // Update user record with parsed LinkedIn data and increment usage counter
+    // Update user record with parsed LinkedIn data
+    // Note: Does NOT increment aiAnalysisCount since user is using their own key
     await prisma.user.update({
       where: { id: user.id },
       data: { 
         linkedinData: linkedinData,
         linkedinSyncedAt: new Date(),
-        // Only increment if using free tier (not custom Anthropic key)
-        ...(!hasCustomKey || userProvider !== 'ANTHROPIC' ? { aiAnalysisCount: { increment: 1 } } : {}),
       },
     });
 
