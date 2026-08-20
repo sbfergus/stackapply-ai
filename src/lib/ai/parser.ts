@@ -1,6 +1,6 @@
 import { createAIProvider } from './providers';
 import { decryptApiKey } from '../encryption';
-import prisma from '../prisma';
+import { prisma } from '../prisma';
 
 export interface ParsedJobData {
   title: string;
