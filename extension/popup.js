@@ -660,6 +660,27 @@ function scrapeJobDataInTab() {
       if (companyAnchor) company = companyAnchor.innerText;
     }
     
+    // Additional fallback for mobile LinkedIn
+    if (!company) {
+      // Try various selectors that mobile LinkedIn might use
+      const selectors = [
+        ".job-details-jobs-unified-top-card__company-name",
+        ".jobs-unified-top-card__company-name",
+        "[data-tracking-control-name='public_jobs_topcard-org-name']",
+        ".topcard__org-name-link",
+        ".jobs-company",
+        "a.app-aware-link[href*='/company/']"
+      ];
+      
+      for (const selector of selectors) {
+        const el = document.querySelector(selector);
+        if (el && el.innerText && el.innerText.trim()) {
+          company = el.innerText.trim();
+          break;
+        }
+      }
+    }
+    
     // Location extraction
     if (!location) {
       const spans = Array.from(document.querySelectorAll("span, p"));
