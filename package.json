@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run build:extension && next build",
+    "build": "npm run build:extension && prisma migrate deploy && next build",
     "build:extension": "node scripts/build-extension.js",
     "start": "next start",
     "lint": "next lint",
