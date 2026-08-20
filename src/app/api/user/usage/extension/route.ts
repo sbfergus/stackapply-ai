@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 import { prisma } from '@/lib/prisma';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+import { ExtensionAuthService } from '@/lib/extensionAuth';
 
 /**
  * GET /api/user/usage/extension
@@ -19,22 +17,16 @@ export async function GET(req: NextRequest) {
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
-    // Verify and decode JWT
-    let decoded: any;
-    try {
-      decoded = jwt.verify(token, JWT_SECRET);
-    } catch (error) {
-      console.error('JWT verification failed:', error);
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
-
-    if (!decoded.userId) {
-      return NextResponse.json({ error: 'Invalid token payload' }, { status: 401 });
+    // Verify and decode JWT using ExtensionAuthService
+    const decoded = await ExtensionAuthService.validateToken(token);
+    
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
 
     // Fetch user data
     const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+      where: { id: decoded.sub },
       select: {
         apiKeyProvider: true,
         apiKeyEncrypted: true,
