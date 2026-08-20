@@ -834,6 +834,23 @@ export default function AccountPage() {
               </div>
               
               <div className="space-y-3">
+                {/* Warning for OpenAI Users */}
+                {apiKeyData.hasKey && apiKeyData.provider === 'OPENAI' && (
+                  <div className="p-4 bg-amber-950/30 border border-amber-900/50 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <div className="text-amber-400 text-lg shrink-0">⚠️</div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-amber-300 mb-1">
+                          PDF parsing requires Anthropic
+                        </p>
+                        <p className="text-xs text-amber-400/80">
+                          LinkedIn PDF parsing uses Claude's document vision. Please add an Anthropic API key or use the free tier to upload your LinkedIn profile.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 {linkedinData ? (
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 bg-slate-900/50 rounded-lg border border-slate-700/50">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -883,7 +900,7 @@ export default function AccountPage() {
                       </p>
                       <button
                         onClick={handleLinkedinClick}
-                        disabled={uploadingLinkedin}
+                        disabled={uploadingLinkedin || (apiKeyData.hasKey && apiKeyData.provider === 'OPENAI')}
                         className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
                       >
                         {uploadingLinkedin ? (

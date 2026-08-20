@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { put, del } from "@vercel/blob";
 import Anthropic from "@anthropic-ai/sdk";
 import { Prisma } from "@prisma/client";
+import { decryptApiKey } from "@/lib/encryption";
 
 /**
  * POST /api/user/linkedin-pdf
@@ -49,7 +50,13 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: { id: true, linkedinUrl: true },
+      select: { 
+        id: true, 
+        linkedinUrl: true,
+        apiKeyProvider: true,
+        apiKeyEncrypted: true,
+        aiAnalysisCount: true,
+      },
     });
 
     if (!user) {
@@ -64,10 +71,60 @@ export async function POST(req: NextRequest) {
       access: "public",
     });
 
+    // Check user's API key status
+    const hasCustomKey = !!user.apiKeyEncrypted;
+    const userProvider = user.apiKeyProvider;
+
+    // PDF parsing requires Anthropic (Claude) for document vision
+    // OpenAI doesn't support PDF document input yet
+    if (hasCustomKey && userProvider === 'OPENAI') {
+      return NextResponse.json(
+        { 
+          error: "PDF parsing not supported with OpenAI",
+          message: "LinkedIn PDF parsing requires Anthropic's Claude model for document vision. Please add an Anthropic API key or use the free tier.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Get free tier config
+    const FREE_TIER_LIMIT = parseInt(process.env.FREE_TIER_LIMIT || '5', 10);
+    const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL || 'claude-3-5-haiku-20241022';
+    const LINKEDIN_PDF_MODEL = process.env.LINKEDIN_PDF_MODEL || 'claude-3-5-sonnet-latest';
+
+    // Check if user has exceeded free tier (only if not using custom Anthropic key)
+    if (!hasCustomKey) {
+      if (user.aiAnalysisCount >= FREE_TIER_LIMIT) {
+        return NextResponse.json(
+          { 
+            error: "Free tier limit reached",
+            message: `You've used all ${FREE_TIER_LIMIT} free AI analyses. Add your own Anthropic API key to continue.`,
+            freeAnalysesUsed: user.aiAnalysisCount,
+            freeAnalysesLimit: FREE_TIER_LIMIT,
+          },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Use appropriate API key and model
+    if (!hasCustomKey && !process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json(
+        { error: "AI service not configured" },
+        { status: 500 }
+      );
+    }
+
+    const apiKey = hasCustomKey && userProvider === 'ANTHROPIC'
+      ? decryptApiKey(user.apiKeyEncrypted!) 
+      : process.env.ANTHROPIC_API_KEY!;
+    
+    const modelToUse = hasCustomKey && userProvider === 'ANTHROPIC' 
+      ? LINKEDIN_PDF_MODEL 
+      : FREE_TIER_MODEL;
+
     // Extract text from PDF using Anthropic's PDF support
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY!,
-    });
+    const anthropic = new Anthropic({ apiKey });
 
     // Convert file to base64 for Anthropic API
     const arrayBuffer = await file.arrayBuffer();
@@ -75,7 +132,7 @@ export async function POST(req: NextRequest) {
 
     // Parse LinkedIn PDF with AI
     const message = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: modelToUse,
       max_tokens: 4096,
       messages: [
         {
@@ -160,12 +217,14 @@ Important:
     linkedinData.scrapedAt = new Date().toISOString();
     linkedinData.source = 'pdf_upload';
 
-    // Update user record with parsed LinkedIn data
+    // Update user record with parsed LinkedIn data and increment usage counter
     await prisma.user.update({
       where: { id: user.id },
       data: { 
         linkedinData: linkedinData,
         linkedinSyncedAt: new Date(),
+        // Only increment if using free tier (not custom Anthropic key)
+        ...(!hasCustomKey || userProvider !== 'ANTHROPIC' ? { aiAnalysisCount: { increment: 1 } } : {}),
       },
     });
 
