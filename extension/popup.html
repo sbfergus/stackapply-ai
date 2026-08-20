@@ -168,7 +168,6 @@
       font-size: 9px;
       color: #94a3b8;
       white-space: nowrap;
-      margin-left: 4px;
       font-weight: 500;
     }
     .toggle-switch {
@@ -222,34 +221,9 @@
       opacity: 0.5;
     }
     
-    /* Tooltip */
+    /* Tooltip - hidden, not used anymore */
     .toggle-container .tooltip {
-      visibility: hidden;
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: 8px;
-      background-color: #1e293b;
-      color: #94a3b8;
-      text-align: right;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 10px;
-      white-space: nowrap;
-      border: 1px solid #334155;
-      z-index: 1;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-    }
-    .toggle-container .tooltip::before {
-      content: '';
-      position: absolute;
-      bottom: 100%;
-      right: 12px;
-      border: 5px solid transparent;
-      border-bottom-color: #334155;
-    }
-    .toggle-container:hover .tooltip {
-      visibility: visible;
+      display: none;
     }
     
     .field-group {
@@ -353,8 +327,7 @@
           <input type="checkbox" id="use-ai-toggle">
           <span class="toggle-slider"></span>
         </label>
-        <span class="usage-counter" id="usage-counter"></span>
-        <span class="tooltip" id="toggle-tooltip">Loading...</span>
+        <span class="usage-counter" id="usage-counter">Loading...</span>
       </div>
     </div>
   </div>

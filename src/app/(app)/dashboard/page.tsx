@@ -313,8 +313,22 @@ function DashboardContent() {
                 useAI ? 'left-4 bg-white' : 'left-0.5 bg-slate-500'
               }`}></span>
             </div>
+            
+            {/* Mobile: Always visible text inside button, to the right of toggle */}
+            <span className="md:hidden text-[10px] text-slate-400 font-medium whitespace-nowrap ml-1">
+              {loadingApiKey
+                ? '...'
+                : !apiKeyData
+                ? 'Error'
+                : apiKeyData.hasKey
+                ? 'Your key'
+                : `${apiKeyData.freeAnalysesRemaining}/${apiKeyData.freeTierLimit} free`
+              }
+            </span>
           </button>
-          <div className="invisible group-hover:visible absolute top-full left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 mt-2 bg-slate-800 text-slate-300 text-[10px] px-3 py-1.5 rounded-md border border-slate-700 whitespace-nowrap shadow-lg z-10">
+          
+          {/* Desktop: Hover tooltip */}
+          <div className="hidden md:block invisible group-hover:visible absolute top-full left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 mt-2 bg-slate-800 text-slate-300 text-[10px] px-3 py-1.5 rounded-md border border-slate-700 whitespace-nowrap shadow-lg z-10">
             {loadingApiKey
               ? 'Loading...'
               : !apiKeyData

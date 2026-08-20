@@ -100,7 +100,6 @@ async function initializeAuthenticatedPopup(authState) {
   const rescrapeBtn = document.getElementById("refresh-btn");
   const useAIToggle = document.getElementById("use-ai-toggle");
   const usageCounterEl = document.getElementById("usage-counter");
-  const toggleTooltip = document.getElementById("toggle-tooltip");
 
   // Show user header
   userHeaderEl.style.display = 'flex';
@@ -141,21 +140,22 @@ async function initializeAuthenticatedPopup(authState) {
           slider.classList.remove('disabled');
         }
         
-        // Update usage counter text
+        // Update usage counter text - visible to the right of toggle
         if (apiKeyData.hasKey) {
-          usageCounterEl.textContent = '';
-          toggleTooltip.textContent = 'Using your API key';
+          usageCounterEl.textContent = 'Your key';
         } else {
-          usageCounterEl.textContent = `${apiKeyData.freeAnalysesRemaining}/${apiKeyData.freeTierLimit}`;
-          toggleTooltip.textContent = `${apiKeyData.freeAnalysesRemaining} of ${apiKeyData.freeTierLimit} free analyses remaining`;
+          usageCounterEl.textContent = `${apiKeyData.freeAnalysesRemaining}/${apiKeyData.freeTierLimit} free`;
         }
+      } else {
+        usageCounterEl.textContent = 'Error';
       }
+    } else {
+      usageCounterEl.textContent = 'Error';
     }
   } catch (err) {
     console.error('Error fetching API key data:', err);
     useAIToggle.disabled = true;
-    usageCounterEl.textContent = '';
-    toggleTooltip.textContent = 'Error loading usage data';
+    usageCounterEl.textContent = 'Error';
   }
 
   // Toggle click handler
