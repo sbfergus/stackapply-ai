@@ -49,65 +49,10 @@
       letter-spacing: 0.05em;
       white-space: nowrap;
     }
-    .linkedin-status {
-      font-size: 9px;
-      padding: 3px 7px;
-      border-radius: 4px;
-      font-weight: 600;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 3px;
-    }
-    .linkedin-status.synced {
-      background-color: rgba(34, 197, 94, 0.15);
-      color: #22c55e;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-    }
-    .linkedin-status.not-synced {
-      background-color: rgba(251, 191, 36, 0.15);
-      color: #fbbf24;
-      border: 1px solid rgba(251, 191, 36, 0.3);
-    }
     .header-actions {
       display: flex;
       align-items: center;
       gap: 6px;
-    }
-    .linkedin-sync-btn {
-      background: none;
-      border: none;
-      color: #6366f1;
-      cursor: pointer;
-      font-size: 16px;
-      padding: 4px 6px;
-      margin: 0;
-      width: auto;
-      height: auto;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      line-height: 1;
-    }
-    .linkedin-sync-btn:hover:not(:disabled) {
-      background-color: rgba(99, 102, 241, 0.15);
-      transform: scale(1.05);
-    }
-    .linkedin-sync-btn:active:not(:disabled) {
-      transform: scale(0.95);
-    }
-    .linkedin-sync-btn:disabled {
-      cursor: not-allowed;
-      opacity: 0.4;
-    }
-    .linkedin-sync-btn.syncing {
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
     }
     .settings-btn {
       background: none;
@@ -370,15 +315,8 @@
     <div class="user-info">
       <span id="user-email" class="user-email"></span>
       <span id="guest-badge" class="guest-badge" style="display: none;">Guest Mode</span>
-      <span id="linkedin-status" class="linkedin-status not-synced" style="display: none;">
-        <span id="linkedin-status-icon">⚠️</span>
-        <span id="linkedin-status-text">No Profile</span>
-      </span>
     </div>
     <div class="header-actions">
-      <button id="linkedin-sync-btn" class="linkedin-sync-btn" title="Sync LinkedIn Profile" aria-label="Sync LinkedIn Profile">
-        🔗
-      </button>
       <button id="settings-btn" class="settings-btn" aria-label="Settings">⚙️</button>
     </div>
   </div>

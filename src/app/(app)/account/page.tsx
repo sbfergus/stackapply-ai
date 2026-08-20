@@ -46,6 +46,8 @@ export default function AccountPage() {
   const [toastMessage, setToastMessage] = useState({ title: "", description: "" });
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
   const [uploadingResume, setUploadingResume] = useState(false);
+  const [linkedinData, setLinkedinData] = useState<any | null>(null);
+  const [uploadingLinkedin, setUploadingLinkedin] = useState(false);
   const [apiKeyData, setApiKeyData] = useState<ApiKeyData>({
     hasKey: false,
     provider: null,
@@ -57,6 +59,7 @@ export default function AccountPage() {
   const [loadingApiKey, setLoadingApiKey] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resumeInputRef = useRef<HTMLInputElement>(null);
+  const linkedinInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -112,6 +115,9 @@ export default function AccountPage() {
         }
         if (data.success && data.user?.resumeUrl) {
           setResumeUrl(data.user.resumeUrl);
+        }
+        if (data.success && data.user?.linkedinData) {
+          setLinkedinData(data.user.linkedinData);
         }
       } catch (err) {
         console.error("Error fetching user data:", err);
@@ -364,6 +370,83 @@ export default function AccountPage() {
     } catch (error) {
       console.error("Resume deletion error:", error);
       alert("Failed to delete resume");
+    }
+  };
+
+  const handleLinkedinUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (file.type !== "application/pdf") {
+      alert("Please select a PDF file");
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File size must be less than 10MB");
+      return;
+    }
+
+    setUploadingLinkedin(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("linkedin", file);
+
+      const res = await fetch("/api/user/linkedin-pdf", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.success && data.linkedinData) {
+        setLinkedinData(data.linkedinData);
+        setToastMessage({
+          title: "LinkedIn Profile Uploaded!",
+          description: "Your LinkedIn profile has been successfully parsed and saved."
+        });
+        showToastNotification();
+      } else {
+        alert(data.error || "Failed to upload LinkedIn profile");
+      }
+    } catch (error) {
+      console.error("LinkedIn upload error:", error);
+      alert("Failed to upload LinkedIn profile");
+    } finally {
+      setUploadingLinkedin(false);
+    }
+  };
+
+  const handleLinkedinClick = () => {
+    linkedinInputRef.current?.click();
+  };
+
+  const handleDeleteLinkedin = async () => {
+    if (!confirm("Are you sure you want to delete your LinkedIn profile data?")) return;
+
+    try {
+      const res = await fetch("/api/user/linkedin-pdf", {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setLinkedinData(null);
+        setToastMessage({
+          title: "LinkedIn Profile Deleted",
+          description: "Your LinkedIn profile data has been removed."
+        });
+        showToastNotification();
+      } else {
+        alert(data.error || "Failed to delete LinkedIn profile");
+      }
+    } catch (error) {
+      console.error("LinkedIn deletion error:", error);
+      alert("Failed to delete LinkedIn profile");
     }
   };
 
@@ -734,6 +817,97 @@ export default function AccountPage() {
                   type="file"
                   accept="application/pdf"
                   onChange={handleResumeUpload}
+                  className="hidden"
+                />
+              </div>
+            </section>
+
+            {/* LinkedIn Profile Section */}
+            <section className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-white">LinkedIn Profile</h2>
+                {linkedinData && !uploadingLinkedin && (
+                  <span className="text-xs text-green-400">
+                    ✓ Synced
+                  </span>
+                )}
+              </div>
+              
+              <div className="space-y-3">
+                {linkedinData ? (
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 bg-slate-900/50 rounded-lg border border-slate-700/50">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-200 truncate">
+                          {linkedinData.name || 'LinkedIn Profile'}
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          PDF • {linkedinData.experience?.length || 0} positions • {linkedinData.skills?.length || 0} skills
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col md:flex-row gap-2 md:flex-shrink-0">
+                      <button 
+                        onClick={handleLinkedinClick}
+                        disabled={uploadingLinkedin}
+                        className="px-4 py-2 text-sm font-medium text-white bg-slate-700 hover:bg-slate-600 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Replace
+                      </button>
+                      <button 
+                        onClick={handleDeleteLinkedin}
+                        disabled={uploadingLinkedin}
+                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-6 bg-slate-900/50 rounded-lg border-2 border-dashed border-slate-700 hover:border-blue-500/50 transition">
+                    <div className="text-center">
+                      <div className="w-12 h-12 mx-auto rounded-lg bg-blue-500/10 flex items-center justify-center mb-3">
+                        <Upload className="w-6 h-6 text-blue-400" />
+                      </div>
+                      <p className="text-sm font-medium text-slate-200 mb-1">
+                        Upload your LinkedIn profile
+                      </p>
+                      <p className="text-xs text-slate-400 mb-2">
+                        PDF up to 10MB • AI-powered parsing
+                      </p>
+                      <p className="text-xs text-slate-500 mb-4">
+                        Save your LinkedIn profile as PDF: Profile → More → Save to PDF
+                      </p>
+                      <button
+                        onClick={handleLinkedinClick}
+                        disabled={uploadingLinkedin}
+                        className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+                      >
+                        {uploadingLinkedin ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Parsing...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4" />
+                            Choose File
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Hidden File Input */}
+                <input
+                  ref={linkedinInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handleLinkedinUpload}
                   className="hidden"
                 />
               </div>
