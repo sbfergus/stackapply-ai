@@ -1,14 +1,12 @@
-import Anthropic from "@anthropic-ai/sdk";
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
-});
+import { createAIProvider } from './providers';
+import { decryptApiKey } from '../encryption';
+import prisma from '../prisma';
 
 export interface ParsedJobData {
   title: string;
   company: string;
   location: string;
-  workSetting: "REMOTE" | "HYBRID" | "IN_OFFICE";
+  workSetting: 'REMOTE' | 'HYBRID' | 'IN_OFFICE';
   salaryMin?: number;
   salaryMax?: number;
   companyOverview: string;
@@ -19,51 +17,64 @@ export interface ParsedJobData {
   matchReasoning: string;
 }
 
+/**
+ * Parse job posting with dynamic key resolution
+ */
 export async function parseJobPosting(
   rawText: string,
+  userId: string,
   userResumeText?: string
 ): Promise<ParsedJobData> {
-  const prompt = `
-You are an expert technical recruiter and resume analyst.
-Analyze the following job posting raw text (and optional candidate resume).
-
-Job Posting Text:
-"""
-${rawText}
-"""
-
-${userResumeText ? `Candidate Resume:\n"""\n${userResumeText}\n"""` : ""}
-
-Extract and analyze the job posting into structured JSON adhering to this EXACT schema:
-{
-  "title": "Job Title (string)",
-  "company": "Company Name (string)",
-  "location": "Location city/state/country (string)",
-  "workSetting": "REMOTE" | "HYBRID" | "IN_OFFICE",
-  "salaryMin": number or null,
-  "salaryMax": number or null,
-  "companyOverview": "Concise 2-3 sentence overview of the company",
-  "roleSummary": "Concise 2-3 sentence summary of core responsibilities",
-  "techStack": ["Next.js", "TypeScript", "Tailwind", etc.],
-  "benefits": ["Health Insurance", "401k", etc.],
-  "matchScore": integer between 0 and 100 representing candidate qualification fit (default 75 if no resume provided),
-  "matchReasoning": "One concise sentence explaining the match score reasoning."
-}
-
-Return ONLY valid JSON. Do not wrap in backticks or markdown codeblocks.
-`;
-
-  const response = await anthropic.messages.create({
-    model: "claude-3-5-haiku-20241022",
-    max_tokens: 1500,
-    temperature: 0.2,
-    messages: [{ role: "user", content: prompt }],
+  // 1. Fetch user's API key config
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      apiKeyProvider: true,
+      apiKeyEncrypted: true,
+      aiAnalysisCount: true,
+    },
   });
 
-  const contentBlock = response.content[0];
-  if (contentBlock.type !== "text") {
-    throw new Error("Unexpected response type from Claude API");
+  if (!user) {
+    throw new Error('User not found');
   }
 
-  return JSON.parse(contentBlock.text.trim()) as ParsedJobData;
+  let provider: ReturnType<typeof createAIProvider>;
+  let shouldIncrementCount = false;
+
+  // 2. Key Resolution Logic
+  if (user.apiKeyProvider && user.apiKeyEncrypted) {
+    // User has custom key - use it (unlimited)
+    const decryptedKey = decryptApiKey(user.apiKeyEncrypted);
+    provider = createAIProvider(user.apiKeyProvider, decryptedKey);
+  } else {
+    // No custom key - check free tier limit
+    if (user.aiAnalysisCount >= 5) {
+      throw new Error(
+        'FREE_TIER_LIMIT_EXCEEDED: You have used all 5 free AI analyses. Please add your own API key in Account Settings to continue.'
+      );
+    }
+
+    // Use system key with ultra-low-cost model
+    const systemKey = process.env.ANTHROPIC_API_KEY;
+    if (!systemKey) {
+      throw new Error('System AI key not configured');
+    }
+
+    provider = createAIProvider('ANTHROPIC', systemKey);
+    shouldIncrementCount = true;
+  }
+
+  // 3. Execute AI parsing
+  const result = await provider.parseJobPosting(rawText, userResumeText);
+
+  // 4. Increment usage counter if system key was used
+  if (shouldIncrementCount) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { aiAnalysisCount: { increment: 1 } },
+    });
+  }
+
+  return result;
 }
