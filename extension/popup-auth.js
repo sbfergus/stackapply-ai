@@ -4,8 +4,9 @@
  */
 
 // API Configuration
-// const API_URL = "https://stackapply-ai.vercel.app";
-const API_URL = "http://localhost:3000"; // For local testing
+// Automatically use production URL
+// To test locally, manually change to: http://localhost:3000
+const API_URL = "https://stackapply-ai.vercel.app";
 
 // ============================================
 // CHROME STORAGE HELPERS
