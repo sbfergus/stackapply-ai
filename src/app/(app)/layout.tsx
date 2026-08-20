@@ -67,14 +67,17 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
         {/* Top Row: Logo/Title and Avatar - Always horizontal */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-1">
-              <div className="p-2 bg-indigo-600/20 rounded-xl border border-indigo-500/30 text-indigo-400">
+            <Link 
+              href="/dashboard"
+              className="flex items-center gap-3 mb-1 group cursor-pointer w-fit"
+            >
+              <div className="p-2 bg-indigo-600/20 rounded-xl border border-indigo-500/30 text-indigo-400 group-hover:bg-indigo-600/30 group-hover:border-indigo-500/50 transition-colors">
                 <Briefcase className="w-6 h-6" />
               </div>
-              <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent whitespace-nowrap">
+              <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent whitespace-nowrap group-hover:from-indigo-300 group-hover:via-indigo-200 group-hover:to-slate-300 transition-all">
                 StackApply.ai
               </h1>
-            </div>
+            </Link>
             <p className="hidden md:block text-xs text-slate-400 ml-11">
               Automated job tracking, candidate matching, and AI resume tailoring
             </p>
