@@ -559,29 +559,43 @@ function DashboardContent() {
                                       <span className="truncate">{job.company}</span>
                                     </div>
 
-                                    {job.matchScore ? (
-                                      <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">
-                                        {job.matchScore}% Match
-                                      </span>
-                                    ) : userData && !userData.hasResume && !userData.hasLinkedInProfile ? (
-                                      <Link
-                                        href="/account"
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-400 border border-amber-800/50 hover:bg-amber-900/80 transition group relative"
-                                        title="Upload Resume or LinkedIn profile to enable AI matching"
-                                      >
-                                        Upload Profile
-                                      </Link>
-                                    ) : !job.matchScore && (userData?.hasResume || userData?.hasLinkedInProfile) ? (
-                                      <button
-                                        onClick={(e) => handleCalculateMatch(job, e)}
-                                        disabled={calculatingMatchForJob === job.id || !useAI}
-                                        className="shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 hover:bg-indigo-900/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                                        title={useAI ? "Click to calculate match score" : "Enable 'Use AI' toggle to calculate match"}
-                                      >
-                                        {calculatingMatchForJob === job.id ? "..." : "Calculate Match"}
-                                      </button>
-                                    ) : null}
+                                    {(() => {
+                                      console.log('Job card render:', {
+                                        jobId: job.id,
+                                        jobTitle: job.title,
+                                        matchScore: job.matchScore,
+                                        hasResume: userData?.hasResume,
+                                        hasLinkedIn: userData?.hasLinkedInProfile,
+                                        useAI: useAI
+                                      });
+                                      
+                                      if (job.matchScore) {
+                                        return (
+                                          <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">
+                                            {job.matchScore}% Match
+                                          </span>
+                                        );
+                                      }
+                                      
+                                      const hasProfile = userData?.hasResume || userData?.hasLinkedInProfile;
+                                      
+                                      return (
+                                        <button
+                                          onClick={(e) => handleCalculateMatch(job, e)}
+                                          disabled={!hasProfile || calculatingMatchForJob === job.id || !useAI}
+                                          className="shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 hover:bg-indigo-900/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                          title={
+                                            !hasProfile
+                                              ? "Upload Resume or LinkedIn profile in Account Settings first"
+                                              : !useAI
+                                              ? "Enable 'Use AI' toggle to calculate match"
+                                              : "Click to calculate match score"
+                                          }
+                                        >
+                                          {calculatingMatchForJob === job.id ? "..." : "Calculate Match"}
+                                        </button>
+                                      );
+                                    })()}
                                   </div>
 
                                   {/* Job Title */}
