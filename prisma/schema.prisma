@@ -21,6 +21,10 @@ model User {
   preferredTechStack String[]
   targetSalaryMin    Int?
   preferredLocations String[]
+  apiKeyProvider     ApiKeyProvider?
+  apiKeyEncrypted    String?
+  aiAnalysisCount    Int                 @default(0)
+  lastAiAnalysisReset DateTime?
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   password           String?
@@ -87,4 +91,9 @@ enum JobStatus {
   INTERVIEWING
   REJECTED
   OFFER
+}
+
+enum ApiKeyProvider {
+  ANTHROPIC
+  OPENAI
 }
