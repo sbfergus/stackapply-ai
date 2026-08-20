@@ -150,6 +150,7 @@ Return ONLY valid JSON adhering to this EXACT schema:
 
 Return ONLY valid JSON. Do not wrap in backticks or markdown codeblocks.
 `;
+}
 
 /**
  * Factory function to create provider
