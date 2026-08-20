@@ -48,9 +48,12 @@ export async function parseJobPosting(
 
   // 2. Key Resolution Logic
   if (user.apiKeyProvider && user.apiKeyEncrypted) {
-    // User has custom key - use it (unlimited)
+    // User has custom key - use it (unlimited) with better model
     const decryptedKey = decryptApiKey(user.apiKeyEncrypted);
-    provider = createAIProvider(user.apiKeyProvider, decryptedKey);
+    const model = user.apiKeyProvider === 'ANTHROPIC' 
+      ? 'claude-3-5-sonnet-latest'  // Better model for paying customers
+      : undefined;                   // OpenAI uses default gpt-4o-mini
+    provider = createAIProvider(user.apiKeyProvider, decryptedKey, model);
   } else {
     // No custom key - check free tier limit
     if (user.aiAnalysisCount >= FREE_TIER_LIMIT) {

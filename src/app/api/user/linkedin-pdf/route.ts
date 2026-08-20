@@ -90,7 +90,6 @@ export async function POST(req: NextRequest) {
     // Get free tier config
     const FREE_TIER_LIMIT = parseInt(process.env.FREE_TIER_LIMIT || '5', 10);
     const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL!;
-    const LINKEDIN_PDF_MODEL = process.env.LINKEDIN_PDF_MODEL!;
 
     // Check if user has exceeded free tier (only if not using custom Anthropic key)
     if (!hasCustomKey) {
@@ -119,9 +118,10 @@ export async function POST(req: NextRequest) {
       ? decryptApiKey(user.apiKeyEncrypted!) 
       : process.env.ANTHROPIC_API_KEY!;
     
-    const modelToUse = hasCustomKey && userProvider === 'ANTHROPIC' 
-      ? LINKEDIN_PDF_MODEL 
-      : FREE_TIER_MODEL;
+    // Use better model (Sonnet) for users with custom keys, Haiku for free tier
+    const modelToUse = hasCustomKey && userProvider === 'ANTHROPIC'
+      ? 'claude-3-5-sonnet-latest'  // Better model for paying customers
+      : FREE_TIER_MODEL;             // Cost-effective model for free tier
 
     // Extract text from PDF using Anthropic's PDF support
     const anthropic = new Anthropic({ apiKey });
