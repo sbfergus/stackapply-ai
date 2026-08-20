@@ -116,7 +116,7 @@ async function initializeAuthenticatedPopup(authState) {
   // Fetch API key data and configure toggle
   let apiKeyData = null;
   try {
-    const res = await fetch(`${API_BASE_URL}/api/user/api-key`, {
+    const res = await fetch(`${API_BASE_URL}/api/user/usage/extension`, {
       headers: {
         'Authorization': `Bearer ${authState.token}`
       }
