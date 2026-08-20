@@ -14,6 +14,7 @@ model User {
   resumeUrl          String?
   linkedinUrl        String?
   linkedinData       Json?
+  linkedinSyncedAt   DateTime?
   baseResumeText     String?
   baseCoverLetter    String?
   writingStyle       Json?

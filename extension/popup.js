@@ -93,6 +93,10 @@ async function initializeAuthenticatedPopup(authState) {
   const userHeaderEl = document.getElementById("user-header");
   const userEmailEl = document.getElementById("user-email");
   const guestBadgeEl = document.getElementById("guest-badge");
+  const linkedinStatusEl = document.getElementById("linkedin-status");
+  const linkedinStatusIcon = document.getElementById("linkedin-status-icon");
+  const linkedinStatusText = document.getElementById("linkedin-status-text");
+  const linkedinSyncBtn = document.getElementById("linkedin-sync-btn");
   const settingsBtn = document.getElementById("settings-btn");
   const settingsMenu = document.getElementById("settings-menu");
   const signoutBtn = document.getElementById("signout-btn");
@@ -108,10 +112,22 @@ async function initializeAuthenticatedPopup(authState) {
   if (authState.isGuest) {
     userEmailEl.textContent = "Guest User";
     guestBadgeEl.style.display = 'inline-block';
+    linkedinStatusEl.style.display = 'none'; // Hide for guests
+    linkedinSyncBtn.style.display = 'none'; // Hide for guests
   } else {
     userEmailEl.textContent = authState.user.email;
     guestBadgeEl.style.display = 'none';
+    linkedinStatusEl.style.display = 'flex';
+    linkedinSyncBtn.style.display = 'flex';
+    
+    // Fetch and display LinkedIn sync status
+    await updateLinkedInStatus(authState.token);
   }
+
+  // LinkedIn Sync Button Handler
+  linkedinSyncBtn.addEventListener("click", async () => {
+    await handleLinkedInSync(authState.token);
+  });
 
   // Fetch API key data and configure toggle
   let apiKeyData = null;
@@ -1080,4 +1096,249 @@ function scrapeJobDataInTab() {
     originalUrls: [window.location.href],
     sources: [source],
   };
+}
+
+
+// ============================================
+// LINKEDIN PROFILE SYNC
+// ============================================
+
+/**
+ * Update LinkedIn sync status badge
+ */
+async function updateLinkedInStatus(token) {
+  const linkedinStatusEl = document.getElementById("linkedin-status");
+  const linkedinStatusIcon = document.getElementById("linkedin-status-icon");
+  const linkedinStatusText = document.getElementById("linkedin-status-text");
+  
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/user/linkedin/sync`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && data.data.hasSynced) {
+        // Profile is synced
+        linkedinStatusEl.className = 'linkedin-status synced';
+        linkedinStatusIcon.textContent = '✓';
+        linkedinStatusText.textContent = 'Profile Synced';
+      } else {
+        // Profile not synced yet
+        linkedinStatusEl.className = 'linkedin-status not-synced';
+        linkedinStatusIcon.textContent = '⚠️';
+        linkedinStatusText.textContent = 'No Profile';
+      }
+    }
+  } catch (err) {
+    console.error('Error fetching LinkedIn status:', err);
+  }
+}
+
+/**
+ * Handle LinkedIn profile sync
+ */
+async function handleLinkedInSync(token) {
+  const linkedinSyncBtn = document.getElementById("linkedin-sync-btn");
+  const statusEl = document.getElementById("status");
+  
+  // Disable button and show syncing state
+  linkedinSyncBtn.disabled = true;
+  linkedinSyncBtn.classList.add('syncing');
+  statusEl.innerText = "🔄 Syncing LinkedIn profile...";
+  statusEl.className = "status";
+  
+  try {
+    // Get current tab
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    
+    // Check if user is on LinkedIn profile page
+    if (!tab?.url || !tab.url.includes('linkedin.com/in/')) {
+      statusEl.innerText = "⚠️ Please navigate to your LinkedIn profile page";
+      statusEl.className = "status error";
+      linkedinSyncBtn.disabled = false;
+      linkedinSyncBtn.classList.remove('syncing');
+      setTimeout(() => {
+        statusEl.innerText = "";
+        statusEl.className = "status";
+      }, 4000);
+      return;
+    }
+    
+    // Scrape LinkedIn profile
+    const results = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: scrapeLinkedInProfile,
+    });
+    
+    if (results && results[0] && results[0].result) {
+      const linkedinData = results[0].result;
+      
+      // Save to backend
+      const res = await fetch(`${API_BASE_URL}/api/user/linkedin/sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          linkedinData,
+          linkedinUrl: tab.url
+        }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        statusEl.innerText = "✅ LinkedIn profile synced successfully!";
+        statusEl.className = "status success";
+        
+        // Update status badge
+        await updateLinkedInStatus(token);
+        
+        setTimeout(() => {
+          statusEl.innerText = "";
+          statusEl.className = "status";
+        }, 3000);
+      } else {
+        throw new Error(data.error || 'Failed to sync profile');
+      }
+    } else {
+      statusEl.innerText = "❌ Could not extract LinkedIn profile data";
+      statusEl.className = "status error";
+      setTimeout(() => {
+        statusEl.innerText = "";
+        statusEl.className = "status";
+      }, 4000);
+    }
+  } catch (err) {
+    console.error('LinkedIn sync error:', err);
+    statusEl.innerText = "❌ Failed to sync: " + err.message;
+    statusEl.className = "status error";
+    setTimeout(() => {
+      statusEl.innerText = "";
+      statusEl.className = "status";
+    }, 4000);
+  } finally {
+    linkedinSyncBtn.disabled = false;
+    linkedinSyncBtn.classList.remove('syncing');
+  }
+}
+
+/**
+ * Scrape LinkedIn profile data
+ * This function is injected into the LinkedIn profile page
+ */
+function scrapeLinkedInProfile() {
+  const profileData = {
+    name: '',
+    headline: '',
+    location: '',
+    about: '',
+    experience: [],
+    education: [],
+    skills: [],
+    profileUrl: window.location.href,
+    scrapedAt: new Date().toISOString(),
+  };
+  
+  try {
+    // Name
+    const nameEl = document.querySelector('h1.text-heading-xlarge') || 
+                   document.querySelector('.pv-text-details__left-panel h1');
+    if (nameEl) profileData.name = nameEl.innerText.trim();
+    
+    // Headline
+    const headlineEl = document.querySelector('.text-body-medium.break-words') ||
+                       document.querySelector('.pv-text-details__left-panel .text-body-medium');
+    if (headlineEl) profileData.headline = headlineEl.innerText.trim();
+    
+    // Location
+    const locationEl = document.querySelector('.text-body-small.inline.t-black--light.break-words') ||
+                       document.querySelector('.pv-text-details__left-panel .text-body-small');
+    if (locationEl) profileData.location = locationEl.innerText.trim();
+    
+    // About section
+    const aboutSection = document.querySelector('#about') ||
+                        document.querySelector('[data-section="summary"]');
+    if (aboutSection) {
+      const aboutContainer = aboutSection.closest('section');
+      if (aboutContainer) {
+        const aboutText = aboutContainer.querySelector('.display-flex.ph5.pv3') ||
+                         aboutContainer.querySelector('.pv-shared-text-with-see-more');
+        if (aboutText) {
+          profileData.about = aboutText.innerText.trim();
+        }
+      }
+    }
+    
+    // Experience
+    const expSection = document.querySelector('#experience');
+    if (expSection) {
+      const expContainer = expSection.closest('section');
+      if (expContainer) {
+        const expItems = expContainer.querySelectorAll('li.artdeco-list__item');
+        expItems.forEach(item => {
+          const titleEl = item.querySelector('.mr1.t-bold span[aria-hidden="true"]');
+          const companyEl = item.querySelector('.t-14.t-normal span[aria-hidden="true"]');
+          const datesEl = item.querySelector('.t-14.t-normal.t-black--light span[aria-hidden="true"]');
+          const descEl = item.querySelector('.pv-shared-text-with-see-more span[aria-hidden="true"]');
+          
+          if (titleEl) {
+            profileData.experience.push({
+              title: titleEl.innerText.trim(),
+              company: companyEl ? companyEl.innerText.trim() : '',
+              dates: datesEl ? datesEl.innerText.trim() : '',
+              description: descEl ? descEl.innerText.trim() : '',
+            });
+          }
+        });
+      }
+    }
+    
+    // Education
+    const eduSection = document.querySelector('#education');
+    if (eduSection) {
+      const eduContainer = eduSection.closest('section');
+      if (eduContainer) {
+        const eduItems = eduContainer.querySelectorAll('li.artdeco-list__item');
+        eduItems.forEach(item => {
+          const schoolEl = item.querySelector('.mr1.hoverable-link-text.t-bold span[aria-hidden="true"]');
+          const degreeEl = item.querySelector('.t-14.t-normal span[aria-hidden="true"]');
+          const datesEl = item.querySelector('.t-14.t-normal.t-black--light span[aria-hidden="true"]');
+          
+          if (schoolEl) {
+            profileData.education.push({
+              school: schoolEl.innerText.trim(),
+              degree: degreeEl ? degreeEl.innerText.trim() : '',
+              dates: datesEl ? datesEl.innerText.trim() : '',
+            });
+          }
+        });
+      }
+    }
+    
+    // Skills
+    const skillsSection = document.querySelector('#skills');
+    if (skillsSection) {
+      const skillsContainer = skillsSection.closest('section');
+      if (skillsContainer) {
+        const skillItems = skillsContainer.querySelectorAll('.pv-skill-category-entity__name span[aria-hidden="true"]') ||
+                          skillsContainer.querySelectorAll('.mr1.hoverable-link-text.t-bold span[aria-hidden="true"]');
+        skillItems.forEach(skill => {
+          const skillText = skill.innerText.trim();
+          if (skillText && !profileData.skills.includes(skillText)) {
+            profileData.skills.push(skillText);
+          }
+        });
+      }
+    }
+    
+    return profileData;
+  } catch (error) {
+    console.error('LinkedIn profile scraping error:', error);
+    return profileData;
+  }
 }
