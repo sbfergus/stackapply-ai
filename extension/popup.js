@@ -1230,6 +1230,9 @@ async function handleLinkedInSync(token) {
 /**
  * Scrape LinkedIn profile data
  * This function is injected into the LinkedIn profile page
+ * 
+ * Strategy: Use structural selectors (IDs, semantic attributes) instead of
+ * fragile CSS classes that LinkedIn frequently changes
  */
 function scrapeLinkedInProfile() {
   const profileData = {
@@ -1240,105 +1243,237 @@ function scrapeLinkedInProfile() {
     experience: [],
     education: [],
     skills: [],
+    certifications: [],
     profileUrl: window.location.href,
     scrapedAt: new Date().toISOString(),
   };
   
   try {
-    // Name
-    const nameEl = document.querySelector('h1.text-heading-xlarge') || 
-                   document.querySelector('.pv-text-details__left-panel h1');
-    if (nameEl) profileData.name = nameEl.innerText.trim();
+    console.log('🔍 Starting LinkedIn profile scrape...');
     
-    // Headline
-    const headlineEl = document.querySelector('.text-body-medium.break-words') ||
-                       document.querySelector('.pv-text-details__left-panel .text-body-medium');
-    if (headlineEl) profileData.headline = headlineEl.innerText.trim();
+    // ===== TOP CARD: Name, Headline, Location =====
+    // Look for section with ID containing "Topcard" or main profile section
+    const topCard = document.querySelector('section[id*="topcard"]') || 
+                    document.querySelector('div[data-view-name*="profile-topcard"]') ||
+                    document.querySelector('main section:first-of-type');
     
-    // Location
-    const locationEl = document.querySelector('.text-body-small.inline.t-black--light.break-words') ||
-                       document.querySelector('.pv-text-details__left-panel .text-body-small');
-    if (locationEl) profileData.location = locationEl.innerText.trim();
+    if (topCard) {
+      // Name - usually first h1 or h2 in topcard
+      const nameEl = topCard.querySelector('h1') || topCard.querySelector('h2');
+      if (nameEl) {
+        profileData.name = nameEl.innerText.trim();
+      }
+      
+      // Headline - typically a paragraph or div after the name
+      const headlineEl = topCard.querySelector('h1 + div') || 
+                        topCard.querySelector('h2 + div') ||
+                        topCard.querySelector('[class*="headline"]');
+      if (headlineEl && !headlineEl.querySelector('h1, h2')) {
+        profileData.headline = headlineEl.innerText.trim();
+      }
+      
+      // Location - look for text patterns or geo-related content
+      const allText = Array.from(topCard.querySelectorAll('span, div'));
+      const locationEl = allText.find(el => {
+        const text = el.innerText || '';
+        // Common location patterns
+        return /United States|Remote|,\s*[A-Z]{2}|Metropolitan Area/i.test(text) &&
+               !text.includes('@') && // Not email
+               text.length < 100; // Not a long paragraph
+      });
+      if (locationEl) {
+        profileData.location = locationEl.innerText.trim();
+      }
+    }
     
-    // About section
-    const aboutSection = document.querySelector('#about') ||
-                        document.querySelector('[data-section="summary"]');
+    // ===== ABOUT SECTION =====
+    // Use ID or aria-labelledby attributes (more stable than classes)
+    const aboutSection = document.querySelector('section[id*="about"]') ||
+                        document.querySelector('section[aria-labelledby*="about"]') ||
+                        Array.from(document.querySelectorAll('section')).find(s => {
+                          const heading = s.querySelector('h2, h3');
+                          return heading && /about/i.test(heading.innerText);
+                        });
+    
     if (aboutSection) {
-      const aboutContainer = aboutSection.closest('section');
-      if (aboutContainer) {
-        const aboutText = aboutContainer.querySelector('.display-flex.ph5.pv3') ||
-                         aboutContainer.querySelector('.pv-shared-text-with-see-more');
-        if (aboutText) {
-          profileData.about = aboutText.innerText.trim();
-        }
+      // Find the largest text block (usually the description)
+      const textBlocks = Array.from(aboutSection.querySelectorAll('span, div'))
+        .filter(el => el.innerText && el.innerText.length > 50)
+        .sort((a, b) => b.innerText.length - a.innerText.length);
+      
+      if (textBlocks[0]) {
+        profileData.about = textBlocks[0].innerText.trim();
       }
     }
     
-    // Experience
-    const expSection = document.querySelector('#experience');
+    // ===== EXPERIENCE SECTION =====
+    const expSection = document.querySelector('section[id*="experience"]') ||
+                      document.querySelector('section[aria-labelledby*="experience"]') ||
+                      Array.from(document.querySelectorAll('section')).find(s => {
+                        const heading = s.querySelector('h2, h3');
+                        return heading && /experience/i.test(heading.innerText);
+                      });
+    
     if (expSection) {
-      const expContainer = expSection.closest('section');
-      if (expContainer) {
-        const expItems = expContainer.querySelectorAll('li.artdeco-list__item');
-        expItems.forEach(item => {
-          const titleEl = item.querySelector('.mr1.t-bold span[aria-hidden="true"]');
-          const companyEl = item.querySelector('.t-14.t-normal span[aria-hidden="true"]');
-          const datesEl = item.querySelector('.t-14.t-normal.t-black--light span[aria-hidden="true"]');
-          const descEl = item.querySelector('.pv-shared-text-with-see-more span[aria-hidden="true"]');
-          
-          if (titleEl) {
-            profileData.experience.push({
-              title: titleEl.innerText.trim(),
-              company: companyEl ? companyEl.innerText.trim() : '',
-              dates: datesEl ? datesEl.innerText.trim() : '',
-              description: descEl ? descEl.innerText.trim() : '',
-            });
-          }
-        });
-      }
+      // Each experience is typically in a list item
+      const expItems = expSection.querySelectorAll('ul > li, [role="listitem"]');
+      
+      expItems.forEach(item => {
+        // Title is usually bold or in a heading
+        const titleEl = item.querySelector('span[aria-hidden="true"]') ||
+                       item.querySelector('div[class*="title"]') ||
+                       Array.from(item.querySelectorAll('span, div')).find(el => {
+                         const style = window.getComputedStyle(el);
+                         return style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600;
+                       });
+        
+        // Company - often has a link to /company/
+        const companyEl = item.querySelector('a[href*="/company/"]') ||
+                         Array.from(item.querySelectorAll('span')).find(s => 
+                           s.innerText && s.innerText.length < 100 && 
+                           s.innerText.toLowerCase().includes('company')
+                         );
+        
+        // Dates - look for date-like patterns
+        const allSpans = Array.from(item.querySelectorAll('span'));
+        const datesEl = allSpans.find(s => 
+          /\d{4}|present|now|current/i.test(s.innerText) &&
+          s.innerText.length < 50
+        );
+        
+        // Description - usually longer text block
+        const descEl = Array.from(item.querySelectorAll('span, div'))
+          .filter(el => el.innerText && el.innerText.length > 80)
+          .sort((a, b) => b.innerText.length - a.innerText.length)[0];
+        
+        if (titleEl && titleEl.innerText.trim()) {
+          profileData.experience.push({
+            title: titleEl.innerText.trim(),
+            company: companyEl ? companyEl.innerText.trim() : '',
+            dates: datesEl ? datesEl.innerText.trim() : '',
+            description: descEl ? descEl.innerText.trim() : '',
+          });
+        }
+      });
     }
     
-    // Education
-    const eduSection = document.querySelector('#education');
+    // ===== EDUCATION SECTION =====
+    const eduSection = document.querySelector('section[id*="education"]') ||
+                      document.querySelector('section[aria-labelledby*="education"]') ||
+                      Array.from(document.querySelectorAll('section')).find(s => {
+                        const heading = s.querySelector('h2, h3');
+                        return heading && /education/i.test(heading.innerText);
+                      });
+    
     if (eduSection) {
-      const eduContainer = eduSection.closest('section');
-      if (eduContainer) {
-        const eduItems = eduContainer.querySelectorAll('li.artdeco-list__item');
-        eduItems.forEach(item => {
-          const schoolEl = item.querySelector('.mr1.hoverable-link-text.t-bold span[aria-hidden="true"]');
-          const degreeEl = item.querySelector('.t-14.t-normal span[aria-hidden="true"]');
-          const datesEl = item.querySelector('.t-14.t-normal.t-black--light span[aria-hidden="true"]');
-          
-          if (schoolEl) {
-            profileData.education.push({
-              school: schoolEl.innerText.trim(),
-              degree: degreeEl ? degreeEl.innerText.trim() : '',
-              dates: datesEl ? datesEl.innerText.trim() : '',
-            });
-          }
-        });
-      }
+      const eduItems = eduSection.querySelectorAll('ul > li, [role="listitem"]');
+      
+      eduItems.forEach(item => {
+        // School name - usually bold or a link
+        const schoolEl = item.querySelector('a[href*="/school/"]') ||
+                        Array.from(item.querySelectorAll('span, div')).find(el => {
+                          const style = window.getComputedStyle(el);
+                          return style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600;
+                        });
+        
+        const allSpans = Array.from(item.querySelectorAll('span'));
+        
+        // Degree - often second line of text
+        const degreeEl = allSpans.find(s => 
+          s.innerText && 
+          /degree|bachelor|master|phd|certificate/i.test(s.innerText) &&
+          s.innerText.length < 100
+        );
+        
+        // Dates
+        const datesEl = allSpans.find(s => 
+          /\d{4}|present|now/i.test(s.innerText) &&
+          s.innerText.length < 50
+        );
+        
+        if (schoolEl && schoolEl.innerText.trim()) {
+          profileData.education.push({
+            school: schoolEl.innerText.trim(),
+            degree: degreeEl ? degreeEl.innerText.trim() : '',
+            dates: datesEl ? datesEl.innerText.trim() : '',
+          });
+        }
+      });
     }
     
-    // Skills
-    const skillsSection = document.querySelector('#skills');
+    // ===== SKILLS SECTION =====
+    const skillsSection = document.querySelector('section[id*="skills"]') ||
+                         document.querySelector('section[aria-labelledby*="skills"]') ||
+                         Array.from(document.querySelectorAll('section')).find(s => {
+                           const heading = s.querySelector('h2, h3');
+                           return heading && /skills/i.test(heading.innerText);
+                         });
+    
     if (skillsSection) {
-      const skillsContainer = skillsSection.closest('section');
-      if (skillsContainer) {
-        const skillItems = skillsContainer.querySelectorAll('.pv-skill-category-entity__name span[aria-hidden="true"]') ||
-                          skillsContainer.querySelectorAll('.mr1.hoverable-link-text.t-bold span[aria-hidden="true"]');
-        skillItems.forEach(skill => {
-          const skillText = skill.innerText.trim();
-          if (skillText && !profileData.skills.includes(skillText)) {
-            profileData.skills.push(skillText);
-          }
-        });
-      }
+      // Skills are often in list items or spans
+      const skillElements = skillsSection.querySelectorAll('ul > li span[aria-hidden="true"]') ||
+                           skillsSection.querySelectorAll('[role="listitem"] span');
+      
+      skillElements.forEach(skill => {
+        const skillText = skill.innerText.trim();
+        // Filter out duplicates and non-skill text
+        if (skillText && 
+            skillText.length < 50 && 
+            !profileData.skills.includes(skillText) &&
+            !/endorsement|show|more|less/i.test(skillText)) {
+          profileData.skills.push(skillText);
+        }
+      });
     }
     
+    // ===== CERTIFICATIONS SECTION =====
+    const certSection = document.querySelector('section[id*="licenses"]') ||
+                       document.querySelector('section[id*="certification"]') ||
+                       document.querySelector('section[aria-labelledby*="certification"]') ||
+                       Array.from(document.querySelectorAll('section')).find(s => {
+                         const heading = s.querySelector('h2, h3');
+                         return heading && /certification|license/i.test(heading.innerText);
+                       });
+    
+    if (certSection) {
+      const certItems = certSection.querySelectorAll('ul > li, [role="listitem"]');
+      
+      certItems.forEach(item => {
+        const titleEl = Array.from(item.querySelectorAll('span, div')).find(el => {
+          const style = window.getComputedStyle(el);
+          return (style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600) &&
+                 el.innerText && el.innerText.length < 150;
+        });
+        
+        const allSpans = Array.from(item.querySelectorAll('span'));
+        
+        // Issuer - often contains "by" or organization name
+        const issuerEl = allSpans.find(s => 
+          s.innerText && s.innerText.length < 100 &&
+          s !== titleEl
+        );
+        
+        // Date
+        const dateEl = allSpans.find(s => 
+          /issued|\d{4}|20\d{2}/i.test(s.innerText) &&
+          s.innerText.length < 50
+        );
+        
+        if (titleEl && titleEl.innerText.trim()) {
+          profileData.certifications.push({
+            name: titleEl.innerText.trim(),
+            issuer: issuerEl ? issuerEl.innerText.trim() : '',
+            date: dateEl ? dateEl.innerText.trim() : '',
+          });
+        }
+      });
+    }
+    
+    console.log('✅ LinkedIn profile scraped:', profileData);
     return profileData;
+    
   } catch (error) {
-    console.error('LinkedIn profile scraping error:', error);
+    console.error('❌ LinkedIn profile scraping error:', error);
     return profileData;
   }
 }

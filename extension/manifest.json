@@ -8,5 +8,12 @@
   "action": {
     "default_popup": "popup.html",
     "default_title": "Save to StackApply AI"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
 }
