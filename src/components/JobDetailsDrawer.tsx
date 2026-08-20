@@ -23,6 +23,7 @@ interface JobDetailsDrawerProps {
   onClose: () => void;
   onJobUpdated: (updatedJob: Job) => void;
   onJobDeleted: (jobId: string) => void;
+  userHasProfile?: boolean;
 }
 
 const STAGE_OPTIONS = [
@@ -50,6 +51,7 @@ export function JobDetailsDrawer({
   onClose,
   onJobUpdated,
   onJobDeleted,
+  userHasProfile = true,
 }: JobDetailsDrawerProps) {
   const [notes, setNotes] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
@@ -202,7 +204,7 @@ export function JobDetailsDrawer({
         </div>
 
         {/* Match Score & Reasoning Banner */}
-        {job.matchScore && (
+        {job.matchScore ? (
           <div className="bg-gradient-to-r from-emerald-950/60 via-slate-900 to-indigo-950/40 border border-emerald-800/40 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 text-emerald-400 font-semibold text-xs">
@@ -219,7 +221,25 @@ export function JobDetailsDrawer({
               </p>
             )}
           </div>
-        )}
+        ) : !userHasProfile ? (
+          <div className="bg-gradient-to-r from-amber-950/60 via-slate-900 to-orange-950/40 border border-amber-800/40 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>AI Match Analysis Unavailable</span>
+              </div>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed mb-3">
+              Upload your Resume or LinkedIn profile to enable AI-powered job matching and get personalized match scores.
+            </p>
+            <a
+              href="/account"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-400 hover:text-amber-300 transition"
+            >
+              Go to Account Settings →
+            </a>
+          </div>
+        ) : null}
 
         {/* Key Facts Grid */}
         <div className="grid grid-cols-2 gap-3 text-xs bg-slate-950/50 p-3.5 rounded-xl border border-slate-800/60">

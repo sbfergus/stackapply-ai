@@ -100,6 +100,10 @@ function DashboardContent() {
     APPLIED: 0,
     INTERVIEWING: 0,
   });
+  const [userData, setUserData] = useState<{
+    hasResume: boolean;
+    hasLinkedInProfile: boolean;
+  } | null>(null);
 
   // Auth check - redirect to sign in if not authenticated and not guest
   useEffect(() => {
@@ -129,6 +133,7 @@ function DashboardContent() {
     
     fetchJobs();
     fetchApiKeyData();
+    fetchUserData();
   }, []);
 
   const fetchApiKeyData = async () => {
@@ -147,6 +152,23 @@ function DashboardContent() {
       console.error('Error fetching API key data:', err);
     } finally {
       setLoadingApiKey(false);
+    }
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const res = await fetch('/api/user');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setUserData({
+            hasResume: !!data.user.resumeUrl,
+            hasLinkedInProfile: !!data.user.linkedinData,
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching user data:', err);
     }
   };
 
@@ -486,11 +508,20 @@ function DashboardContent() {
                                       <span className="truncate">{job.company}</span>
                                     </div>
 
-                                    {job.matchScore && (
+                                    {job.matchScore ? (
                                       <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">
                                         {job.matchScore}% Match
                                       </span>
-                                    )}
+                                    ) : userData && !userData.hasResume && !userData.hasLinkedInProfile ? (
+                                      <Link
+                                        href="/account"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-400 border border-amber-800/50 hover:bg-amber-900/80 transition group relative"
+                                        title="Upload Resume or LinkedIn profile to enable AI matching"
+                                      >
+                                        Upload Profile
+                                      </Link>
+                                    ) : null}
                                   </div>
 
                                   {/* Job Title */}
@@ -627,6 +658,7 @@ function DashboardContent() {
         onClose={() => setIsDrawerOpen(false)}
         onJobUpdated={handleJobUpdated}
         onJobDeleted={handleJobDeleted}
+        userHasProfile={userData?.hasResume || userData?.hasLinkedInProfile || false}
       />
 
       {/* Manual Add Job Modal */}
