@@ -164,6 +164,13 @@
       color: #94a3b8;
       white-space: nowrap;
     }
+    .usage-counter {
+      font-size: 9px;
+      color: #94a3b8;
+      white-space: nowrap;
+      margin-left: 4px;
+      font-weight: 500;
+    }
     .toggle-switch {
       position: relative;
       width: 40px;
@@ -180,7 +187,7 @@
     }
     .toggle-slider {
       position: absolute;
-      cursor: not-allowed;
+      cursor: pointer;
       top: 0;
       left: 0;
       right: 0;
@@ -188,6 +195,9 @@
       background-color: #334155;
       transition: 0.3s;
       border-radius: 22px;
+    }
+    .toggle-slider.disabled {
+      cursor: not-allowed;
     }
     .toggle-slider:before {
       position: absolute;
@@ -206,6 +216,10 @@
     input:checked + .toggle-slider:before {
       background-color: #ffffff;
       transform: translateX(18px);
+    }
+    input:disabled + .toggle-slider {
+      cursor: not-allowed;
+      opacity: 0.5;
     }
     
     /* Tooltip */
@@ -336,10 +350,11 @@
       <div class="toggle-container">
         <span class="toggle-label">Use AI</span>
         <label class="toggle-switch">
-          <input type="checkbox" id="use-ai-toggle" disabled>
+          <input type="checkbox" id="use-ai-toggle">
           <span class="toggle-slider"></span>
         </label>
-        <span class="tooltip">Add AI Keys to Activate</span>
+        <span class="usage-counter" id="usage-counter"></span>
+        <span class="tooltip" id="toggle-tooltip">Loading...</span>
       </div>
     </div>
   </div>

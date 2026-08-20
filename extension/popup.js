@@ -98,6 +98,9 @@ async function initializeAuthenticatedPopup(authState) {
   const signoutBtn = document.getElementById("signout-btn");
   const switchAccountBtn = document.getElementById("switch-account-btn");
   const rescrapeBtn = document.getElementById("refresh-btn");
+  const useAIToggle = document.getElementById("use-ai-toggle");
+  const usageCounterEl = document.getElementById("usage-counter");
+  const toggleTooltip = document.getElementById("toggle-tooltip");
 
   // Show user header
   userHeaderEl.style.display = 'flex';
@@ -110,6 +113,56 @@ async function initializeAuthenticatedPopup(authState) {
     userEmailEl.textContent = authState.user.email;
     guestBadgeEl.style.display = 'none';
   }
+
+  // Fetch API key data and configure toggle
+  let apiKeyData = null;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/user/api-key`, {
+      headers: {
+        'Authorization': `Bearer ${authState.token}`
+      }
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        apiKeyData = data.data;
+        
+        // Set toggle state based on available analyses or custom key
+        const hasAnalysesAvailable = apiKeyData.hasKey || apiKeyData.freeAnalysesRemaining > 0;
+        useAIToggle.checked = hasAnalysesAvailable;
+        useAIToggle.disabled = !hasAnalysesAvailable;
+        
+        // Update slider styling
+        const slider = useAIToggle.nextElementSibling;
+        if (!hasAnalysesAvailable) {
+          slider.classList.add('disabled');
+        } else {
+          slider.classList.remove('disabled');
+        }
+        
+        // Update usage counter text
+        if (apiKeyData.hasKey) {
+          usageCounterEl.textContent = '';
+          toggleTooltip.textContent = 'Using your API key';
+        } else {
+          usageCounterEl.textContent = `${apiKeyData.freeAnalysesRemaining}/${apiKeyData.freeTierLimit}`;
+          toggleTooltip.textContent = `${apiKeyData.freeAnalysesRemaining} of ${apiKeyData.freeTierLimit} free analyses remaining`;
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error fetching API key data:', err);
+    useAIToggle.disabled = true;
+    usageCounterEl.textContent = '';
+    toggleTooltip.textContent = 'Error loading usage data';
+  }
+
+  // Toggle click handler
+  useAIToggle.addEventListener('change', () => {
+    // Just toggle the state - actual enforcement happens on the server
+    console.log('Use AI toggled:', useAIToggle.checked);
+  });
 
   // Settings menu toggle
   settingsBtn.addEventListener("click", (e) => {

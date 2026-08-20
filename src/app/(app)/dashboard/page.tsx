@@ -86,7 +86,14 @@ function DashboardContent() {
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const [useAI] = useState(false);
+  const [useAI, setUseAI] = useState(false);
+  const [apiKeyData, setApiKeyData] = useState<{
+    hasKey: boolean;
+    freeAnalysesRemaining: number;
+    freeTierLimit: number;
+    aiAnalysisCount: number;
+  } | null>(null);
+  const [loadingApiKey, setLoadingApiKey] = useState(true);
   const [skeletonCounts, setSkeletonCounts] = useState<Record<string, number>>({
     TO_REVIEW: 0,
     READY_TO_APPLY: 0,
@@ -121,7 +128,27 @@ function DashboardContent() {
     }
     
     fetchJobs();
+    fetchApiKeyData();
   }, []);
+
+  const fetchApiKeyData = async () => {
+    try {
+      setLoadingApiKey(true);
+      const res = await fetch('/api/user/api-key');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setApiKeyData(data.data);
+          // Set useAI to true if user has analyses remaining or has their own key
+          setUseAI(data.data.hasKey || data.data.freeAnalysesRemaining > 0);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching API key data:', err);
+    } finally {
+      setLoadingApiKey(false);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = () => {
@@ -262,24 +289,40 @@ function DashboardContent() {
         {/* Use AI Toggle */}
         <div className="relative group">
           <button
-            disabled
-            className="w-full md:w-auto flex items-center justify-center gap-2 px-3.5 py-1.5 text-xs font-medium text-slate-400 bg-slate-900 border border-slate-800 rounded-lg cursor-not-allowed opacity-60 whitespace-nowrap"
+            onClick={() => setUseAI(!useAI)}
+            disabled={loadingApiKey || !apiKeyData || (apiKeyData.freeAnalysesRemaining === 0 && !apiKeyData.hasKey)}
+            className={`w-full md:w-auto flex items-center justify-center gap-2 px-3.5 py-1.5 text-xs font-medium rounded-lg transition whitespace-nowrap ${
+              loadingApiKey || !apiKeyData || (apiKeyData.freeAnalysesRemaining === 0 && !apiKeyData.hasKey)
+                ? 'text-slate-400 bg-slate-900 border border-slate-800 cursor-not-allowed opacity-60'
+                : 'text-slate-300 bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:text-white cursor-pointer'
+            }`}
           >
             <span className="text-xs font-semibold shrink-0">Use AI</span>
             <div className="relative inline-block w-8 h-4 shrink-0">
               <input
                 type="checkbox"
                 checked={useAI}
-                disabled
+                disabled={loadingApiKey || !apiKeyData || (apiKeyData.freeAnalysesRemaining === 0 && !apiKeyData.hasKey)}
                 className="opacity-0 w-0 h-0"
                 readOnly
               />
-              <span className={`absolute cursor-not-allowed top-0 left-0 right-0 bottom-0 rounded-full transition-all ${useAI ? 'bg-indigo-600' : 'bg-slate-700'}`}></span>
-              <span className={`absolute bottom-0.5 w-3 h-3 rounded-full transition-all ${useAI ? 'left-4 bg-white' : 'left-0.5 bg-slate-500'}`}></span>
+              <span className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all ${
+                useAI ? 'bg-indigo-600' : 'bg-slate-700'
+              }`}></span>
+              <span className={`absolute bottom-0.5 w-3 h-3 rounded-full transition-all ${
+                useAI ? 'left-4 bg-white' : 'left-0.5 bg-slate-500'
+              }`}></span>
             </div>
           </button>
           <div className="invisible group-hover:visible absolute top-full left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 mt-2 bg-slate-800 text-slate-300 text-[10px] px-3 py-1.5 rounded-md border border-slate-700 whitespace-nowrap shadow-lg z-10">
-            Add AI Keys to Activate
+            {loadingApiKey
+              ? 'Loading...'
+              : !apiKeyData
+              ? 'Error loading data'
+              : apiKeyData.hasKey
+              ? 'Using your API key'
+              : `${apiKeyData.freeAnalysesRemaining} of ${apiKeyData.freeTierLimit} free analyses remaining`
+            }
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 md:left-4 md:translate-x-0 border-4 border-transparent border-b-slate-700"></div>
           </div>
         </div>
