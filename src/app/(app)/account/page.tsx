@@ -3,15 +3,24 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import { Mail, Calendar, Key, Trash2, Camera, Pencil, FileText, Upload } from "lucide-react";
+import { Mail, Calendar, Key, Trash2, Camera, Pencil, FileText, Upload, Sparkles } from "lucide-react";
 import DeleteAccountModal from "@/components/DeleteAccountModal";
 import EditEmailModal from "@/components/EditEmailModal";
 import EditPasswordModal from "@/components/EditPasswordModal";
+import AddApiKeyModal from "@/components/AddApiKeyModal";
 
 interface JobStats {
   totalJobs: number;
   appliedJobs: number;
   interviewingJobs: number;
+}
+
+interface ApiKeyData {
+  hasKey: boolean;
+  provider: 'ANTHROPIC' | 'OPENAI' | null;
+  keyMasked: string;
+  aiAnalysisCount: number;
+  freeAnalysesRemaining: number;
 }
 
 export default function AccountPage() {
@@ -29,12 +38,21 @@ export default function AccountPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditEmailModal, setShowEditEmailModal] = useState(false);
   const [showEditPasswordModal, setShowEditPasswordModal] = useState(false);
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [currentEmail, setCurrentEmail] = useState(session?.user?.email || "");
   const [showToast, setShowToast] = useState(false);
   const [toastExiting, setToastExiting] = useState(false);
   const [toastMessage, setToastMessage] = useState({ title: "", description: "" });
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
   const [uploadingResume, setUploadingResume] = useState(false);
+  const [apiKeyData, setApiKeyData] = useState<ApiKeyData>({
+    hasKey: false,
+    provider: null,
+    keyMasked: '',
+    aiAnalysisCount: 0,
+    freeAnalysesRemaining: 5,
+  });
+  const [loadingApiKey, setLoadingApiKey] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resumeInputRef = useRef<HTMLInputElement>(null);
 
@@ -102,6 +120,27 @@ export default function AccountPage() {
       fetchUserAvatar();
     }
   }, [session, status]);
+
+  // Fetch API key status
+  useEffect(() => {
+    const fetchApiKeyStatus = async () => {
+      try {
+        const res = await fetch('/api/user/api-key');
+        const data = await res.json();
+        if (data.success) {
+          setApiKeyData(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching API key status:', error);
+      } finally {
+        setLoadingApiKey(false);
+      }
+    };
+
+    if (status === 'authenticated') {
+      fetchApiKeyStatus();
+    }
+  }, [status]);
 
   if (!mounted || status === "loading") {
     return (
@@ -326,6 +365,58 @@ export default function AccountPage() {
     }
   };
 
+  const handleApiKeySuccess = async () => {
+    // Refresh API key status
+    try {
+      const res = await fetch('/api/user/api-key');
+      const data = await res.json();
+      if (data.success) {
+        setApiKeyData(data.data);
+      }
+      setToastMessage({
+        title: 'API Key Added!',
+        description: 'Your API key has been successfully saved and validated.',
+      });
+      showToastNotification();
+    } catch (error) {
+      console.error('Error refreshing API key status:', error);
+    }
+  };
+
+  const handleRemoveApiKey = async () => {
+    if (!confirm('Are you sure you want to remove your API key? You will fall back to the free tier (5 analyses).')) {
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/user/api-key', {
+        method: 'DELETE',
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setApiKeyData({
+          hasKey: false,
+          provider: null,
+          keyMasked: '',
+          aiAnalysisCount: apiKeyData.aiAnalysisCount,
+          freeAnalysesRemaining: Math.max(0, 5 - apiKeyData.aiAnalysisCount),
+        });
+        setToastMessage({
+          title: 'API Key Removed',
+          description: 'Your API key has been removed from your account.',
+        });
+        showToastNotification();
+      } else {
+        alert(data.error || 'Failed to remove API key');
+      }
+    } catch (error) {
+      console.error('API key removal error:', error);
+      alert('Failed to remove API key');
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
@@ -462,6 +553,94 @@ export default function AccountPage() {
                   </button>
                 </div>
               </div>
+            </section>
+
+            {/* API Keys Section */}
+            <section className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-white">API Keys</h2>
+                {!loadingApiKey && !apiKeyData.hasKey && (
+                  <span className="text-xs text-slate-400">
+                    {apiKeyData.freeAnalysesRemaining} of 5 free analyses remaining
+                  </span>
+                )}
+              </div>
+              
+              {loadingApiKey ? (
+                <div className="flex items-center justify-center p-8">
+                  <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+                <>
+                  {/* Usage Counter (if no custom key) */}
+                  {!apiKeyData.hasKey && (
+                    <div className="mb-4 p-4 bg-indigo-950/30 border border-indigo-900/50 rounded-lg">
+                      <div className="flex items-start gap-3">
+                        <Sparkles className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-indigo-300 mb-1">
+                            Free Tier: <strong>{apiKeyData.freeAnalysesRemaining} of 5</strong> AI analyses remaining
+                          </p>
+                          <p className="text-xs text-indigo-400/80">
+                            Add your own API key below for unlimited analyses
+                          </p>
+                        </div>
+                      </div>
+                      {apiKeyData.freeAnalysesRemaining === 0 && (
+                        <div className="mt-3 pt-3 border-t border-indigo-900/50">
+                          <p className="text-xs text-red-400">
+                            ⚠️ Free limit reached. Add your API key to continue using AI features.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Key Status */}
+                  {apiKeyData.hasKey ? (
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 bg-slate-900/50 rounded-lg border border-slate-700/50">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                          <Key className="w-5 h-5 text-green-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-200">
+                            Connected to {apiKeyData.provider === 'ANTHROPIC' ? 'Anthropic' : 'OpenAI'}
+                          </p>
+                          <p className="text-xs text-slate-400 font-mono truncate">
+                            {apiKeyData.keyMasked}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleRemoveApiKey}
+                        className="w-full md:w-auto px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowApiKeyModal(true)}
+                      className="w-full p-6 bg-slate-900/50 hover:bg-slate-900/70 rounded-lg border-2 border-dashed border-slate-700 hover:border-indigo-500/50 transition text-center group"
+                    >
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-12 h-12 rounded-lg bg-indigo-500/10 group-hover:bg-indigo-500/20 flex items-center justify-center transition">
+                          <Key className="w-6 h-6 text-indigo-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-slate-200 mb-1">
+                            Add Your API Key
+                          </p>
+                          <p className="text-xs text-slate-400">
+                            Use your own Anthropic or OpenAI key for unlimited AI analyses
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  )}
+                </>
+              )}
             </section>
 
             {/* Resume Section */}
@@ -638,6 +817,13 @@ export default function AccountPage() {
         isOpen={showEditPasswordModal}
         onClose={() => setShowEditPasswordModal(false)}
         onSuccess={handlePasswordUpdate}
+      />
+
+      {/* Add API Key Modal */}
+      <AddApiKeyModal
+        isOpen={showApiKeyModal}
+        onClose={() => setShowApiKeyModal(false)}
+        onSuccess={handleApiKeySuccess}
       />
 
       {/* Toast Notification */}
