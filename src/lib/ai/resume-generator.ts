@@ -193,12 +193,12 @@ This resume MUST fill the entire page while staying within one page. Balance is 
 2. Most recent/relevant position: 4-5 bullet points (each 1 line max)
 3. Second position: 3-4 bullet points
 4. Third position (if relevant): 2-3 bullet points
-5. Older positions (5+ years ago): Include ONLY if relevant to target job (1-2 bullets)
+5. Older positions (5+ years ago): Include ONLY if there's space after certifications (1-2 bullets)
 6. Each bullet should be close to one full line (12-18 words for good fill)
 7. Skills: Single line, comma-separated, include all relevant skills (12-15 skills)
-8. Certifications: Include ALL relevant certifications with complete details
-9. Add relevant coursework, projects, or additional sections if space permits
-10. The goal is to FILL the page with relevant content while staying concise
+8. Certifications: ALWAYS include - this section is REQUIRED if certifications exist
+9. PRIORITY ORDER: Summary > Recent Experience > Education > Certifications > Skills > Older Experience
+10. The goal is to FILL the page with the MOST RELEVANT content while ensuring certifications appear
 
 **CRITICAL ANTI-AI-DETECTION CONSTRAINTS:**
 1. NO em dashes (—). Use hyphens (-) or commas instead.
@@ -253,12 +253,10 @@ EXPERIENCE
 [Include 3-4 positions to fill the page - prioritize those most relevant to the job]
 
 EDUCATION
-[Degree] - [School]
-[Dates]
+[Degree] - [School] [Dates]
 
 [If applicable: Second degree or bootcamp/certificate program]
-[Program] - [Institution]
-[Dates]
+[Program] - [Institution] [Dates]
 
 SKILLS
 [Single comma-separated line with 12-15 relevant skills, prioritizing exact terminology from job posting]
@@ -270,6 +268,12 @@ ${resume.certifications && resume.certifications.length > 0 ? `CERTIFICATIONS
 **CERTIFICATION FORMAT EXAMPLE:**
 AWS Certified Solutions Architect - Amazon Web Services - June 2023
 React Testing and Debugging - LinkedIn Learning - March 2024
+
+**EDUCATION FORMAT EXAMPLE:**
+Bachelor's Degree, Computer Science - State University of New York at Buffalo 2018 - 2022
+Web Development Bootcamp - General Assembly 2023
+
+[NOTE: Dates appear at the END of the education line for right-alignment in PDF]
 
 **ACTION VERB EXAMPLES:**
 ✓ STRONG: Built, Led, Engineered, Designed, Delivered, Drove, Increased, Reduced, Launched, Shipped, Created, Developed
@@ -298,6 +302,8 @@ React Testing and Debugging - LinkedIn Learning - March 2024
 - Every bullet should start with a strong action verb
 - NO fabrication - only include genuine experiences from the original resume
 - ATS-FRIENDLY OUTPUT: Plain text only, no columns, no tables, no special symbols, single-column layout
+- ALWAYS include certifications section if certifications exist - adjust experience bullets to make room
+- Education dates should appear at the END of each education line for right-alignment
 
-**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and strategic. Mirror the job posting's language naturally. No buzzwords, no em dashes, no overused AI verbs. Output must be ATS-parseable plain text. Fill the page with the most relevant content.`;
+**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and strategic. Mirror the job posting's language naturally. No buzzwords, no em dashes, no overused AI verbs. Output must be ATS-parseable plain text. Prioritize showing certifications over including 4+ work positions.`;
 }

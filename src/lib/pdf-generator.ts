@@ -29,16 +29,19 @@ export function generateResumePDF(resumeText: string, company: string): Buffer {
 
   // Parse resume sections
   const lines = resumeText.split('\n').filter(line => line.trim());
-  let contentFits = true;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     
-    // ONE PAGE ENFORCEMENT: Stop if we exceed page height
-    if (yPosition > marginTop + maxContentHeight) {
-      contentFits = false;
-      console.warn('Resume content truncated to fit one page');
-      break;
+    // ONE PAGE ENFORCEMENT: Warn but continue to fit as much as possible
+    if (yPosition > marginTop + maxContentHeight - 10) {
+      // Getting close to bottom, but allow certifications section
+      const remainingLines = lines.slice(i);
+      const hasCertifications = remainingLines.some(l => l === 'CERTIFICATIONS');
+      if (!hasCertifications || yPosition > marginTop + maxContentHeight) {
+        console.warn('Resume content truncated to fit one page');
+        break;
+      }
     }
 
     // Detect section headers (ALL CAPS)
@@ -99,10 +102,27 @@ export function generateResumePDF(resumeText: string, company: string): Buffer {
     }
     // Job titles / Company names (lines with dates or dashes)
     else if (line.match(/\d{4}/) || (line.includes(' - ') && !line.startsWith('-'))) {
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.text(line, marginLeft, yPosition);
-      yPosition += 5;
+      // Check if this is an education entry with dates that should be right-aligned
+      const isEducationWithDates = line.match(/^(.+?)\s+(\d{4}\s*-\s*\d{4}|\d{4})$/);
+      
+      if (isEducationWithDates) {
+        // Education entry: left-align title, right-align dates
+        const [, title, dates] = isEducationWithDates;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text(title.trim(), marginLeft, yPosition);
+        
+        // Right-align the dates
+        const datesWidth = doc.getTextWidth(dates);
+        doc.text(dates, pageWidth - marginRight - datesWidth, yPosition);
+        yPosition += 5;
+      } else {
+        // Regular job title or company
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text(line, marginLeft, yPosition);
+        yPosition += 5;
+      }
     }
     // Regular text - compact
     else {
