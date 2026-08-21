@@ -342,6 +342,9 @@ function DashboardContent() {
         if (selectedJob?.id === job.id) {
           setSelectedJob({ ...selectedJob, matchScore: data.matchScore, matchReasoning: data.matchReasoning });
         }
+        
+        // Refresh API key data to update the counter (in case free tier was used)
+        fetchApiKeyData();
       } else {
         alert(data.error || "Failed to calculate match score");
       }
