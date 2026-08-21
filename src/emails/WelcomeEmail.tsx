@@ -18,17 +18,17 @@ export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({ userEmail }) => {
       </p>
       
       <div style={{ backgroundColor: "#F3F4F6", padding: "20px", borderRadius: "8px", margin: "24px 0" }}>
-        <h2 style={{ color: "#1F2937", fontSize: "18px", marginTop: "0" }}>Getting Started</h2>
+        <h2 style={{ color: "#1F2937", fontSize: "18px", marginTop: "0" }}>AI-Powered Features</h2>
         <ul style={{ color: "#374151", lineHeight: "1.8" }}>
-          <li>📊 Track all your job applications in one place</li>
-          <li>🤖 Use AI to tailor your resume and cover letters</li>
-          <li>🔖 Save jobs from anywhere with our browser extension</li>
-          <li>📈 Monitor your application pipeline and progress</li>
+          <li>✨ <strong>Match Scoring:</strong> Upload your resume and get instant match scores for every job</li>
+          <li>📄 <strong>Generate Tailored Resumes:</strong> Create job-specific resumes with one click</li>
+          <li>🔖 <strong>Browser Extension:</strong> Save jobs from LinkedIn, Indeed, or any job site instantly</li>
+          <li>📊 <strong>Pipeline Tracking:</strong> Organize jobs by stage and drag-and-drop to update</li>
         </ul>
       </div>
       
       <p style={{ fontSize: "16px", lineHeight: "1.6", color: "#374151" }}>
-        Ready to get started? Head over to your dashboard and add your first job!
+        Ready to get started? Upload your resume and let our AI help you land your dream job!
       </p>
       
       <a 

@@ -32,7 +32,7 @@ const STEPS = [
     id: 3,
     icon: BarChart3,
     title: "AI-Powered Matching",
-    description: "Upload your resume and get instant match scores for every job. See exactly why you're a great fit.",
+    description: "Upload your resume and get instant match scores for every job. Generate tailored resumes for each position with one click.",
     visual: "✨",
     badge: "92% Match",
     primaryAction: "Next",
