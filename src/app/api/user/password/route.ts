@@ -3,6 +3,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { Resend } from "resend";
+import { createElement } from "react";
+import { PasswordChangedEmail } from "@/emails/PasswordChangedEmail";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
  * PUT /api/user/password
@@ -67,6 +72,27 @@ export async function PUT(req: NextRequest) {
       where: { id: user.id },
       data: { password: hashedPassword },
     });
+
+    // Send password changed confirmation email (don't block response if email fails)
+    const timestamp = new Date().toLocaleString('en-US', { 
+      dateStyle: 'long', 
+      timeStyle: 'short' 
+    });
+
+    try {
+      await resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL || "StackApply <security@resend.dev>",
+        to: session.user.email,
+        subject: "Password Changed - StackApply",
+        react: createElement(PasswordChangedEmail, { 
+          userEmail: session.user.email,
+          timestamp 
+        }),
+      });
+    } catch (emailError) {
+      console.error("Failed to send password changed email:", emailError);
+      // Don't fail password update if email fails
+    }
 
     return NextResponse.json({
       success: true,
