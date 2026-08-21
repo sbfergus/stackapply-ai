@@ -19,7 +19,8 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const fetchAvatar = async () => {
       try {
-        const res = await fetch("/api/user");
+        const url = isGuest ? "/api/user?guest=true" : "/api/user";
+        const res = await fetch(url);
         const data = await res.json();
         if (data.success && data.user?.avatarUrl) {
           setAvatarUrl(data.user.avatarUrl);
