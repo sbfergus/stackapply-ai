@@ -243,14 +243,13 @@ PROFESSIONAL SUMMARY
 [2-3 sentences tailored to match the job title and core requirements, 50-60 words]
 
 EXPERIENCE
-[Job Title] - [Company]
-[Dates]
+[Job Title] - [Company] [Dates]
 - [Bullet with measurable impact using job posting terminology, 12-18 words]
 - [Bullet with technical skills matching job requirements, 12-18 words]
 - [Bullet with quantifiable result (%, $, numbers), 12-18 words]
 - [Additional bullets ranked by relevance to job posting]
 
-[Include 3-4 positions to fill the page - prioritize those most relevant to the job]
+[Include 2-3 positions to fill the page - prioritize those most relevant to the job]
 
 EDUCATION
 [Degree] - [School] [Dates]
@@ -262,18 +261,22 @@ SKILLS
 [Single comma-separated line with 12-15 relevant skills, prioritizing exact terminology from job posting]
 
 ${resume.certifications && resume.certifications.length > 0 ? `CERTIFICATIONS
-[Certification Name] - [Issuing Organization] - [Date Completed]
-[Include all relevant certifications with complete information: name, issuer, date]` : ''}
+[Certification Name] - [Issuing Organization] [Date]
+[Include all relevant certifications with complete information: name, issuer, date right-aligned]` : ''}
 
 **CERTIFICATION FORMAT EXAMPLE:**
-AWS Certified Solutions Architect - Amazon Web Services - June 2023
-React Testing and Debugging - LinkedIn Learning - March 2024
+AWS Certified Solutions Architect - Amazon Web Services June 2023
+React Testing and Debugging - LinkedIn Learning March 2024
 
 **EDUCATION FORMAT EXAMPLE:**
 Bachelor's Degree, Computer Science - State University of New York at Buffalo 2018 - 2022
 Web Development Bootcamp - General Assembly 2023
 
-[NOTE: Dates appear at the END of the education line for right-alignment in PDF]
+**EXPERIENCE FORMAT EXAMPLE:**
+Senior Software Engineer - Tech Company November 2022 - Present
+Lead Developer - Startup Inc January 2021 - November 2022
+
+[NOTE: Dates appear at the END of the line for right-alignment in PDF for Experience, Education, and Certifications]
 
 **ACTION VERB EXAMPLES:**
 ✓ STRONG: Built, Led, Engineered, Designed, Delivered, Drove, Increased, Reduced, Launched, Shipped, Created, Developed

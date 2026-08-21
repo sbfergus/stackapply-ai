@@ -100,24 +100,29 @@ export function generateResumePDF(resumeText: string, company: string): Buffer {
       doc.text(splitText, marginLeft + 4, yPosition);
       yPosition += splitText.length * 4.5; // Slightly more spacing for readability
     }
-    // Job titles / Company names (lines with dates or dashes)
+    // Job titles / Company names / Certifications (lines with dates or dashes)
     else if (line.match(/\d{4}/) || (line.includes(' - ') && !line.startsWith('-'))) {
-      // Check if this is an education entry with dates that should be right-aligned
-      const isEducationWithDates = line.match(/^(.+?)\s+(\d{4}\s*-\s*\d{4}|\d{4})$/);
+      // Check if this line has dates at the end that should be right-aligned
+      // Matches patterns like:
+      // - "Title - Company November 2022 - Present"
+      // - "Degree - School 2018 - 2022"
+      // - "Certification - Org June 2023"
+      const withDateRange = line.match(/^(.+?)\s+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\s*-\s*(?:Present|(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})|\d{4}\s*-\s*\d{4}|\d{4})$/);
       
-      if (isEducationWithDates) {
-        // Education entry: left-align title, right-align dates
-        const [, title, dates] = isEducationWithDates;
+      if (withDateRange) {
+        // Entry with dates: left-align title, right-align dates
+        const [, title, dates] = withDateRange;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.text(title.trim(), marginLeft, yPosition);
         
         // Right-align the dates
+        doc.setFont('helvetica', 'normal');
         const datesWidth = doc.getTextWidth(dates);
         doc.text(dates, pageWidth - marginRight - datesWidth, yPosition);
         yPosition += 5;
       } else {
-        // Regular job title or company
+        // Regular line with dates or dashes (fallback)
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.text(line, marginLeft, yPosition);
