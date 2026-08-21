@@ -783,9 +783,12 @@ function DashboardContent() {
                                       <button
                                         onClick={(e) => {
                                           e.stopPropagation();
-                                          // TODO: Implement cover letter generation
+                                          if (useAI) {
+                                            // Show toast for mobile users
+                                            alert("🚧 Still in Development\n\nThis feature is coming soon!");
+                                          }
                                         }}
-                                        disabled={true}
+                                        disabled={!useAI}
                                         className={`flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
                                           useAI
                                             ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 cursor-not-allowed"
@@ -805,9 +808,12 @@ function DashboardContent() {
                                       <button
                                         onClick={(e) => {
                                           e.stopPropagation();
-                                          // TODO: Implement interview notes generation
+                                          if (useAI) {
+                                            // Show toast for mobile users
+                                            alert("🚧 Still in Development\n\nThis feature is coming soon!");
+                                          }
                                         }}
-                                        disabled={true}
+                                        disabled={!useAI}
                                         className={`w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
                                           useAI
                                             ? "bg-amber-600/20 text-amber-400 border border-amber-500/40 cursor-not-allowed"
