@@ -156,70 +156,148 @@ ${matchAnalysisSection}
 **YOUR TASK:**
 Rewrite this resume to be optimally tailored for the target job. Follow these STRICT RULES:
 
+**PROFESSIONAL RESUME TAILORING METHODOLOGY:**
+
+1. RELEVANCE SCORING & PRIORITIZATION:
+   - Rank every bullet point from the original resume against the job description requirements
+   - Retain and EXPAND top-ranking bullets with more detail and impact
+   - Condense or DROP bottom-ranking bullets that don't align with the job
+   - Prioritize bullets containing hard metrics (%, $, numbers, time saved)
+
+2. TERMINOLOGY ALIGNMENT:
+   - Use the EXACT terminology from the job posting
+   - Replace synonyms with the job posting's language (e.g., if posting says "account management", use that instead of "client management")
+   - Mirror key phrases and technical terms from the job description
+   - Match the job posting's vocabulary and industry jargon
+
+3. SUMMARY & HEADLINE REWRITE:
+   - Rewrite the professional summary to reflect 2-3 CORE requirements from the job posting
+   - Use the job posting's title as the primary focus
+   - Position the candidate as a perfect fit for THIS specific role
+
+4. STRONG ACTION VERBS:
+   - Eliminate weak verbs: "Responsible for", "Helped with", "Assisted in", "Worked on", "Involved in"
+   - Replace with strong, directional action verbs that show ownership and impact
+   - Examples: "Built", "Led", "Engineered", "Designed", "Delivered", "Drove", "Increased", "Reduced"
+   - Vary verb choice - don't repeat the same verb across bullets
+
+5. NO FABRICATION - GAP HANDLING:
+   - If a required skill is COMPLETELY MISSING from the user's resume, DO NOT invent it
+   - DO NOT add skills, experiences, or achievements that don't exist
+   - Focus on highlighting transferable skills and relevant experiences that DO exist
+   - If major gaps exist, emphasize compensating strengths
+
 **ONE-PAGE CONSTRAINT:**
-This resume MUST fit on one page when printed. To ensure this:
-1. Professional summary: EXACTLY 2 sentences, maximum 50 words total
-2. Most recent/relevant position: 3-4 bullet points (each 1 line, max 15 words)
-3. Second position: 2-3 bullet points
-4. Older positions (3+ years ago): 1 bullet point or OMIT entirely if not relevant
-5. Each bullet must be ONE line when printed (15 words maximum)
-6. Skills: Single line, comma-separated, 8-12 most relevant only
-7. Certifications: Include ONLY if directly relevant to the job (2-3 max)
-8. Remove all filler words, redundant phrases, and unnecessary details
+This resume MUST fill the entire page while staying within one page. Balance is key:
+1. Professional summary: EXACTLY 2-3 sentences, 50-60 words total, focused on job requirements
+2. Most recent/relevant position: 4-5 bullet points (each 1 line max)
+3. Second position: 3-4 bullet points
+4. Third position (if relevant): 2-3 bullet points
+5. Older positions (5+ years ago): Include ONLY if relevant to target job (1-2 bullets)
+6. Each bullet should be close to one full line (12-18 words for good fill)
+7. Skills: Single line, comma-separated, include all relevant skills (12-15 skills)
+8. Certifications: Include ALL relevant certifications with complete details
+9. Add relevant coursework, projects, or additional sections if space permits
+10. The goal is to FILL the page with relevant content while staying concise
 
 **CRITICAL ANTI-AI-DETECTION CONSTRAINTS:**
 1. NO em dashes (—). Use hyphens (-) or commas instead.
 2. NO corporate buzzwords: "synergy," "leverage," "paradigm," "disrupt," "innovative solutions," "best-in-class," "world-class," "cutting-edge"
-3. NO AI giveaways: "robust," "streamline," "optimize," "spearheaded," "orchestrated," "facilitated," "utilized," "impactful," "collaborative," "dynamic"
-4. Use simple, direct language. Prefer "led" over "spearheaded," "built" over "architected," "improved" over "optimized"
-5. Vary sentence structure naturally. Humans don't write in perfect parallel structure.
-6. Use contractions occasionally where appropriate
-7. Include minor imperfections that make it human (e.g., slight inconsistencies in formatting, natural phrasing)
+3. NO overused AI verbs: "spearheaded," "orchestrated," "facilitated," "utilized"
+4. PREFER direct, powerful verbs: "built," "led," "designed," "delivered," "engineered," "created," "drove," "increased," "reduced," "launched," "shipped"
+5. Use simple, direct language that sounds human and authentic
+6. Vary sentence structure naturally - humans don't write in perfect parallel structure
+7. Use contractions occasionally where appropriate
+8. Include minor stylistic variations that make it human
 
 **CONTENT RULES:**
 1. DO NOT fabricate, lie, or invent any information
 2. Only include experiences, skills, and achievements from the original resume
-3. Reorder and emphasize experiences that are most relevant to the target job
-4. Reword bullet points to highlight skills matching the job requirements - keep under 15 words each
-5. If the user lacks a required skill, DO NOT add it - omit or downplay unrelated skills instead
+3. RANK and PRIORITIZE experiences based on relevance to the job posting
+4. Reword bullet points using the job posting's EXACT terminology and language
+5. If the user lacks a required skill, DO NOT add it - focus on highlighting related strengths
 6. Keep all dates, company names, job titles, and factual information exactly as provided
-7. Maintain the user's authentic writing voice and style
-8. Professional summary: EXACTLY 2 sentences, maximum 50 words
-9. RUTHLESSLY PRIORITIZE BREVITY - cut any experience older than 5 years unless highly relevant
-10. Each bullet point must be ONE line maximum (approximately 15 words)
+7. Maintain the user's authentic writing voice while aligning with job language
+8. Professional summary: 2-3 sentences, 50-60 words, focused on matching job requirements
+9. FILL THE PAGE - include more positions and bullets to utilize space effectively
+10. Eliminate weak passive verbs; use strong action verbs that show ownership and impact
+11. Each bullet point should be close to one full line (12-18 words for optimal page fill)
+12. Prioritize bullets with measurable results (%, $, numbers, time, scale)
 
 **FORMAT:**
 Return the complete resume as plain text with clear sections. Use this EXACT structure:
+
+**ATS-FRIENDLY FORMATTING RULES:**
+- Use ONLY plain text with simple line breaks
+- NO columns, tables, or complex layouts
+- NO special characters or non-standard symbols (only use: - | , . @ # + ( ))
+- NO boxes, borders, or graphic elements
+- Single-column layout only
+- Standard bullet points using hyphens (-)
+- Simple section headers in ALL CAPS
 
 [Name]
 [Email] | [Phone] | [Location]
 
 PROFESSIONAL SUMMARY
-[EXACTLY 2 sentences, maximum 50 words - natural human tone]
+[2-3 sentences tailored to match the job title and core requirements, 50-60 words]
 
 EXPERIENCE
 [Job Title] - [Company]
 [Dates]
-- [ONE line bullet with quantifiable impact, max 15 words]
-- [ONE line bullet showing technical skills, max 15 words]
-- [ONE line bullet if needed, max 15 words]
+- [Bullet with measurable impact using job posting terminology, 12-18 words]
+- [Bullet with technical skills matching job requirements, 12-18 words]
+- [Bullet with quantifiable result (%, $, numbers), 12-18 words]
+- [Additional bullets ranked by relevance to job posting]
 
-[ONLY include 2-3 most recent/relevant positions - positions older than 5 years should be omitted unless critical]
+[Include 3-4 positions to fill the page - prioritize those most relevant to the job]
 
 EDUCATION
 [Degree] - [School]
 [Dates]
 
+[If applicable: Second degree or bootcamp/certificate program]
+[Program] - [Institution]
+[Dates]
+
 SKILLS
-[Single comma-separated line: 8-12 most relevant skills only]
+[Single comma-separated line with 12-15 relevant skills, prioritizing exact terminology from job posting]
 
-${resume.certifications && resume.certifications.length > 0 ? 'CERTIFICATIONS\n[List ONLY 2-3 most relevant certifications - omit if not directly applicable to job]' : ''}
+${resume.certifications && resume.certifications.length > 0 ? `CERTIFICATIONS
+[Certification Name] - [Issuing Organization] - [Date Completed]
+[Include all relevant certifications with complete information: name, issuer, date]` : ''}
 
-**EXAMPLE OF PROPER BULLET LENGTH:**
-✓ GOOD: "Built React components for checkout flow, increasing conversion by 12%"
-✗ TOO LONG: "Built React components for purchase flows, subscription management, and customer account features that directly impact conversion and retention across multiple user touchpoints"
+**CERTIFICATION FORMAT EXAMPLE:**
+AWS Certified Solutions Architect - Amazon Web Services - June 2023
+React Testing and Debugging - LinkedIn Learning - March 2024
 
-**CRITICAL:** Target approximately 30-35 total lines of content. When in doubt, CUT rather than include. Every word must justify its presence.
+**ACTION VERB EXAMPLES:**
+✓ STRONG: Built, Led, Engineered, Designed, Delivered, Drove, Increased, Reduced, Launched, Shipped, Created, Developed
+✗ WEAK: Responsible for, Helped with, Assisted in, Worked on, Involved in, Participated in
+✗ OVERUSED AI: Spearheaded, Orchestrated, Facilitated, Utilized, Leveraged
 
-**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and CONCISE. No buzzwords, no em dashes, no "AI voice." Keep bullets to ONE line each.`;
+**BULLET POINT EXAMPLES:**
+✓ GOOD (with metrics + job terminology): "Engineered React components for checkout flow using TypeScript, reducing cart abandonment by 12%"
+✓ GOOD (relevance + impact): "Led migration from legacy backend to GraphQL API, improving page load times by 40%"
+✗ WEAK (no action): "Responsible for building React components and managing the frontend codebase"
+✗ TOO SHORT: "Built checkout flow"
+
+**TAILORING CHECKLIST:**
+- Professional summary mentions the target job title and core requirements
+- Bullet points use terminology from the job posting (not generic synonyms)
+- Top-ranked relevant bullets are expanded with more detail
+- Less relevant bullets are condensed or removed
+- Strong action verbs replace weak passive language
+- Measurable results are prioritized and highlighted
+- Skills section mirrors job posting's required technologies
+
+**CRITICAL:** 
+- Target filling 85-95% of the page with content
+- Use the job posting's EXACT language and terminology throughout
+- Rank bullets by relevance; expand top ones, cut bottom ones
+- Every bullet should start with a strong action verb
+- NO fabrication - only include genuine experiences from the original resume
+- ATS-FRIENDLY OUTPUT: Plain text only, no columns, no tables, no special symbols, single-column layout
+
+**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and strategic. Mirror the job posting's language naturally. No buzzwords, no em dashes, no overused AI verbs. Output must be ATS-parseable plain text. Fill the page with the most relevant content.`;
 }

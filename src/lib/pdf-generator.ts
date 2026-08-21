@@ -43,6 +43,11 @@ export function generateResumePDF(resumeText: string, company: string): Buffer {
 
     // Detect section headers (ALL CAPS)
     if (line === line.toUpperCase() && line.length > 2 && line.length < 50 && !line.includes('@')) {
+      // Add extra space before section headers (except first one)
+      if (i > 0) {
+        yPosition += 3;
+      }
+      
       // Section header with accent color and horizontal rule
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
@@ -90,7 +95,7 @@ export function generateResumePDF(resumeText: string, company: string): Buffer {
       
       // Draw text
       doc.text(splitText, marginLeft + 4, yPosition);
-      yPosition += splitText.length * 4; // Tighter line spacing
+      yPosition += splitText.length * 4.5; // Slightly more spacing for readability
     }
     // Job titles / Company names (lines with dates or dashes)
     else if (line.match(/\d{4}/) || (line.includes(' - ') && !line.startsWith('-'))) {
@@ -105,13 +110,10 @@ export function generateResumePDF(resumeText: string, company: string): Buffer {
       doc.setFont('helvetica', 'normal');
       const splitText = doc.splitTextToSize(line, maxWidth);
       doc.text(splitText, marginLeft, yPosition);
-      yPosition += splitText.length * 4; // Tighter line spacing
+      yPosition += splitText.length * 4.5; // Slightly more spacing
     }
     
-    // Minimal spacing between sections
-    if (line === line.toUpperCase() && i > 0) {
-      yPosition += 1;
-    }
+    // Minimal spacing between sections - removed to save space
   }
 
   // Convert to buffer
