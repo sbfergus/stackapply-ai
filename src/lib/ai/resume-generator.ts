@@ -156,6 +156,16 @@ ${matchAnalysisSection}
 **YOUR TASK:**
 Rewrite this resume to be optimally tailored for the target job. Follow these STRICT RULES:
 
+**ONE-PAGE CONSTRAINT:**
+This resume MUST fit on one page when printed. To ensure this:
+1. Keep professional summary to 2-3 concise sentences (under 60 words total)
+2. Limit to 3-4 most relevant bullet points per job position
+3. Prioritize recent and relevant experience (last 5-7 years for most impact)
+4. Each bullet point should be 1-2 lines maximum
+5. Omit or condense older/less relevant positions to 1-2 bullets
+6. Skills section should be concise - list only the most relevant skills
+7. Be ruthlessly selective - quality over quantity
+
 **CRITICAL ANTI-AI-DETECTION CONSTRAINTS:**
 1. NO em dashes (—). Use hyphens (-) or commas instead.
 2. NO corporate buzzwords: "synergy," "leverage," "paradigm," "disrupt," "innovative solutions," "best-in-class," "world-class," "cutting-edge"
@@ -173,7 +183,8 @@ Rewrite this resume to be optimally tailored for the target job. Follow these ST
 5. If the user lacks a required skill, DO NOT add it - omit or downplay unrelated skills instead
 6. Keep all dates, company names, job titles, and factual information exactly as provided
 7. Maintain the user's authentic writing voice and style
-8. Professional summary should be 2-3 sentences, natural and conversational
+8. Professional summary should be 2-3 sentences, natural and conversational (under 60 words)
+9. PRIORITIZE BREVITY - every word must earn its place on the page
 
 **FORMAT:**
 Return the complete resume as plain text with clear sections. Use this structure:
@@ -182,25 +193,27 @@ Return the complete resume as plain text with clear sections. Use this structure
 [Email] | [Phone] | [Location]
 
 PROFESSIONAL SUMMARY
-[2-3 sentences in natural, human tone]
+[2-3 concise sentences in natural, human tone - under 60 words]
 
 EXPERIENCE
 [Job Title] - [Company]
 [Dates]
-- [Bullet point highlighting relevant achievement]
-- [Bullet point showing impact with numbers when possible]
-- [Additional bullets as needed]
+- [Bullet point highlighting relevant achievement with quantifiable impact]
+- [Bullet point showing technical skills used]
+- [Additional 1-2 bullets only if highly relevant]
 
-[Repeat for each relevant position]
+[Repeat for 2-3 most relevant positions - older positions get fewer bullets]
 
 EDUCATION
 [Degree] - [School]
 [Dates]
 
 SKILLS
-[Relevant skills, prioritized for this job]
+[Comma-separated list of most relevant skills, prioritized for this job]
 
-${resume.certifications && resume.certifications.length > 0 ? 'CERTIFICATIONS\n[List relevant certifications]' : ''}
+${resume.certifications && resume.certifications.length > 0 ? 'CERTIFICATIONS\n[List only the most relevant certifications]' : ''}
 
-**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and natural. No buzzwords, no em dashes, no "AI voice."`;
+**CRITICAL:** Every section must be concise enough to fit the entire resume on ONE PAGE. When in doubt, cut content rather than exceed the page limit.
+
+**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and natural. No buzzwords, no em dashes, no "AI voice." Keep it tight and impactful.`;
 }
