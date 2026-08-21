@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "npm run build:extension && next build",
     "build:extension": "node scripts/build-extension.js",
-    "vercel-build": "prisma migrate deploy && npm run build",
+    "vercel-build": "prisma migrate deploy && prisma db seed && npm run build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
@@ -46,6 +46,7 @@
     "eslint-config-next": "16.3.0",
     "prisma": "^7.9.1",
     "tailwindcss": "^4",
+    "tsx": "^4.23.12",
     "typescript": "^5"
   }
 }
