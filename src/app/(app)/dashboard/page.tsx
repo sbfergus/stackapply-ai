@@ -140,7 +140,8 @@ function DashboardContent() {
   const fetchApiKeyData = async () => {
     try {
       setLoadingApiKey(true);
-      const res = await fetch('/api/user/api-key');
+      const url = isGuest ? '/api/user/api-key?guest=true' : '/api/user/api-key';
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
@@ -158,7 +159,8 @@ function DashboardContent() {
 
   const fetchUserData = async () => {
     try {
-      const res = await fetch('/api/user');
+      const url = isGuest ? '/api/user?guest=true' : '/api/user';
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         if (data.success) {

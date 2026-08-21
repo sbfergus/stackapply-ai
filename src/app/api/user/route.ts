@@ -3,38 +3,70 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const { searchParams } = new URL(req.url);
+    const isGuest = searchParams.get("guest") === "true";
 
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
+    let user;
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-        avatarUrl: true,
-        resumeUrl: true,
-        resumeHash: true,
-        resumeUpdatedAt: true,
-        parsedResume: true,
-        resumeLastParsedAt: true,
-        createdAt: true,
-      },
-    });
+    if (isGuest) {
+      // Guest mode - return demo user
+      user = await prisma.user.findUnique({
+        where: { email: "demo@stackapply.ai" },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          avatarUrl: true,
+          resumeUrl: true,
+          resumeHash: true,
+          resumeUpdatedAt: true,
+          parsedResume: true,
+          resumeLastParsedAt: true,
+          createdAt: true,
+        },
+      });
 
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "User not found" },
-        { status: 404 }
-      );
+      if (!user) {
+        return NextResponse.json(
+          { success: false, error: "Demo user not found" },
+          { status: 404 }
+        );
+      }
+    } else {
+      // Authenticated mode
+      const session = await getServerSession(authOptions);
+
+      if (!session?.user?.email) {
+        return NextResponse.json(
+          { success: false, error: "Unauthorized" },
+          { status: 401 }
+        );
+      }
+
+      user = await prisma.user.findUnique({
+        where: { email: session.user.email },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          avatarUrl: true,
+          resumeUrl: true,
+          resumeHash: true,
+          resumeUpdatedAt: true,
+          parsedResume: true,
+          resumeLastParsedAt: true,
+          createdAt: true,
+        },
+      });
+
+      if (!user) {
+        return NextResponse.json(
+          { success: false, error: "User not found" },
+          { status: 404 }
+        );
+      }
     }
 
     return NextResponse.json({

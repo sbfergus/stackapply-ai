@@ -9,22 +9,44 @@ import { ApiKeyProvider } from '@prisma/client';
 // GET /api/user/api-key - Get user's API key status
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { searchParams } = new URL(req.url);
+    const isGuest = searchParams.get("guest") === "true";
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        apiKeyProvider: true,
-        apiKeyEncrypted: true,
-        aiAnalysisCount: true,
-      },
-    });
+    let user;
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (isGuest) {
+      // Guest mode - return demo user data
+      user = await prisma.user.findUnique({
+        where: { email: "demo@stackapply.ai" },
+        select: {
+          apiKeyProvider: true,
+          apiKeyEncrypted: true,
+          aiAnalysisCount: true,
+        },
+      });
+
+      if (!user) {
+        return NextResponse.json({ error: 'Demo user not found' }, { status: 404 });
+      }
+    } else {
+      // Authenticated mode
+      const session = await getServerSession(authOptions);
+      if (!session?.user?.id) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          apiKeyProvider: true,
+          apiKeyEncrypted: true,
+          aiAnalysisCount: true,
+        },
+      });
+
+      if (!user) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
     }
 
     const hasKey = !!(user.apiKeyProvider && user.apiKeyEncrypted);
