@@ -7,30 +7,31 @@ datasource db {
 }
 
 model User {
-  id                 String              @id @default(uuid())
-  email              String              @unique
-  fullName           String?
-  avatarUrl          String?
-  resumeUrl          String?
-  linkedinUrl        String?
-  linkedinData       Json?
-  linkedinSyncedAt   DateTime?
-  baseResumeText     String?
-  baseCoverLetter    String?
-  writingStyle       Json?
-  preferredWorkTypes WorkType[]          @default([REMOTE, HYBRID])
-  preferredTechStack String[]
-  targetSalaryMin    Int?
-  preferredLocations String[]
-  apiKeyProvider     ApiKeyProvider?
-  apiKeyEncrypted    String?
-  aiAnalysisCount    Int                 @default(0)
+  id                  String              @id @default(uuid())
+  email               String              @unique
+  fullName            String?
+  avatarUrl           String?
+  resumeUrl           String?
+  resumeHash          String?
+  resumeUpdatedAt     DateTime?
+  parsedResume        Json?
+  resumeLastParsedAt  DateTime?
+  baseResumeText      String?
+  baseCoverLetter     String?
+  writingStyle        Json?
+  preferredWorkTypes  WorkType[]          @default([REMOTE, HYBRID])
+  preferredTechStack  String[]
+  targetSalaryMin     Int?
+  preferredLocations  String[]
+  apiKeyProvider      ApiKeyProvider?
+  apiKeyEncrypted     String?
+  aiAnalysisCount     Int                 @default(0)
   lastAiAnalysisReset DateTime?
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  password           String?
-  jobs               Job[]
-  extensionSessions  ExtensionSession[]
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  password            String?
+  jobs                Job[]
+  extensionSessions   ExtensionSession[]
 }
 
 model ExtensionSession {
@@ -49,32 +50,33 @@ model ExtensionSession {
 }
 
 model Job {
-  id                 String    @id @default(uuid())
-  userId             String
-  title              String
-  company            String
-  location           String
-  workSetting        WorkType  @default(HYBRID)
-  salaryMin          Int?
-  salaryMax          Int?
-  sources            String[]
-  originalUrls       String[]
-  companyOverview    String
-  roleSummary        String
-  techStack          String[]
-  benefits           Json
-  status             JobStatus @default(TO_REVIEW)
-  matchScore         Int?
-  preferenceScore    Int?
-  matchReasoning     String?
-  tailoredResumeText String?
-  coverLetterText    String?
-  appliedAt          DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  notes              String?
-  listedAt           DateTime?
-  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                             String    @id @default(uuid())
+  userId                         String
+  title                          String
+  company                        String
+  location                       String
+  workSetting                    WorkType  @default(HYBRID)
+  salaryMin                      Int?
+  salaryMax                      Int?
+  sources                        String[]
+  originalUrls                   String[]
+  companyOverview                String
+  roleSummary                    String
+  techStack                      String[]
+  benefits                       Json
+  status                         JobStatus @default(TO_REVIEW)
+  matchScore                     Int?
+  preferenceScore                Int?
+  matchReasoning                 String?
+  matchCalculatedWithResumeHash  String?
+  tailoredResumeText             String?
+  coverLetterText                String?
+  appliedAt                      DateTime?
+  createdAt                      DateTime  @default(now())
+  updatedAt                      DateTime  @updatedAt
+  notes                          String?
+  listedAt                       DateTime?
+  user                           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
 }

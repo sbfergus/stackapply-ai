@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { parseJobPosting } from "@/lib/ai/parser";
+import { parseJobPosting, parseResumePDF } from "@/lib/ai/parser";
 
 export async function POST(
   req: NextRequest,
@@ -32,6 +32,52 @@ export async function POST(
       );
     }
 
+    // Fetch user's resume data and hash
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        resumeUrl: true,
+        resumeHash: true,
+        resumeUpdatedAt: true,
+        parsedResume: true,
+        resumeLastParsedAt: true,
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    if (!user.resumeUrl) {
+      return NextResponse.json(
+        { success: false, error: "No resume uploaded. Please upload your resume in Account Settings." },
+        { status: 400 }
+      );
+    }
+
+    // Step 1: Check if resume needs re-parsing
+    const needsReparsing = 
+      !user.parsedResume || 
+      !user.resumeLastParsedAt || 
+      (user.resumeUpdatedAt && user.resumeLastParsedAt && user.resumeUpdatedAt > user.resumeLastParsedAt);
+
+    if (needsReparsing) {
+      // Parse the resume PDF
+      const parsedResume = await parseResumePDF(user.resumeUrl, session.user.id);
+
+      // Save parsed resume to database (cache it)
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: {
+          parsedResume: parsedResume as any, // Prisma JsonValue
+          resumeLastParsedAt: new Date(),
+        },
+      });
+    }
+
     // Build a text representation of the job for AI analysis
     const jobText = `
 Job Title: ${job.title}
@@ -52,14 +98,16 @@ Benefits: ${Array.isArray(job.benefits) ? (job.benefits as string[]).join(', ') 
 `.trim();
 
     // Use the parser to analyze the job with user's profile
+    // Note: parseJobPosting will use the cached parsedResume from the database
     const result = await parseJobPosting(jobText, session.user.id);
 
-    // Update the job with the match score and reasoning
+    // Update the job with the match score, reasoning, and resume hash tracking
     const updatedJob = await prisma.job.update({
       where: { id: jobId },
       data: {
         matchScore: result.matchScore,
         matchReasoning: result.matchReasoning,
+        matchCalculatedWithResumeHash: user.resumeHash, // Track which resume version was used
       },
     });
 

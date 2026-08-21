@@ -102,7 +102,7 @@ function DashboardContent() {
   });
   const [userData, setUserData] = useState<{
     hasResume: boolean;
-    hasLinkedInProfile: boolean;
+    resumeHash: string | null;
   } | null>(null);
   const [calculatingMatchForJob, setCalculatingMatchForJob] = useState<string | null>(null);
 
@@ -164,7 +164,7 @@ function DashboardContent() {
         if (data.success) {
           setUserData({
             hasResume: !!data.user.resumeUrl,
-            hasLinkedInProfile: !!data.user.linkedinData,
+            resumeHash: data.user.resumeHash || null,
           });
         }
       }
@@ -307,8 +307,8 @@ function DashboardContent() {
     e.stopPropagation();
     
     // Check prerequisites
-    if (!userData?.hasResume && !userData?.hasLinkedInProfile) {
-      alert("Please upload your Resume or LinkedIn profile to calculate match scores.");
+    if (!userData?.hasResume) {
+      alert("Please upload your resume in Account Settings to calculate match scores.");
       router.push("/account");
       return;
     }
@@ -559,26 +559,61 @@ function DashboardContent() {
                                       <span className="truncate">{job.company}</span>
                                     </div>
 
-                                    {job.matchScore ? (
-                                      <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">
-                                        {job.matchScore}% Match
-                                      </span>
-                                    ) : (
-                                      <button
-                                        onClick={(e) => handleCalculateMatch(job, e)}
-                                        disabled={!userData?.hasResume && !userData?.hasLinkedInProfile || calculatingMatchForJob === job.id || !useAI}
-                                        className="shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 hover:bg-indigo-900/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                                        title={
-                                          !userData?.hasResume && !userData?.hasLinkedInProfile
-                                            ? "Upload Resume or LinkedIn profile in Account Settings first"
-                                            : !useAI
-                                            ? "Enable 'Use AI' toggle to calculate match"
-                                            : "Click to calculate match score"
-                                        }
-                                      >
-                                        {calculatingMatchForJob === job.id ? "..." : "Calculate Match"}
-                                      </button>
-                                    )}
+                                    {(() => {
+                                      // Determine if match score is stale (resume content changed)
+                                      const isStaleMatch = 
+                                        job.matchScore && 
+                                        job.matchCalculatedWithResumeHash && 
+                                        userData?.resumeHash &&
+                                        job.matchCalculatedWithResumeHash !== userData.resumeHash;
+
+                                      // State 1: No match score yet
+                                      if (!job.matchScore) {
+                                        return (
+                                          <button
+                                            onClick={(e) => handleCalculateMatch(job, e)}
+                                            disabled={!userData?.hasResume || calculatingMatchForJob === job.id || !useAI}
+                                            className="shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 hover:bg-indigo-900/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                            title={
+                                              !userData?.hasResume
+                                                ? "Upload your resume in Account Settings to calculate matches"
+                                                : !useAI
+                                                ? "Enable 'Use AI' toggle to calculate match"
+                                                : "Click to calculate match score"
+                                            }
+                                          >
+                                            {calculatingMatchForJob === job.id ? "..." : "Calculate Match"}
+                                          </button>
+                                        );
+                                      }
+
+                                      // State 2: Valid match score (resume unchanged)
+                                      if (!isStaleMatch) {
+                                        return (
+                                          <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">
+                                            {job.matchScore}% Match
+                                          </span>
+                                        );
+                                      }
+
+                                      // State 3: Stale match score (resume changed)
+                                      return (
+                                        <button
+                                          onClick={(e) => handleCalculateMatch(job, e)}
+                                          disabled={!userData?.hasResume || calculatingMatchForJob === job.id || !useAI}
+                                          className="shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-400 border border-amber-800/50 hover:bg-amber-900/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                          title={
+                                            !userData?.hasResume
+                                              ? "Upload your resume in Account Settings"
+                                              : !useAI
+                                              ? "Enable 'Use AI' toggle to calculate match"
+                                              : "Your resume was updated. Click to recalculate match with your new resume."
+                                          }
+                                        >
+                                          {calculatingMatchForJob === job.id ? "..." : "Recalculate Match"}
+                                        </button>
+                                      );
+                                    })()}
                                   </div>
 
                                   {/* Job Title */}
@@ -715,7 +750,7 @@ function DashboardContent() {
         onClose={() => setIsDrawerOpen(false)}
         onJobUpdated={handleJobUpdated}
         onJobDeleted={handleJobDeleted}
-        userHasProfile={userData?.hasResume || userData?.hasLinkedInProfile || false}
+        userHasProfile={userData?.hasResume || false}
       />
 
       {/* Manual Add Job Modal */}

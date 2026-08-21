@@ -9,6 +9,7 @@ export interface Job {
   techStack: string[];
   matchScore?: number | null;
   matchReasoning?: string | null;
+  matchCalculatedWithResumeHash?: string | null;
   companyOverview?: string | null;
   roleSummary?: string | null;
   benefits?: string[];

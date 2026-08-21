@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { put, del } from "@vercel/blob";
+import { createHash } from "crypto";
+import { Prisma } from "@prisma/client";
 
 /**
  * POST /api/user/resume
@@ -68,20 +70,38 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Convert file to buffer for hash generation
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Generate SHA-256 hash from file content
+    const hash = createHash('sha256');
+    hash.update(buffer);
+    const resumeHash = hash.digest('hex');
+
     // Upload new resume to Vercel Blob
-    const blob = await put(`resumes/${user.id}-${Date.now()}.pdf`, file, {
+    const blob = await put(`resumes/${user.id}-${Date.now()}.pdf`, buffer, {
       access: "public",
+      contentType: "application/pdf",
     });
 
-    // Update user record with new resume URL
+    // Update user record with new resume URL, hash, and timestamps
+    // Clear cached parsed data to force re-parsing on next match calculation
     await prisma.user.update({
       where: { id: user.id },
-      data: { resumeUrl: blob.url },
+      data: { 
+        resumeUrl: blob.url,
+        resumeHash: resumeHash,
+        resumeUpdatedAt: new Date(),
+        parsedResume: Prisma.JsonNull,
+        resumeLastParsedAt: null,
+      },
     });
 
     return NextResponse.json({
       success: true,
       resumeUrl: blob.url,
+      resumeHash: resumeHash,
     });
   } catch (error) {
     console.error("Resume upload error:", error);
@@ -134,10 +154,16 @@ export async function DELETE(req: NextRequest) {
       console.error("Failed to delete resume from storage:", error);
     }
 
-    // Update user record
+    // Update user record - clear all resume-related fields
     await prisma.user.update({
       where: { id: user.id },
-      data: { resumeUrl: null },
+      data: { 
+        resumeUrl: null,
+        resumeHash: null,
+        resumeUpdatedAt: null,
+        parsedResume: Prisma.JsonNull,
+        resumeLastParsedAt: null,
+      },
     });
 
     return NextResponse.json({

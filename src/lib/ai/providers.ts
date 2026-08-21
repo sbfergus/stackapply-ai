@@ -1,9 +1,10 @@
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
-import { ParsedJobData } from './parser';
+import { ParsedJobData, ParsedResume } from './parser';
 
 export interface AIProvider {
   parseJobPosting(rawText: string, userProfileText?: string): Promise<ParsedJobData>;
+  parseResume(base64Pdf: string): Promise<ParsedResume>;
   testConnection(): Promise<boolean>;
 }
 
@@ -49,6 +50,86 @@ export class AnthropicProvider implements AIProvider {
     }
 
     return JSON.parse(contentBlock.text.trim()) as ParsedJobData;
+  }
+
+  async parseResume(base64Pdf: string): Promise<ParsedResume> {
+    const response = await this.client.messages.create({
+      model: this.model,
+      max_tokens: 4096,
+      temperature: 0,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'document',
+              source: {
+                type: 'base64',
+                media_type: 'application/pdf',
+                data: base64Pdf,
+              },
+            },
+            {
+              type: 'text',
+              text: `Extract structured profile data from this resume PDF.
+
+Return ONLY a valid JSON object with this exact structure (no markdown, no code blocks):
+
+{
+  "name": "Full Name",
+  "email": "email@example.com",
+  "phone": "+1234567890",
+  "location": "City, State/Country",
+  "summary": "Professional summary or objective statement",
+  "experience": [
+    {
+      "title": "Job Title",
+      "company": "Company Name",
+      "dates": "Start Date - End Date",
+      "description": "Role description and key achievements"
+    }
+  ],
+  "education": [
+    {
+      "school": "School Name",
+      "degree": "Degree Name and Field",
+      "dates": "Start Year - End Year"
+    }
+  ],
+  "skills": ["Skill 1", "Skill 2", "Skill 3"],
+  "certifications": [
+    {
+      "name": "Certification Name",
+      "issuer": "Issuing Organization",
+      "date": "Issue Date"
+    }
+  ]
+}
+
+Important:
+- Extract all information accurately from the PDF
+- If a section is missing, use an empty array [] or empty string ""
+- Ensure the JSON is valid and parseable
+- Do NOT include any markdown formatting or code blocks
+- Return ONLY the JSON object`,
+            },
+          ],
+        },
+      ],
+    });
+
+    const contentBlock = response.content[0];
+    if (contentBlock.type !== 'text') {
+      throw new Error('Unexpected response type from Claude API');
+    }
+
+    // Remove markdown code blocks if present
+    const cleanedResponse = contentBlock.text
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+
+    return JSON.parse(cleanedResponse) as ParsedResume;
   }
 }
 
@@ -98,6 +179,11 @@ export class OpenAIProvider implements AIProvider {
     }
 
     return JSON.parse(content) as ParsedJobData;
+  }
+
+  async parseResume(base64Pdf: string): Promise<ParsedResume> {
+    // OpenAI does not support PDF document parsing
+    throw new Error('OpenAI does not support PDF parsing. Please use Anthropic API key or provide resume data in a different format.');
   }
 }
 

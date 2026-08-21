@@ -22,7 +22,10 @@ export async function GET() {
         fullName: true,
         avatarUrl: true,
         resumeUrl: true,
-        linkedinData: true,
+        resumeHash: true,
+        resumeUpdatedAt: true,
+        parsedResume: true,
+        resumeLastParsedAt: true,
         createdAt: true,
       },
     });

@@ -2,7 +2,7 @@
 
 ## ⚠️ Note: LinkedIn Profile Scraping Removed
 
-**LinkedIn profile scraping has been removed** from this extension and replaced with a PDF upload approach on the web app. See [LINKEDIN_PDF_UPLOAD.md](../../LINKEDIN_PDF_UPLOAD.md) for details.
+**LinkedIn profile scraping has been removed** from this extension and replaced with a resume PDF upload approach on the web app.
 
 This architecture document now focuses on **job listing scrapers only**.
 
@@ -66,7 +66,7 @@ extension/
 | Greenhouse | 🟡 Generic | `scrapeGenericJob()` | `greenhouse.io` |
 | Other | 🟡 Generic | `scrapeGenericJob()` | Fallback |
 
-**Note:** LinkedIn Profile scraping was removed. Users now upload LinkedIn profile PDFs via the web app.
+**Note:** LinkedIn Profile scraping was removed. Users now upload their resume PDFs via the web app.
 
 ## Data Schema
 
@@ -86,8 +86,6 @@ extension/
   sources: string[]
 }
 ```
-
-**Note:** LinkedIn Profile data schema has been moved to the web application. See [LINKEDIN_PDF_UPLOAD.md](../../LINKEDIN_PDF_UPLOAD.md#data-schema) for the profile data structure.
 
 ## Adding a New Scraper
 

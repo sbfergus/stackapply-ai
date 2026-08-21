@@ -1,7 +1,31 @@
 import { createAIProvider } from './providers';
 import { decryptApiKey } from '../encryption';
 import { prisma } from '../prisma';
-import { buildComprehensiveProfile, formatProfileForAI } from './profile-builder';
+
+export interface ParsedResume {
+  name: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  summary: string;
+  experience: Array<{
+    title: string;
+    company: string;
+    dates: string;
+    description: string;
+  }>;
+  education: Array<{
+    school: string;
+    degree: string;
+    dates: string;
+  }>;
+  skills: string[];
+  certifications?: Array<{
+    name: string;
+    issuer: string;
+    date: string;
+  }>;
+}
 
 export interface ParsedJobData {
   title: string;
@@ -19,7 +43,133 @@ export interface ParsedJobData {
 }
 
 /**
- * Parse job posting with dynamic key resolution and comprehensive profile matching
+ * Parse resume PDF and extract structured data using AI
+ */
+export async function parseResumePDF(
+  resumeUrl: string,
+  userId: string
+): Promise<ParsedResume> {
+  // Get free tier configuration
+  const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL!;
+
+  // Fetch user's API key config
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      apiKeyProvider: true,
+      apiKeyEncrypted: true,
+    },
+  });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // Determine which AI provider to use
+  let provider: ReturnType<typeof createAIProvider>;
+
+  if (user.apiKeyProvider && user.apiKeyEncrypted) {
+    // User has custom key
+    const decryptedKey = decryptApiKey(user.apiKeyEncrypted);
+    
+    // For PDF parsing, we need Anthropic (Sonnet supports PDFs)
+    if (user.apiKeyProvider === 'ANTHROPIC') {
+      provider = createAIProvider('ANTHROPIC', decryptedKey, 'claude-3-5-sonnet-latest');
+    } else {
+      throw new Error('OpenAI does not support PDF parsing. Please use Anthropic API key or upload a different format.');
+    }
+  } else {
+    // Use system key with Sonnet (free tier uses Sonnet for PDF parsing - it's expensive but necessary)
+    const systemKey = process.env.ANTHROPIC_API_KEY;
+    if (!systemKey) {
+      throw new Error('System AI key not configured');
+    }
+    // Must use Sonnet for PDF support (Haiku doesn't support PDFs)
+    provider = createAIProvider('ANTHROPIC', systemKey, 'claude-3-5-sonnet-latest');
+  }
+
+  // Download PDF from blob storage
+  const response = await fetch(resumeUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch resume PDF: ${response.statusText}`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const base64 = buffer.toString('base64');
+
+  // Parse resume with AI
+  const parsedResume = await provider.parseResume(base64);
+
+  return parsedResume;
+}
+
+/**
+ * Format parsed resume as readable text for AI analysis
+ */
+export function formatResumeForAI(resume: ParsedResume): string {
+  const sections: string[] = [];
+
+  // Header
+  sections.push(`=== CANDIDATE PROFILE ===\n`);
+  sections.push(`Name: ${resume.name}`);
+  if (resume.email) sections.push(`Email: ${resume.email}`);
+  if (resume.phone) sections.push(`Phone: ${resume.phone}`);
+  if (resume.location) sections.push(`Location: ${resume.location}`);
+  sections.push('');
+
+  // Professional Summary
+  if (resume.summary) {
+    sections.push(`=== PROFESSIONAL SUMMARY ===`);
+    sections.push(resume.summary);
+    sections.push('');
+  }
+
+  // Experience
+  if (resume.experience.length > 0) {
+    sections.push(`=== WORK EXPERIENCE ===`);
+    resume.experience.forEach((exp, i) => {
+      sections.push(`\n${i + 1}. ${exp.title} at ${exp.company}`);
+      if (exp.dates) sections.push(`   ${exp.dates}`);
+      if (exp.description) sections.push(`   ${exp.description}`);
+    });
+    sections.push('');
+  }
+
+  // Education
+  if (resume.education.length > 0) {
+    sections.push(`=== EDUCATION ===`);
+    resume.education.forEach((edu, i) => {
+      sections.push(`${i + 1}. ${edu.school}`);
+      if (edu.degree) sections.push(`   ${edu.degree}`);
+      if (edu.dates) sections.push(`   ${edu.dates}`);
+    });
+    sections.push('');
+  }
+
+  // Skills
+  if (resume.skills.length > 0) {
+    sections.push(`=== SKILLS ===`);
+    sections.push(resume.skills.join(', '));
+    sections.push('');
+  }
+
+  // Certifications
+  if (resume.certifications && resume.certifications.length > 0) {
+    sections.push(`=== CERTIFICATIONS ===`);
+    resume.certifications.forEach((cert, i) => {
+      sections.push(`${i + 1}. ${cert.name}`);
+      if (cert.issuer) sections.push(`   Issuer: ${cert.issuer}`);
+      if (cert.date) sections.push(`   Date: ${cert.date}`);
+    });
+    sections.push('');
+  }
+
+  return sections.join('\n');
+}
+
+/**
+ * Parse job posting with dynamic key resolution and resume-based matching
  */
 export async function parseJobPosting(
   rawText: string,
@@ -29,18 +179,24 @@ export async function parseJobPosting(
   const FREE_TIER_LIMIT = parseInt(process.env.FREE_TIER_LIMIT || '5', 10);
   const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL!;
 
-  // 1. Fetch user's API key config
+  // 1. Fetch user's API key config and resume data
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
       apiKeyProvider: true,
       apiKeyEncrypted: true,
       aiAnalysisCount: true,
+      resumeUrl: true,
+      parsedResume: true,
     },
   });
 
   if (!user) {
     throw new Error('User not found');
+  }
+
+  if (!user.resumeUrl) {
+    throw new Error('No resume uploaded. Please upload your resume in Account Settings.');
   }
 
   let provider: ReturnType<typeof createAIProvider>;
@@ -72,11 +228,21 @@ export async function parseJobPosting(
     shouldIncrementCount = true;
   }
 
-  // 3. Build comprehensive user profile (combines resume + LinkedIn)
-  const userProfile = await buildComprehensiveProfile(userId);
-  const formattedProfile = formatProfileForAI(userProfile);
+  // 3. Get or use cached parsed resume
+  let parsedResume: ParsedResume;
+  
+  if (user.parsedResume) {
+    // Use cached parsed resume
+    parsedResume = user.parsedResume as unknown as ParsedResume;
+  } else {
+    // This shouldn't happen as parsing should occur in calculate-match endpoint
+    // But as a fallback, we'll parse here
+    parsedResume = await parseResumePDF(user.resumeUrl, userId);
+  }
 
-  // 4. Execute AI parsing with comprehensive profile
+  const formattedProfile = formatResumeForAI(parsedResume);
+
+  // 4. Execute AI parsing with resume profile
   const result = await provider.parseJobPosting(rawText, formattedProfile);
 
   // 5. Increment usage counter if system key was used

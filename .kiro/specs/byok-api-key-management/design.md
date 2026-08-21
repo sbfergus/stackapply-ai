@@ -66,32 +66,34 @@ When User Creates Job:
 
 ```prisma
 model User {
-  id                 String              @id @default(uuid())
-  email              String              @unique
-  fullName           String?
-  avatarUrl          String?
-  resumeUrl          String?
-  linkedinUrl        String?
-  linkedinData       Json?
-  baseResumeText     String?
-  baseCoverLetter    String?
-  writingStyle       Json?
-  preferredWorkTypes WorkType[]          @default([REMOTE, HYBRID])
-  preferredTechStack String[]
-  targetSalaryMin    Int?
-  preferredLocations String[]
+  id                    String              @id @default(uuid())
+  email                 String              @unique
+  fullName              String?
+  avatarUrl             String?
+  resumeUrl             String?
+  resumeHash            String?             // SHA-256 hash of resume PDF content
+  resumeUpdatedAt       DateTime?           // Timestamp of last resume upload
+  parsedResume          Json?               // AI-parsed resume data (cached)
+  resumeLastParsedAt    DateTime?           // Timestamp of last resume parse
+  baseResumeText        String?
+  baseCoverLetter       String?
+  writingStyle          Json?
+  preferredWorkTypes    WorkType[]          @default([REMOTE, HYBRID])
+  preferredTechStack    String[]
+  targetSalaryMin       Int?
+  preferredLocations    String[]
   
   // NEW: BYOK Fields
-  apiKeyProvider     ApiKeyProvider?     // Which provider (Anthropic/OpenAI)
-  apiKeyEncrypted    String?             // AES-256 encrypted key
-  aiAnalysisCount    Int                 @default(0) // Free tier usage
-  lastAiAnalysisReset DateTime?          // Future: monthly reset
+  apiKeyProvider        ApiKeyProvider?     // Which provider (Anthropic/OpenAI)
+  apiKeyEncrypted       String?             // AES-256 encrypted key
+  aiAnalysisCount       Int                 @default(0) // Free tier usage
+  lastAiAnalysisReset   DateTime?           // Future: monthly reset
   
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  password           String?
-  jobs               Job[]
-  extensionSessions  ExtensionSession[]
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  password              String?
+  jobs                  Job[]
+  extensionSessions     ExtensionSession[]
 }
 
 enum ApiKeyProvider {
