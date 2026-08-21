@@ -693,22 +693,6 @@ function DashboardContent() {
                                       <button
                                         onClick={(e) => {
                                           e.stopPropagation();
-                                          // TODO: Implement cover letter generation
-                                          console.log("Generate cover letter for:", job.id);
-                                        }}
-                                        disabled={!useAI}
-                                        className={`flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
-                                          useAI
-                                            ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 hover:bg-indigo-600/30"
-                                            : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
-                                        }`}
-                                      >
-                                        <FileText className="w-3 h-3 shrink-0" />
-                                        <span className="whitespace-nowrap">Generate Cover Letter</span>
-                                      </button>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
                                           // TODO: Implement resume generation
                                           console.log("Generate resume for:", job.id);
                                         }}
@@ -721,6 +705,22 @@ function DashboardContent() {
                                       >
                                         <FileUser className="w-3 h-3 shrink-0" />
                                         <span className="whitespace-nowrap">Generate Resume</span>
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          // TODO: Implement cover letter generation
+                                          console.log("Generate cover letter for:", job.id);
+                                        }}
+                                        disabled={!useAI}
+                                        className={`flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
+                                          useAI
+                                            ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 hover:bg-indigo-600/30"
+                                            : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
+                                        }`}
+                                      >
+                                        <FileText className="w-3 h-3 shrink-0" />
+                                        <span className="whitespace-nowrap">Generate Cover Letter</span>
                                       </button>
                                     </div>
                                   )}
