@@ -49,8 +49,8 @@ export async function parseResumePDF(
   resumeUrl: string,
   userId: string
 ): Promise<ParsedResume> {
-  // Get free tier configuration
-  const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL!;
+  // PDF parsing ALWAYS requires Sonnet (Haiku doesn't support PDFs)
+  const PDF_PARSING_MODEL = process.env.PDF_PARSING_MODEL || 'claude-3-5-sonnet-20241022';
 
   // Fetch user's API key config
   const user = await prisma.user.findUnique({
@@ -69,23 +69,21 @@ export async function parseResumePDF(
   let provider: ReturnType<typeof createAIProvider>;
 
   if (user.apiKeyProvider && user.apiKeyEncrypted) {
-    // User has custom key
+    // BYOK: User has custom key - use THEIR key with Sonnet for PDF parsing
     const decryptedKey = decryptApiKey(user.apiKeyEncrypted);
     
-    // For PDF parsing, we need Anthropic (Sonnet supports PDFs)
     if (user.apiKeyProvider === 'ANTHROPIC') {
-      provider = createAIProvider('ANTHROPIC', decryptedKey, 'claude-3-5-sonnet-latest');
+      provider = createAIProvider('ANTHROPIC', decryptedKey, PDF_PARSING_MODEL);
     } else {
       throw new Error('OpenAI does not support PDF parsing. Please use Anthropic API key or upload a different format.');
     }
   } else {
-    // Use system key with Sonnet (free tier uses Sonnet for PDF parsing - it's expensive but necessary)
+    // Non-BYOK: Use system key with Sonnet for PDF parsing
     const systemKey = process.env.ANTHROPIC_API_KEY;
     if (!systemKey) {
       throw new Error('System AI key not configured');
     }
-    // Must use Sonnet for PDF support (Haiku doesn't support PDFs)
-    provider = createAIProvider('ANTHROPIC', systemKey, 'claude-3-5-sonnet-latest');
+    provider = createAIProvider('ANTHROPIC', systemKey, PDF_PARSING_MODEL);
   }
 
   // Download PDF from blob storage
@@ -204,21 +202,18 @@ export async function parseJobPosting(
 
   // 2. Key Resolution Logic
   if (user.apiKeyProvider && user.apiKeyEncrypted) {
-    // User has custom key - use it (unlimited) with better model
+    // BYOK: User has custom key - use THEIR key with FREE_TIER_MODEL
     const decryptedKey = decryptApiKey(user.apiKeyEncrypted);
-    const model = user.apiKeyProvider === 'ANTHROPIC' 
-      ? 'claude-3-5-sonnet-latest'  // Better model for paying customers
-      : undefined;                   // OpenAI uses default gpt-4o-mini
-    provider = createAIProvider(user.apiKeyProvider, decryptedKey, model);
+    provider = createAIProvider(user.apiKeyProvider, decryptedKey, FREE_TIER_MODEL);
   } else {
-    // No custom key - check free tier limit
+    // Non-BYOK: Check free tier limit
     if (user.aiAnalysisCount >= FREE_TIER_LIMIT) {
       throw new Error(
         `FREE_TIER_LIMIT_EXCEEDED: You have used all ${FREE_TIER_LIMIT} free AI analyses. Please add your own API key in Account Settings to continue.`
       );
     }
 
-    // Use system key with configured model
+    // Use system key with FREE_TIER_MODEL
     const systemKey = process.env.ANTHROPIC_API_KEY;
     if (!systemKey) {
       throw new Error('System AI key not configured');
