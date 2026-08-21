@@ -49,7 +49,20 @@ export class AnthropicProvider implements AIProvider {
       throw new Error('Unexpected response type from Claude API');
     }
 
-    return JSON.parse(contentBlock.text.trim()) as ParsedJobData;
+    // Clean up the response - remove markdown code blocks and thinking text
+    const cleanedResponse = contentBlock.text
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+    
+    // Try to find JSON object in the response
+    const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error('No JSON found in response:', cleanedResponse);
+      throw new Error('Could not find valid JSON in AI response');
+    }
+
+    return JSON.parse(jsonMatch[0]) as ParsedJobData;
   }
 
   async parseResume(base64Pdf: string): Promise<ParsedResume> {
