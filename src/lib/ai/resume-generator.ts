@@ -159,10 +159,12 @@ Rewrite this resume to be optimally tailored for the target job. Follow these ST
 **PROFESSIONAL RESUME TAILORING METHODOLOGY:**
 
 1. RELEVANCE SCORING & PRIORITIZATION:
-   - Rank every bullet point from the original resume against the job description requirements
-   - Retain and EXPAND top-ranking bullets with more detail and impact
-   - Condense or DROP bottom-ranking bullets that don't align with the job
-   - Prioritize bullets containing hard metrics (%, $, numbers, time saved)
+   - Evaluate EACH position from the original resume against the job requirements
+   - INCLUDE only the 2-4 positions that are MOST RELEVANT to this specific job
+   - EXCLUDE positions that don't add value for this target role
+   - Within included positions, rank and prioritize bullets by relevance
+   - Expand top-ranking bullets with more detail and impact
+   - Each bullet must show how the experience maps to a specific job requirement
 
 2. TERMINOLOGY ALIGNMENT:
    - Use the EXACT terminology from the job posting
@@ -188,18 +190,19 @@ Rewrite this resume to be optimally tailored for the target job. Follow these ST
    - If major gaps exist, emphasize compensating strengths
 
 **ONE-PAGE CONSTRAINT:**
-This resume MUST fill the entire page while staying within one page. Balance is key:
+This resume MUST fit completely on one page with all sections visible. Critical requirements:
 1. Professional summary: 2-3 sentences, 50-60 words total, focused on job requirements
-2. INCLUDE ALL EXPERIENCE from the original resume - prioritize and expand relevant positions
-3. Most relevant position: 4-6 bullet points (each 1 line max)
-4. Second position: 3-4 bullet points
-5. Additional positions: 2-3 bullets each (condense less relevant ones)
-6. Each bullet should be close to one full line (12-18 words for good fill)
-7. Skills: Single line, comma-separated, include all relevant skills (12-15 skills)
-8. Education: Include ALL education entries from original resume
-9. Certifications: Include ALL certifications from original resume
-10. PRIORITY ORDER: Summary > Experience (all positions) > Education (all entries) > Skills > Certifications (all)
-11. The goal is to FILL THE PAGE by including all content, prioritizing and expanding the most relevant items
+2. SELECTIVE INCLUSION: Include only the 2-4 positions MOST RELEVANT to the target job
+3. Most relevant position: 4-5 bullet points tailored to job posting language
+4. Second relevant position: 3-4 bullet points tailored to job posting
+5. Third position (if highly relevant): 2-3 bullet points
+6. Each bullet must be ONE line maximum (12-18 words)
+7. Education: Include all education entries (keep concise)
+8. Skills: MUST appear on page - single line with all relevant skills
+9. Certifications: MUST appear on page - include all relevant certifications
+10. MANDATORY: All sections (Summary, Experience, Education, Skills, Certifications) must fit on one page
+11. If content doesn't fit: reduce number of experience positions or bullets per position
+12. Priority order: Summary > Relevant Experience (2-4 positions) > Education > Skills > Certifications
 
 **CRITICAL ANTI-AI-DETECTION CONSTRAINTS:**
 1. NO em dashes (—). Use hyphens (-) or commas instead.
@@ -213,19 +216,20 @@ This resume MUST fill the entire page while staying within one page. Balance is 
 
 **CONTENT RULES:**
 1. DO NOT fabricate, lie, or invent any information
-2. Include ALL experiences, education, skills, and certifications from the original resume
-3. PRIORITIZE by RELEVANCE - reorder to put most job-relevant content first and expand it
-4. Reword bullet points using the job posting's EXACT terminology and language
-5. If the user lacks a required skill, DO NOT add it - focus on highlighting related strengths
-6. Keep all dates, company names, job titles, and factual information exactly as provided
-7. Maintain the user's authentic writing voice while aligning with job language
-8. Professional summary: 2-3 sentences, 50-60 words, focused on matching job requirements
-9. EXPAND relevant positions with more detailed bullets; CONDENSE less relevant ones
-10. Eliminate weak passive verbs; use strong action verbs that show ownership and impact
-11. Each bullet point should be close to one full line (12-18 words for optimal page fill)
-12. Prioritize bullets with measurable results (%, $, numbers, time, scale)
-13. CERTIFICATIONS: Include ALL certifications - if dates exist in original, include them; if not, omit dates
-14. EDUCATION: Include ALL education entries from original resume
+2. SELECTIVELY include only the most job-relevant positions (2-4 positions maximum)
+3. RANK positions by relevance to job posting - include only those that strengthen the application
+4. Reword EVERY bullet point to use the job posting's EXACT terminology and requirements
+5. Each bullet must demonstrate how the experience matches a specific job requirement
+6. If the user lacks a required skill, DO NOT add it - emphasize transferable skills instead
+7. Keep all dates, company names, job titles, and factual information exactly as provided
+8. Professional summary: 2-3 sentences mirroring the job title and core requirements
+9. TAILOR everything - summary, bullets, skills - to match the job posting's language
+10. Use strong action verbs that align with job posting's tone
+11. Each bullet point must be ONE line (12-18 words maximum)
+12. Include measurable results where possible (%, $, numbers, time, scale)
+13. Education: Include all education entries
+14. Skills: Include all relevant skills that match job requirements
+15. Certifications: Include all relevant certifications (with dates only if present in original)
 
 **FORMAT:**
 Return the complete resume as plain text with clear sections. Use this EXACT structure:
@@ -247,13 +251,15 @@ PROFESSIONAL SUMMARY
 
 EXPERIENCE
 [Job Title] - [Company] [Dates]
-- [Bullet with measurable impact using job posting terminology, 12-18 words]
-- [Bullet with technical skills matching job requirements, 12-18 words]
-- [Bullet with quantifiable result (%, $, numbers), 12-18 words]
-- [Additional bullets ranked by relevance to job posting]
+- [Bullet tailored to job requirement #1 using exact job posting terminology, 12-18 words]
+- [Bullet tailored to job requirement #2 with measurable impact, 12-18 words]
+- [Bullet tailored to job requirement #3 showing relevant skills, 12-18 words]
+- [Additional bullets each mapping to specific job requirements]
 
-[Include ALL positions from original resume]
-[Most relevant positions get 4-6 bullets with detail, less relevant get 2-3 condensed bullets]
+[Include ONLY 2-4 MOST RELEVANT positions]
+[Evaluate each original position - only include if it strengthens application for THIS job]
+[Most relevant position: 4-5 bullets, Second: 3-4 bullets, Third (if needed): 2-3 bullets]
+[CRITICAL: Every bullet must be rewritten to match job posting's language and requirements]
 
 EDUCATION
 [Degree] - [School] [Dates]
@@ -317,25 +323,29 @@ Lead Developer - Startup Inc January 2021 - November 2022
 ✗ TOO SHORT: "Built checkout flow"
 
 **TAILORING CHECKLIST:**
-- Professional summary mentions the target job title and core requirements
-- Bullet points use terminology from the job posting (not generic synonyms)
-- Top-ranked relevant bullets are expanded with more detail
-- Less relevant bullets are condensed or removed
-- Strong action verbs replace weak passive language
-- Measurable results are prioritized and highlighted
-- Skills section mirrors job posting's required technologies
+- Professional summary mentions the target job title and mirrors core requirements
+- ONLY 2-4 most job-relevant positions are included (evaluate all, include best matches only)
+- Every bullet is rewritten using terminology from the job posting (not generic)
+- Each bullet demonstrates how experience matches a specific job requirement
+- Top-ranked relevant bullets are expanded with measurable impact
+- Irrelevant positions are excluded to save space for Skills and Certifications
+- Strong action verbs replace weak passive language throughout
+- Measurable results are highlighted where available (%, $, numbers, time)
+- Skills section includes all relevant technologies from job posting
+- All sections (Summary, Experience, Education, Skills, Certifications) fit on one page
 
 **CRITICAL:** 
-- Target filling 90-100% of the page with content
-- Use the job posting's EXACT language and terminology throughout
-- Include ALL positions, education, and certifications from original resume
-- PRIORITIZE by relevance - most relevant content gets expanded, less relevant gets condensed
+- ALL sections must fit on one page: Summary, Experience, Education, Skills, Certifications
+- Include only 2-4 MOST RELEVANT experience positions for the target job
+- Use the job posting's EXACT language and terminology in every bullet
+- Every bullet must be tailored to demonstrate a match with job requirements
 - Every bullet should start with a strong action verb
 - NO fabrication - only include genuine experiences from the original resume
 - ATS-FRIENDLY OUTPUT: Plain text only, no columns, no tables, no special symbols, single-column layout
+- If content exceeds one page: reduce number of positions or bullets (not skills/certifications)
+- Skills and Certifications sections are MANDATORY and must appear on the page
 - Certification dates: include ONLY if present in original resume data
-- DO NOT invent or add dates that don't exist in original resume
-- Fill the page by including all content with strategic prioritization
+- Each bullet must be ONE line maximum (12-18 words)
 
-**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and strategic. Mirror the job posting's language naturally. No buzzwords, no em dashes, no overused AI verbs. Output must be ATS-parseable plain text. Use ALL available content from the original resume to create a complete, impressive one-page resume that fills the entire page.`;
+**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and strategic. Mirror the job posting's language naturally in EVERY bullet. No buzzwords, no em dashes, no overused AI verbs. Output must be ATS-parseable plain text. Think like an expert resume builder: be selective about which positions to include, but tailor every single bullet to the specific job requirements. Quality over quantity.`;
 }
