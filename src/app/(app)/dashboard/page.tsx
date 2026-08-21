@@ -342,7 +342,11 @@ function DashboardContent() {
     }
 
     const confirmGenerate = confirm(
-      `Generate a tailored resume for ${job.company}?\n\nThis will use 1 AI analysis credit.`
+      `Generate a tailored resume for ${job.company}?${
+        apiKeyData?.hasKey 
+          ? '' 
+          : '\n\nThis will use 1 AI analysis credit.'
+      }`
     );
 
     if (!confirmGenerate) return;
@@ -766,6 +770,8 @@ function DashboardContent() {
                                             ? "Upload your resume in Account Settings to generate tailored resumes"
                                             : !useAI
                                             ? "Enable 'Use AI' toggle to generate resumes"
+                                            : apiKeyData?.hasKey
+                                            ? "Generate a tailored resume for this job using your API key"
                                             : "Generate a tailored resume for this job (costs 1 AI credit)"
                                         }
                                       >
