@@ -79,6 +79,8 @@ Benefits: ${Array.isArray(job.benefits) ? (job.benefits as string[]).join(', ') 
       jobDescription,
       techStack: job.techStack,
       parsedResume,
+      matchReasoning: job.matchReasoning,
+      matchScore: job.matchScore,
     });
 
     // Save to database

@@ -11,6 +11,8 @@ interface GenerateResumeParams {
   jobDescription: string;
   techStack: string[];
   parsedResume: ParsedResume;
+  matchReasoning?: string | null;
+  matchScore?: number | null;
 }
 
 /**
@@ -18,7 +20,7 @@ interface GenerateResumeParams {
  * Uses strict constraints to avoid AI detection patterns
  */
 export async function generateTailoredResume(params: GenerateResumeParams): Promise<string> {
-  const { userId, jobTitle, company, jobDescription, techStack, parsedResume } = params;
+  const { userId, jobTitle, company, jobDescription, techStack, parsedResume, matchReasoning, matchScore } = params;
 
   // Get free tier configuration
   const FREE_TIER_LIMIT = parseInt(process.env.FREE_TIER_LIMIT || '5', 10);
@@ -65,7 +67,7 @@ export async function generateTailoredResume(params: GenerateResumeParams): Prom
   }
 
   // Build the prompt with anti-AI-detection constraints
-  const prompt = buildResumePrompt(parsedResume, jobTitle, company, jobDescription, techStack);
+  const prompt = buildResumePrompt(parsedResume, jobTitle, company, jobDescription, techStack, matchReasoning, matchScore);
 
   // Generate tailored resume
   const tailoredResume = await provider.generateResume(prompt);
@@ -89,8 +91,27 @@ function buildResumePrompt(
   jobTitle: string,
   company: string,
   jobDescription: string,
-  techStack: string[]
+  techStack: string[],
+  matchReasoning?: string | null,
+  matchScore?: number | null
 ): string {
+  const matchAnalysisSection = matchReasoning ? `
+
+**MATCH ANALYSIS (Use this to guide your tailoring):**
+Match Score: ${matchScore}%
+Analysis: ${matchReasoning}
+
+CRITICAL: Use this analysis to:
+- Emphasize the skills and experiences that contributed to the high match score
+- Reorder bullet points to highlight relevant achievements FIRST
+- Use similar language and keywords from the job description
+- Focus on compensating strengths for any gaps identified
+- DO NOT add skills or experiences not in the original resume
+` : `
+
+**NOTE:** No match analysis available. Tailor the resume based on the job description and required tech stack.
+`;
+
   return `You are a professional resume writer helping a job seeker tailor their resume for a specific position.
 
 **ORIGINAL RESUME:**
@@ -130,6 +151,7 @@ Required Tech Stack: ${techStack.join(', ')}
 
 Job Description:
 ${jobDescription}
+${matchAnalysisSection}
 
 **YOUR TASK:**
 Rewrite this resume to be optimally tailored for the target job. Follow these STRICT RULES:
