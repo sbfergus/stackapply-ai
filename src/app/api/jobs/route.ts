@@ -54,11 +54,13 @@ export async function GET(req: NextRequest) {
     let userId: string;
 
     if (isGuest) {
-      // Guest mode - get the first/demo user
-      const demoUser = await prisma.user.findFirst();
+      // Guest mode - get the dedicated demo user
+      const demoUser = await prisma.user.findUnique({
+        where: { email: "demo@stackapply.ai" }
+      });
       if (!demoUser) {
         return NextResponse.json(
-          { error: "No demo user found" },
+          { error: "Demo user not found. Please run database seed." },
           { status: 404, headers: corsHeaders() }
         );
       }
