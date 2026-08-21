@@ -784,14 +784,10 @@ function DashboardContent() {
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           // TODO: Implement cover letter generation
-                                          console.log("Generate cover letter for:", job.id);
                                         }}
-                                        disabled={!useAI}
-                                        className={`flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
-                                          useAI
-                                            ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 hover:bg-indigo-600/30"
-                                            : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
-                                        }`}
+                                        disabled={true}
+                                        className="flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
+                                        title="Still in Development"
                                       >
                                         <FileText className="w-3 h-3 shrink-0" />
                                         <span className="whitespace-nowrap">Generate Cover Letter</span>
@@ -806,14 +802,10 @@ function DashboardContent() {
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           // TODO: Implement interview notes generation
-                                          console.log("Generate interview notes for:", job.id);
                                         }}
-                                        disabled={!useAI}
-                                        className={`w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
-                                          useAI
-                                            ? "bg-amber-600/20 text-amber-400 border border-amber-500/40 hover:bg-amber-600/30"
-                                            : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
-                                        }`}
+                                        disabled={true}
+                                        className="w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
+                                        title="Still in Development"
                                       >
                                         <Lightbulb className="w-3 h-3 shrink-0" />
                                         <span className="whitespace-nowrap">Generate Interview Notes</span>
