@@ -72,12 +72,7 @@ export async function parseResumePDF(
     // BYOK: User has custom key - use THEIR key for PDF parsing
     console.log('[parseResumePDF] Using BYOK - Provider:', user.apiKeyProvider, 'Model:', FREE_TIER_MODEL);
     const decryptedKey = decryptApiKey(user.apiKeyEncrypted);
-    
-    if (user.apiKeyProvider === 'ANTHROPIC') {
-      provider = createAIProvider('ANTHROPIC', decryptedKey, FREE_TIER_MODEL);
-    } else {
-      throw new Error('OpenAI does not support PDF parsing. Please use Anthropic API key or upload a different format.');
-    }
+    provider = createAIProvider(user.apiKeyProvider, decryptedKey, FREE_TIER_MODEL);
   } else {
     // Non-BYOK: Use system key for PDF parsing
     console.log('[parseResumePDF] Using system key - Model:', FREE_TIER_MODEL);

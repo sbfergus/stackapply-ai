@@ -195,8 +195,90 @@ export class OpenAIProvider implements AIProvider {
   }
 
   async parseResume(base64Pdf: string): Promise<ParsedResume> {
-    // OpenAI does not support PDF document parsing
-    throw new Error('OpenAI does not support PDF parsing. Please use Anthropic API key or provide resume data in a different format.');
+    // GPT-4o and later models support PDF parsing via the File API
+    // We'll use the vision/file input approach
+    const response = await this.client.chat.completions.create({
+      model: this.model,
+      max_tokens: 4096,
+      temperature: 0,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: `Extract structured profile data from this resume PDF.
+
+Return ONLY a valid JSON object with this exact structure (no markdown, no code blocks):
+
+{
+  "name": "Full Name",
+  "email": "email@example.com",
+  "phone": "+1234567890",
+  "location": "City, State/Country",
+  "summary": "Professional summary or objective statement",
+  "experience": [
+    {
+      "title": "Job Title",
+      "company": "Company Name",
+      "dates": "Start Date - End Date",
+      "description": "Role description and key achievements"
+    }
+  ],
+  "education": [
+    {
+      "school": "School Name",
+      "degree": "Degree Name and Field",
+      "dates": "Start Year - End Year"
+    }
+  ],
+  "skills": ["Skill 1", "Skill 2", "Skill 3"],
+  "certifications": [
+    {
+      "name": "Certification Name",
+      "issuer": "Issuing Organization",
+      "date": "Issue Date"
+    }
+  ]
+}
+
+Important:
+- Extract all information accurately from the PDF
+- If a section is missing, use an empty array [] or empty string ""
+- Ensure the JSON is valid and parseable
+- Do NOT include any markdown formatting or code blocks
+- Return ONLY the JSON object`,
+            },
+            {
+              type: 'image_url',
+              image_url: {
+                url: `data:application/pdf;base64,${base64Pdf}`,
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content) {
+      throw new Error('Empty response from OpenAI API');
+    }
+
+    // Remove markdown code blocks if present
+    const cleanedResponse = content
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+
+    // Try to find JSON object in the response
+    const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error('No JSON found in response:', cleanedResponse);
+      throw new Error('Could not find valid JSON in AI response');
+    }
+
+    return JSON.parse(jsonMatch[0]) as ParsedResume;
   }
 }
 
