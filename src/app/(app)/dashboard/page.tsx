@@ -107,6 +107,7 @@ function DashboardContent() {
   } | null>(null);
   const [calculatingMatchForJob, setCalculatingMatchForJob] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [generatingResumeForJob, setGeneratingResumeForJob] = useState<string | null>(null);
 
   // Auth check - redirect to sign in if not authenticated and not guest
   useEffect(() => {
@@ -322,6 +323,68 @@ function DashboardContent() {
       });
     } catch (err) {
       console.error('Error saving onboarding status:', err);
+    }
+  };
+
+  const handleGenerateResume = async (job: Job, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    // Check prerequisites
+    if (!userData?.hasResume) {
+      alert("Please upload your resume in Account Settings to generate tailored resumes.");
+      router.push("/account");
+      return;
+    }
+
+    if (!useAI) {
+      alert("Please enable the 'Use AI' toggle to generate resumes.");
+      return;
+    }
+
+    const confirmGenerate = confirm(
+      `Generate a tailored resume for ${job.company}?\n\nThis will use 1 AI analysis credit.`
+    );
+
+    if (!confirmGenerate) return;
+
+    setGeneratingResumeForJob(job.id);
+
+    try {
+      const res = await fetch(`/api/jobs/${job.id}/generate-resume`, {
+        method: 'POST',
+      });
+
+      if (res.ok) {
+        // Download the PDF
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        // Get filename from Content-Disposition header or generate one
+        const contentDisposition = res.headers.get('Content-Disposition');
+        const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+        const filename = filenameMatch ? filenameMatch[1] : `resume-${job.company}-${new Date().toISOString().split('T')[0]}.pdf`;
+        
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        // Refresh API key data to update credit counter
+        fetchApiKeyData();
+
+        alert(`Resume generated successfully!\n\nSaved as: ${filename}`);
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to generate resume");
+      }
+    } catch (err) {
+      console.error("Failed to generate resume:", err);
+      alert("An error occurred while generating the resume");
+    } finally {
+      setGeneratingResumeForJob(null);
     }
   };
 
@@ -691,20 +754,25 @@ function DashboardContent() {
                                   {job.status === "READY_TO_APPLY" && (
                                     <div className="mt-3 pt-3 border-t border-slate-800/60 flex flex-col gap-2">
                                       <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          // TODO: Implement resume generation
-                                          console.log("Generate resume for:", job.id);
-                                        }}
-                                        disabled={!useAI}
+                                        onClick={(e) => handleGenerateResume(job, e)}
+                                        disabled={!userData?.hasResume || generatingResumeForJob === job.id || !useAI}
                                         className={`flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
-                                          useAI
+                                          useAI && !generatingResumeForJob
                                             ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-600/30"
                                             : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
                                         }`}
+                                        title={
+                                          !userData?.hasResume
+                                            ? "Upload your resume in Account Settings to generate tailored resumes"
+                                            : !useAI
+                                            ? "Enable 'Use AI' toggle to generate resumes"
+                                            : "Generate a tailored resume for this job (costs 1 AI credit)"
+                                        }
                                       >
                                         <FileUser className="w-3 h-3 shrink-0" />
-                                        <span className="whitespace-nowrap">Generate Resume</span>
+                                        <span className="whitespace-nowrap">
+                                          {generatingResumeForJob === job.id ? "Generating..." : "Generate Resume"}
+                                        </span>
                                       </button>
                                       <button
                                         onClick={(e) => {

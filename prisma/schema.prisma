@@ -71,6 +71,7 @@ model Job {
   matchReasoning                 String?
   matchCalculatedWithResumeHash  String?
   tailoredResumeText             String?
+  tailoredResumeGeneratedAt      DateTime?
   coverLetterText                String?
   appliedAt                      DateTime?
   createdAt                      DateTime  @default(now())

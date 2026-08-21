@@ -6,6 +6,7 @@ export interface AIProvider {
   parseJobPosting(rawText: string, userProfileText?: string): Promise<ParsedJobData>;
   parseResume(base64Pdf: string): Promise<ParsedResume>;
   testConnection(): Promise<boolean>;
+  generateResume(prompt: string): Promise<string>;
 }
 
 /**
@@ -144,6 +145,22 @@ Important:
 
     return JSON.parse(cleanedResponse) as ParsedResume;
   }
+
+  async generateResume(prompt: string): Promise<string> {
+    const response = await this.client.messages.create({
+      model: this.model,
+      max_tokens: 4096,
+      temperature: 0.3, // Slight randomness for natural variation
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    const contentBlock = response.content[0];
+    if (contentBlock.type !== 'text') {
+      throw new Error('Unexpected response type from Claude API');
+    }
+
+    return contentBlock.text.trim();
+  }
 }
 
 /**
@@ -279,6 +296,25 @@ Important:
     }
 
     return JSON.parse(jsonMatch[0]) as ParsedResume;
+  }
+
+  async generateResume(prompt: string): Promise<string> {
+    const response = await this.client.chat.completions.create({
+      model: this.model,
+      max_tokens: 4096,
+      temperature: 0.3, // Slight randomness for natural variation
+      messages: [
+        { role: 'system', content: 'You are a professional resume writer. Write naturally and avoid AI detection patterns.' },
+        { role: 'user', content: prompt },
+      ],
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content) {
+      throw new Error('Empty response from OpenAI API');
+    }
+
+    return content.trim();
   }
 }
 
