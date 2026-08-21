@@ -158,13 +158,14 @@ Rewrite this resume to be optimally tailored for the target job. Follow these ST
 
 **ONE-PAGE CONSTRAINT:**
 This resume MUST fit on one page when printed. To ensure this:
-1. Keep professional summary to 2-3 concise sentences (under 60 words total)
-2. Limit to 3-4 most relevant bullet points per job position
-3. Prioritize recent and relevant experience (last 5-7 years for most impact)
-4. Each bullet point should be 1-2 lines maximum
-5. Omit or condense older/less relevant positions to 1-2 bullets
-6. Skills section should be concise - list only the most relevant skills
-7. Be ruthlessly selective - quality over quantity
+1. Professional summary: EXACTLY 2 sentences, maximum 50 words total
+2. Most recent/relevant position: 3-4 bullet points (each 1 line, max 15 words)
+3. Second position: 2-3 bullet points
+4. Older positions (3+ years ago): 1 bullet point or OMIT entirely if not relevant
+5. Each bullet must be ONE line when printed (15 words maximum)
+6. Skills: Single line, comma-separated, 8-12 most relevant only
+7. Certifications: Include ONLY if directly relevant to the job (2-3 max)
+8. Remove all filler words, redundant phrases, and unnecessary details
 
 **CRITICAL ANTI-AI-DETECTION CONSTRAINTS:**
 1. NO em dashes (—). Use hyphens (-) or commas instead.
@@ -179,41 +180,46 @@ This resume MUST fit on one page when printed. To ensure this:
 1. DO NOT fabricate, lie, or invent any information
 2. Only include experiences, skills, and achievements from the original resume
 3. Reorder and emphasize experiences that are most relevant to the target job
-4. Reword bullet points to highlight skills matching the job requirements
+4. Reword bullet points to highlight skills matching the job requirements - keep under 15 words each
 5. If the user lacks a required skill, DO NOT add it - omit or downplay unrelated skills instead
 6. Keep all dates, company names, job titles, and factual information exactly as provided
 7. Maintain the user's authentic writing voice and style
-8. Professional summary should be 2-3 sentences, natural and conversational (under 60 words)
-9. PRIORITIZE BREVITY - every word must earn its place on the page
+8. Professional summary: EXACTLY 2 sentences, maximum 50 words
+9. RUTHLESSLY PRIORITIZE BREVITY - cut any experience older than 5 years unless highly relevant
+10. Each bullet point must be ONE line maximum (approximately 15 words)
 
 **FORMAT:**
-Return the complete resume as plain text with clear sections. Use this structure:
+Return the complete resume as plain text with clear sections. Use this EXACT structure:
 
 [Name]
 [Email] | [Phone] | [Location]
 
 PROFESSIONAL SUMMARY
-[2-3 concise sentences in natural, human tone - under 60 words]
+[EXACTLY 2 sentences, maximum 50 words - natural human tone]
 
 EXPERIENCE
 [Job Title] - [Company]
 [Dates]
-- [Bullet point highlighting relevant achievement with quantifiable impact]
-- [Bullet point showing technical skills used]
-- [Additional 1-2 bullets only if highly relevant]
+- [ONE line bullet with quantifiable impact, max 15 words]
+- [ONE line bullet showing technical skills, max 15 words]
+- [ONE line bullet if needed, max 15 words]
 
-[Repeat for 2-3 most relevant positions - older positions get fewer bullets]
+[ONLY include 2-3 most recent/relevant positions - positions older than 5 years should be omitted unless critical]
 
 EDUCATION
 [Degree] - [School]
 [Dates]
 
 SKILLS
-[Comma-separated list of most relevant skills, prioritized for this job]
+[Single comma-separated line: 8-12 most relevant skills only]
 
-${resume.certifications && resume.certifications.length > 0 ? 'CERTIFICATIONS\n[List only the most relevant certifications]' : ''}
+${resume.certifications && resume.certifications.length > 0 ? 'CERTIFICATIONS\n[List ONLY 2-3 most relevant certifications - omit if not directly applicable to job]' : ''}
 
-**CRITICAL:** Every section must be concise enough to fit the entire resume on ONE PAGE. When in doubt, cut content rather than exceed the page limit.
+**EXAMPLE OF PROPER BULLET LENGTH:**
+✓ GOOD: "Built React components for checkout flow, increasing conversion by 12%"
+✗ TOO LONG: "Built React components for purchase flows, subscription management, and customer account features that directly impact conversion and retention across multiple user touchpoints"
 
-**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and natural. No buzzwords, no em dashes, no "AI voice." Keep it tight and impactful.`;
+**CRITICAL:** Target approximately 30-35 total lines of content. When in doubt, CUT rather than include. Every word must justify its presence.
+
+**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and CONCISE. No buzzwords, no em dashes, no "AI voice." Keep bullets to ONE line each.`;
 }
