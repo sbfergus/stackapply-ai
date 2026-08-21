@@ -24,6 +24,7 @@ export async function GET(req: Request) {
           resumeUpdatedAt: true,
           parsedResume: true,
           resumeLastParsedAt: true,
+          hasSeenOnboarding: true,
           createdAt: true,
         },
       });
@@ -57,6 +58,7 @@ export async function GET(req: Request) {
           resumeUpdatedAt: true,
           parsedResume: true,
           resumeLastParsedAt: true,
+          hasSeenOnboarding: true,
           createdAt: true,
         },
       });

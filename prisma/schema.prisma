@@ -26,6 +26,7 @@ model User {
   apiKeyProvider      ApiKeyProvider?
   apiKeyEncrypted     String?
   aiAnalysisCount     Int                 @default(0)
+  hasSeenOnboarding   Boolean             @default(false)
   lastAiAnalysisReset DateTime?
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt

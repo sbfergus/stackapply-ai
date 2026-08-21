@@ -30,6 +30,7 @@ import { JobDetailsDrawer } from "@/components/JobDetailsDrawer";
 import { AddJobModal } from "@/components/AddJobModal";
 import { ExtensionDownloadButton } from "@/components/ExtensionDownloadButton";
 import { HeaderActions } from "@/components/HeaderActions";
+import { OnboardingModal } from "@/components/OnboardingModal";
 import { Job } from "@/types/job";
 
 const STAGES = [
@@ -105,6 +106,7 @@ function DashboardContent() {
     resumeHash: string | null;
   } | null>(null);
   const [calculatingMatchForJob, setCalculatingMatchForJob] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Auth check - redirect to sign in if not authenticated and not guest
   useEffect(() => {
@@ -168,6 +170,11 @@ function DashboardContent() {
             hasResume: !!data.user.resumeUrl,
             resumeHash: data.user.resumeHash || null,
           });
+          
+          // Show onboarding if user hasn't seen it (and not in guest mode)
+          if (!isGuest && data.user.hasSeenOnboarding === false) {
+            setShowOnboarding(true);
+          }
         }
       }
     } catch (err) {
@@ -302,6 +309,19 @@ function DashboardContent() {
     } catch (err) {
       console.error("Failed to update job status:", err);
       fetchJobs();
+    }
+  };
+
+  const handleOnboardingComplete = async () => {
+    setShowOnboarding(false);
+    
+    // Mark onboarding as seen in database
+    try {
+      await fetch('/api/user/onboarding', {
+        method: 'POST',
+      });
+    } catch (err) {
+      console.error('Error saving onboarding status:', err);
     }
   };
 
@@ -764,6 +784,12 @@ function DashboardContent() {
         onClose={() => setIsAddModalOpen(false)}
         onJobAdded={handleJobAdded}
         isGuest={isGuest}
+      />
+
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onComplete={handleOnboardingComplete}
       />
     </div>
   );
