@@ -231,12 +231,13 @@ export async function parseJobPosting(
   // 3. Get or use cached parsed resume
   let parsedResume: ParsedResume;
   
-  if (user.parsedResume) {
+  if (user.parsedResume && typeof user.parsedResume === 'object' && user.parsedResume !== null) {
     // Use cached parsed resume
     parsedResume = user.parsedResume as unknown as ParsedResume;
   } else {
     // This shouldn't happen as parsing should occur in calculate-match endpoint
     // But as a fallback, we'll parse here
+    console.log('No cached parsedResume found, parsing now...');
     parsedResume = await parseResumePDF(user.resumeUrl, userId);
   }
 

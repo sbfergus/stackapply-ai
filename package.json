@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "npm run build:extension && next build",
     "build:extension": "node scripts/build-extension.js",
+    "vercel-build": "prisma migrate deploy && npm run build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",

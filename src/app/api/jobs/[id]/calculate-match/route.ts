@@ -51,6 +51,15 @@ export async function POST(
       );
     }
 
+    // Safety check: Ensure the schema has been migrated
+    if (!('resumeHash' in user)) {
+      console.error('Database schema mismatch: resumeHash field missing. Please run database migration.');
+      return NextResponse.json(
+        { success: false, error: "Database schema not up to date. Please contact support." },
+        { status: 500 }
+      );
+    }
+
     if (!user.resumeUrl) {
       return NextResponse.json(
         { success: false, error: "No resume uploaded. Please upload your resume in Account Settings." },
@@ -119,6 +128,7 @@ Benefits: ${Array.isArray(job.benefits) ? (job.benefits as string[]).join(', ') 
     });
   } catch (error: unknown) {
     console.error("Calculate match error:", error);
+    console.error("Error stack:", error instanceof Error ? error.stack : 'No stack trace');
     
     // Handle free tier limit error
     if (error instanceof Error && error.message.includes('FREE_TIER_LIMIT_EXCEEDED')) {
