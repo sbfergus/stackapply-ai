@@ -189,17 +189,17 @@ Rewrite this resume to be optimally tailored for the target job. Follow these ST
 
 **ONE-PAGE CONSTRAINT:**
 This resume MUST fill the entire page while staying within one page. Balance is key:
-1. Professional summary: EXACTLY 2-3 sentences, 50-60 words total, focused on job requirements
-2. PRIORITIZE RECENT & RELEVANT: Include only the 2-3 MOST RECENT and RELEVANT positions
-3. Most recent/relevant position: 4-5 bullet points (each 1 line max)
+1. Professional summary: 2-3 sentences, 50-60 words total, focused on job requirements
+2. INCLUDE ALL EXPERIENCE from the original resume - prioritize and expand relevant positions
+3. Most relevant position: 4-6 bullet points (each 1 line max)
 4. Second position: 3-4 bullet points
-5. Third position (if space and highly relevant): 2-3 bullet points
-6. DO NOT include positions older than 3-4 years unless critically relevant to the job
-7. Each bullet should be close to one full line (12-18 words for good fill)
-8. Skills: Single line, comma-separated, include all relevant skills (12-15 skills)
-9. Certifications: Include only RECENT and RELEVANT certifications (prioritize last 2-3 years)
-10. PRIORITY ORDER: Summary > Recent Relevant Experience > Education > Recent Certifications > Skills
-11. The goal is to present the MOST IMPRESSIVE and RELEVANT content only
+5. Additional positions: 2-3 bullets each (condense less relevant ones)
+6. Each bullet should be close to one full line (12-18 words for good fill)
+7. Skills: Single line, comma-separated, include all relevant skills (12-15 skills)
+8. Education: Include ALL education entries from original resume
+9. Certifications: Include ALL certifications from original resume
+10. PRIORITY ORDER: Summary > Experience (all positions) > Education (all entries) > Skills > Certifications (all)
+11. The goal is to FILL THE PAGE by including all content, prioritizing and expanding the most relevant items
 
 **CRITICAL ANTI-AI-DETECTION CONSTRAINTS:**
 1. NO em dashes (—). Use hyphens (-) or commas instead.
@@ -213,19 +213,19 @@ This resume MUST fill the entire page while staying within one page. Balance is 
 
 **CONTENT RULES:**
 1. DO NOT fabricate, lie, or invent any information
-2. Only include experiences, skills, and achievements from the original resume
-3. RANK and PRIORITIZE by RECENCY and RELEVANCE - most recent and relevant first
+2. Include ALL experiences, education, skills, and certifications from the original resume
+3. PRIORITIZE by RELEVANCE - reorder to put most job-relevant content first and expand it
 4. Reword bullet points using the job posting's EXACT terminology and language
 5. If the user lacks a required skill, DO NOT add it - focus on highlighting related strengths
 6. Keep all dates, company names, job titles, and factual information exactly as provided
 7. Maintain the user's authentic writing voice while aligning with job language
 8. Professional summary: 2-3 sentences, 50-60 words, focused on matching job requirements
-9. CURATE SELECTIVELY - include 2-3 most recent/relevant positions only
+9. EXPAND relevant positions with more detailed bullets; CONDENSE less relevant ones
 10. Eliminate weak passive verbs; use strong action verbs that show ownership and impact
 11. Each bullet point should be close to one full line (12-18 words for optimal page fill)
 12. Prioritize bullets with measurable results (%, $, numbers, time, scale)
-13. CERTIFICATIONS: Include only recent (last 2-3 years) and relevant certifications with dates
-14. DO NOT include outdated or irrelevant certifications - quality over quantity
+13. CERTIFICATIONS: Include ALL certifications - if dates exist in original, include them; if not, omit dates
+14. EDUCATION: Include ALL education entries from original resume
 
 **FORMAT:**
 Return the complete resume as plain text with clear sections. Use this EXACT structure:
@@ -252,44 +252,47 @@ EXPERIENCE
 - [Bullet with quantifiable result (%, $, numbers), 12-18 words]
 - [Additional bullets ranked by relevance to job posting]
 
-[Include ONLY 2-3 most recent and relevant positions - prioritize quality over quantity]
-[Omit positions older than 3-4 years unless critically relevant to the target role]
+[Include ALL positions from original resume]
+[Most relevant positions get 4-6 bullets with detail, less relevant get 2-3 condensed bullets]
 
 EDUCATION
 [Degree] - [School] [Dates]
 
-[If applicable: Second degree or bootcamp/certificate program]
-[Program] - [Institution] [Dates]
+[Include ALL education entries from original resume]
+[List all degrees, bootcamps, certifications programs, etc.]
 
 SKILLS
 [Single comma-separated line with 12-15 relevant skills, prioritizing exact terminology from job posting]
 
 ${resume.certifications && resume.certifications.length > 0 ? `CERTIFICATIONS
-[Certification Name] - [Issuing Organization] [Date]
+[Certification Name] - [Issuing Organization] [Date if available]
 
 MANDATORY INSTRUCTIONS FOR CERTIFICATIONS:
-1. The original resume certifications are listed as: "[Name] - [Issuer] ([Date])"
-2. You MUST extract the date from parentheses and place it at the END of the line
-3. Remove the parentheses around the date
-4. Only include RECENT (last 2-3 years) and JOB-RELEVANT certifications
-5. Format: [Name] - [Issuer] [Date]
+1. Include ALL certifications from the original resume
+2. If the original certification has a date in parentheses: extract and place at END of line without parentheses
+3. If the original certification has NO date: omit the date (do not invent one)
+4. Format WITH date: [Name] - [Issuer] [Date]
+5. Format WITHOUT date: [Name] - [Issuer]
 
-EXAMPLE:
-Original resume has: "React: Testing and Debugging - LinkedIn Learning (March 2024)"
-Your output MUST be: "React: Testing and Debugging - LinkedIn Learning March 2024"` : ''}
+EXAMPLES:
+- If original has date: "React: Testing and Debugging - LinkedIn Learning (March 2024)" → "React: Testing and Debugging - LinkedIn Learning March 2024"
+- If original has NO date: "JavaScript: Under the Hood" → "JavaScript: Under the Hood - LinkedIn Learning"` : ''}
 
 **CERTIFICATION FORMAT EXAMPLE:**
 React: Testing and Debugging - LinkedIn Learning March 2024
 AWS Certified Solutions Architect - Amazon Web Services June 2023
-Google Ads Search Certification - Google January 2025
+Google Analytics Individual Qualification - Google
+CSS Layouts: From Float to Flexbox and Grid - Udemy
+
+(Note: Some certifications have dates, some don't - include dates only when present in original resume)
 
 **CRITICAL CERTIFICATION FORMATTING RULE:**
-The original resume lists certifications as: "[Name] - [Issuer] ([Date])"
-You MUST reformat to: "[Name] - [Issuer] [Date]"
-Move the date from parentheses to the END of the line (remove parentheses).
-Example transformation:
-- Original: "React: Testing and Debugging - LinkedIn Learning (March 2024)"
-- Output: "React: Testing and Debugging - LinkedIn Learning March 2024"
+- If original certification includes date in parentheses: Move date to end, remove parentheses
+- If original certification has NO date: List without date
+- DO NOT invent dates that don't exist
+Example transformations:
+- With date: "React: Testing and Debugging - LinkedIn Learning (March 2024)" → "React: Testing and Debugging - LinkedIn Learning March 2024"
+- Without date: "CSS Layouts - Udemy" → "CSS Layouts: From Float to Flexbox and Grid - Udemy"
 
 **EDUCATION FORMAT EXAMPLE:**
 Bachelor's Degree, Computer Science - State University of New York at Buffalo 2018 - 2022
@@ -323,16 +326,16 @@ Lead Developer - Startup Inc January 2021 - November 2022
 - Skills section mirrors job posting's required technologies
 
 **CRITICAL:** 
-- Target filling 85-95% of the page with content
+- Target filling 90-100% of the page with content
 - Use the job posting's EXACT language and terminology throughout
-- Rank by RECENCY and RELEVANCE - only include 2-3 most recent/relevant positions
+- Include ALL positions, education, and certifications from original resume
+- PRIORITIZE by relevance - most relevant content gets expanded, less relevant gets condensed
 - Every bullet should start with a strong action verb
 - NO fabrication - only include genuine experiences from the original resume
 - ATS-FRIENDLY OUTPUT: Plain text only, no columns, no tables, no special symbols, single-column layout
-- Include recent relevant certifications WITH DATES at the end of each line
-- Certification dates: extract from parentheses in original resume, place at END of line without parentheses
-- DO NOT include old certifications (3+ years) unless highly relevant to the job
-- DO NOT include old job positions (3+ years) unless highly relevant to the job
+- Certification dates: include ONLY if present in original resume data
+- DO NOT invent or add dates that don't exist in original resume
+- Fill the page by including all content with strategic prioritization
 
-**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and strategic. Mirror the job posting's language naturally. No buzzwords, no em dashes, no overused AI verbs. Output must be ATS-parseable plain text. Show only the most impressive, recent, and relevant content - think like an expert resume builder who prioritizes quality over quantity.`;
+**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and strategic. Mirror the job posting's language naturally. No buzzwords, no em dashes, no overused AI verbs. Output must be ATS-parseable plain text. Use ALL available content from the original resume to create a complete, impressive one-page resume that fills the entire page.`;
 }
