@@ -786,8 +786,12 @@ function DashboardContent() {
                                           // TODO: Implement cover letter generation
                                         }}
                                         disabled={true}
-                                        className="flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
-                                        title="Still in Development"
+                                        className={`flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
+                                          useAI
+                                            ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 cursor-not-allowed"
+                                            : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
+                                        }`}
+                                        title={useAI ? "Still in Development" : "Enable 'Use AI' toggle to generate cover letters"}
                                       >
                                         <FileText className="w-3 h-3 shrink-0" />
                                         <span className="whitespace-nowrap">Generate Cover Letter</span>
@@ -804,8 +808,12 @@ function DashboardContent() {
                                           // TODO: Implement interview notes generation
                                         }}
                                         disabled={true}
-                                        className="w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
-                                        title="Still in Development"
+                                        className={`w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium rounded-md transition ${
+                                          useAI
+                                            ? "bg-amber-600/20 text-amber-400 border border-amber-500/40 cursor-not-allowed"
+                                            : "bg-slate-800/40 text-slate-500 border border-slate-700/40 cursor-not-allowed opacity-50"
+                                        }`}
+                                        title={useAI ? "Still in Development" : "Enable 'Use AI' toggle to generate interview notes"}
                                       >
                                         <Lightbulb className="w-3 h-3 shrink-0" />
                                         <span className="whitespace-nowrap">Generate Interview Notes</span>
