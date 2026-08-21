@@ -49,8 +49,8 @@ export async function parseResumePDF(
   resumeUrl: string,
   userId: string
 ): Promise<ParsedResume> {
-  // PDF parsing ALWAYS requires Sonnet (Haiku doesn't support PDFs)
-  const PDF_PARSING_MODEL = process.env.PDF_PARSING_MODEL || 'claude-3-5-sonnet-20241022';
+  // Use the same model as job matching (Haiku supports PDFs)
+  const FREE_TIER_MODEL = process.env.FREE_TIER_MODEL!;
 
   // Fetch user's API key config
   const user = await prisma.user.findUnique({
@@ -69,21 +69,21 @@ export async function parseResumePDF(
   let provider: ReturnType<typeof createAIProvider>;
 
   if (user.apiKeyProvider && user.apiKeyEncrypted) {
-    // BYOK: User has custom key - use THEIR key with Sonnet for PDF parsing
+    // BYOK: User has custom key - use THEIR key for PDF parsing
     const decryptedKey = decryptApiKey(user.apiKeyEncrypted);
     
     if (user.apiKeyProvider === 'ANTHROPIC') {
-      provider = createAIProvider('ANTHROPIC', decryptedKey, PDF_PARSING_MODEL);
+      provider = createAIProvider('ANTHROPIC', decryptedKey, FREE_TIER_MODEL);
     } else {
       throw new Error('OpenAI does not support PDF parsing. Please use Anthropic API key or upload a different format.');
     }
   } else {
-    // Non-BYOK: Use system key with Sonnet for PDF parsing
+    // Non-BYOK: Use system key for PDF parsing
     const systemKey = process.env.ANTHROPIC_API_KEY;
     if (!systemKey) {
       throw new Error('System AI key not configured');
     }
-    provider = createAIProvider('ANTHROPIC', systemKey, PDF_PARSING_MODEL);
+    provider = createAIProvider('ANTHROPIC', systemKey, FREE_TIER_MODEL);
   }
 
   // Download PDF from blob storage
