@@ -130,6 +130,12 @@ Benefits: ${Array.isArray(job.benefits) ? (job.benefits as string[]).join(', ') 
     console.error("Calculate match error:", error);
     console.error("Error stack:", error instanceof Error ? error.stack : 'No stack trace');
     
+    // Log additional context for debugging
+    if (error instanceof Error) {
+      console.error("Error name:", error.name);
+      console.error("Error message:", error.message);
+    }
+    
     // Handle free tier limit error
     if (error instanceof Error && error.message.includes('FREE_TIER_LIMIT_EXCEEDED')) {
       return NextResponse.json(

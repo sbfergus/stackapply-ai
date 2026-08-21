@@ -70,6 +70,7 @@ export async function parseResumePDF(
 
   if (user.apiKeyProvider && user.apiKeyEncrypted) {
     // BYOK: User has custom key - use THEIR key for PDF parsing
+    console.log('[parseResumePDF] Using BYOK - Provider:', user.apiKeyProvider, 'Model:', FREE_TIER_MODEL);
     const decryptedKey = decryptApiKey(user.apiKeyEncrypted);
     
     if (user.apiKeyProvider === 'ANTHROPIC') {
@@ -79,6 +80,7 @@ export async function parseResumePDF(
     }
   } else {
     // Non-BYOK: Use system key for PDF parsing
+    console.log('[parseResumePDF] Using system key - Model:', FREE_TIER_MODEL);
     const systemKey = process.env.ANTHROPIC_API_KEY;
     if (!systemKey) {
       throw new Error('System AI key not configured');
@@ -203,10 +205,25 @@ export async function parseJobPosting(
   // 2. Key Resolution Logic
   if (user.apiKeyProvider && user.apiKeyEncrypted) {
     // BYOK: User has custom key - use THEIR key with FREE_TIER_MODEL
-    const decryptedKey = decryptApiKey(user.apiKeyEncrypted);
-    provider = createAIProvider(user.apiKeyProvider, decryptedKey, FREE_TIER_MODEL);
+    console.log('[parseJobPosting] Using BYOK - Provider:', user.apiKeyProvider, 'Model:', FREE_TIER_MODEL);
+    try {
+      const decryptedKey = decryptApiKey(user.apiKeyEncrypted);
+      provider = createAIProvider(user.apiKeyProvider, decryptedKey, FREE_TIER_MODEL);
+      
+      // Test the connection before proceeding
+      const isValid = await provider.testConnection();
+      if (!isValid) {
+        console.error('[parseJobPosting] BYOK API key test failed, user may need to update their key');
+        throw new Error('Your API key appears to be invalid or does not have access to the required model. Please update your API key in Account Settings.');
+      }
+    } catch (error) {
+      // If BYOK fails, log it and rethrow with helpful message
+      console.error('[parseJobPosting] BYOK failed:', error);
+      throw error;
+    }
   } else {
     // Non-BYOK: Check free tier limit
+    console.log('[parseJobPosting] Using system key - Count:', user.aiAnalysisCount, 'Limit:', FREE_TIER_LIMIT, 'Model:', FREE_TIER_MODEL);
     if (user.aiAnalysisCount >= FREE_TIER_LIMIT) {
       throw new Error(
         `FREE_TIER_LIMIT_EXCEEDED: You have used all ${FREE_TIER_LIMIT} free AI analyses. Please add your own API key in Account Settings to continue.`
