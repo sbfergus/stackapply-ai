@@ -262,11 +262,13 @@ SKILLS
 
 ${resume.certifications && resume.certifications.length > 0 ? `CERTIFICATIONS
 [Certification Name] - [Issuing Organization] [Date]
-[Include all relevant certifications with complete information: name, issuer, date right-aligned]` : ''}
+[Include ALL certifications from original resume with dates right-aligned]
+[CRITICAL: Extract the date from each certification in the original resume and place it at the END of the line]` : ''}
 
 **CERTIFICATION FORMAT EXAMPLE:**
 AWS Certified Solutions Architect - Amazon Web Services June 2023
-React Testing and Debugging - LinkedIn Learning March 2024
+React: Testing and Debugging - LinkedIn Learning March 2024
+Google Ads Search Certification - Google January 2025
 
 **EDUCATION FORMAT EXAMPLE:**
 Bachelor's Degree, Computer Science - State University of New York at Buffalo 2018 - 2022
@@ -277,6 +279,7 @@ Senior Software Engineer - Tech Company November 2022 - Present
 Lead Developer - Startup Inc January 2021 - November 2022
 
 [NOTE: Dates appear at the END of the line for right-alignment in PDF for Experience, Education, and Certifications]
+[IMPORTANT: ALL certifications MUST include dates - if original resume lacks certification dates, use the date from the original resume or mark as "Completed" with no specific date]
 
 **ACTION VERB EXAMPLES:**
 ✓ STRONG: Built, Led, Engineered, Designed, Delivered, Drove, Increased, Reduced, Launched, Shipped, Created, Developed
@@ -307,6 +310,8 @@ Lead Developer - Startup Inc January 2021 - November 2022
 - ATS-FRIENDLY OUTPUT: Plain text only, no columns, no tables, no special symbols, single-column layout
 - ALWAYS include certifications section if certifications exist - adjust experience bullets to make room
 - Education dates should appear at the END of each education line for right-alignment
+- EVERY certification MUST include a date at the end of the line for right-alignment
+- Certification format: [Name] - [Issuer] [Date] (use dates from original resume certifications)
 
-**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and strategic. Mirror the job posting's language naturally. No buzzwords, no em dashes, no overused AI verbs. Output must be ATS-parseable plain text. Prioritize showing certifications over including 4+ work positions.`;
+**REMEMBER:** Write like a human, not an AI. Be direct, authentic, and strategic. Mirror the job posting's language naturally. No buzzwords, no em dashes, no overused AI verbs. Output must be ATS-parseable plain text. Prioritize showing certifications with dates over including 4+ work positions.`;
 }

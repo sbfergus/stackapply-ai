@@ -102,21 +102,43 @@ export function generateResumePDF(resumeText: string, company: string): Buffer {
     }
     // Job titles / Company names / Certifications (lines with dates or dashes)
     else if (line.match(/\d{4}/) || (line.includes(' - ') && !line.startsWith('-'))) {
+      // Detect if this is a certification (under CERTIFICATIONS section)
+      let isCertification = false;
+      for (let j = i - 1; j >= 0; j--) {
+        const prevLine = lines[j].trim();
+        if (prevLine === 'CERTIFICATIONS') {
+          isCertification = true;
+          break;
+        }
+        if (prevLine === prevLine.toUpperCase() && prevLine.length > 2 && prevLine.length < 50) {
+          // Hit another section header before CERTIFICATIONS
+          break;
+        }
+      }
+      
       // Check if this line has dates at the end that should be right-aligned
       // Matches patterns like:
       // - "Title - Company November 2022 - Present"
       // - "Degree - School 2018 - 2022"
       // - "Certification - Org June 2023"
-      const withDateRange = line.match(/^(.+?)\s+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\s*-\s*(?:Present|(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})|\d{4}\s*-\s*\d{4}|\d{4})$/);
+      const withDateRange = line.match(/^(.+?)\s+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\s*-\s*(?:Present|(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})|\d{4}\s*-\s*\d{4}|(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}|\d{4})$/);
       
       if (withDateRange) {
         // Entry with dates: left-align title, right-align dates
         const [, title, dates] = withDateRange;
         doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
+        
+        if (isCertification) {
+          // Certifications: normal weight (not bold)
+          doc.setFont('helvetica', 'normal');
+        } else {
+          // Experience/Education: bold
+          doc.setFont('helvetica', 'bold');
+        }
+        
         doc.text(title.trim(), marginLeft, yPosition);
         
-        // Right-align the dates
+        // Right-align the dates (always normal weight)
         doc.setFont('helvetica', 'normal');
         const datesWidth = doc.getTextWidth(dates);
         doc.text(dates, pageWidth - marginRight - datesWidth, yPosition);
@@ -124,7 +146,13 @@ export function generateResumePDF(resumeText: string, company: string): Buffer {
       } else {
         // Regular line with dates or dashes (fallback)
         doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
+        
+        if (isCertification) {
+          doc.setFont('helvetica', 'normal');
+        } else {
+          doc.setFont('helvetica', 'bold');
+        }
+        
         doc.text(line, marginLeft, yPosition);
         yPosition += 5;
       }
