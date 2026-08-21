@@ -122,7 +122,27 @@ export async function POST(req: NextRequest) {
       }
     }
     
-    // 3. No authentication - return 401
+    // 3. Check for guest mode
+    if (!userId) {
+      const { searchParams } = new URL(req.url);
+      const isGuest = searchParams.get("guest") === "true";
+      
+      if (isGuest) {
+        // Guest mode - use demo user
+        const demoUser = await prisma.user.findUnique({
+          where: { email: "demo@stackapply.ai" }
+        });
+        if (!demoUser) {
+          return NextResponse.json(
+            { error: "Demo user not found. Please run database seed." },
+            { status: 404, headers: corsHeaders() }
+          );
+        }
+        userId = demoUser.id;
+      }
+    }
+    
+    // 4. No authentication - return 401
     if (!userId) {
       return NextResponse.json(
         { error: "Unauthorized. Please sign in." },

@@ -8,9 +8,10 @@ interface AddJobModalProps {
   isOpen: boolean;
   onClose: () => void;
   onJobAdded: (newJob: Job) => void;
+  isGuest?: boolean;
 }
 
-export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
+export function AddJobModal({ isOpen, onClose, onJobAdded, isGuest = false }: AddJobModalProps) {
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
   const [location, setLocation] = useState("Remote");
@@ -77,7 +78,8 @@ export function AddJobModal({ isOpen, onClose, onJobAdded }: AddJobModalProps) {
     };
 
     try {
-      const res = await fetch("/api/jobs", {
+      const url = isGuest ? "/api/jobs?guest=true" : "/api/jobs";
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

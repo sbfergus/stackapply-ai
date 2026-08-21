@@ -761,6 +761,7 @@ function DashboardContent() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onJobAdded={handleJobAdded}
+        isGuest={isGuest}
       />
     </div>
   );
